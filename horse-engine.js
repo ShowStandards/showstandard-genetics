@@ -316,6 +316,7 @@ function getHorsePhenotype(parsed) {
   colour =
     applyHorseRoan(colour, parsed);
 
+  colour =
     applyHorsePatterns(colour, parsed);
 
   colour =
@@ -323,7 +324,7 @@ function getHorsePhenotype(parsed) {
 
   return colour.trim();
 
-
+}
 function getHorseVisibleColourWithoutGrey(parsed) {
 
   let colour =
