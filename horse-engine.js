@@ -316,15 +316,12 @@ function getHorsePhenotype(parsed) {
   colour =
     applyHorseRoan(colour, parsed);
 
-  colour =
     applyHorsePatterns(colour, parsed);
 
   colour =
     applyHorseAppaloosa(colour, parsed);
 
   return colour.trim();
-
-}
 
 
 function getHorseVisibleColourWithoutGrey(parsed) {
