@@ -516,10 +516,19 @@ function applyHorsePatterns(colour, parsed) {
     hasDominantGene(parsed.Frame, "OLW");
 
   if (hasTobiano && hasFrame) {
+
     patterns.push("Tovero");
+
   } else {
-    if (hasTobiano) patterns.push("Tobiano");
-    if (hasFrame) patterns.push("Frame Overo");
+
+    if (hasTobiano) {
+      patterns.push("Tobiano");
+    }
+
+    if (hasFrame) {
+      patterns.push("Frame Overo");
+    }
+
   }
 
   if (hasDominantGene(parsed.Splash, "Spl")) {
@@ -535,6 +544,10 @@ function applyHorsePatterns(colour, parsed) {
   }
 
   return colour;
+
+}
+
+
 function applyHorseAppaloosa(colour, parsed) {
 
   const lp = parsed.Appaloosa;
@@ -576,7 +589,6 @@ function applyHorseAppaloosa(colour, parsed) {
   return colour + " Varnish Roan";
 
 }
-
 
 /* =========================
    OUTPUT HELPERS
