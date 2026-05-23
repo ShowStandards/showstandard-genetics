@@ -279,46 +279,25 @@ function applyHorseCream(baseColour, parsed) {
 
   const cream = parsed.Cream;
 
-  // Single cream
-
   if (cream === "Cr/n") {
 
-    if (baseColour === "Chestnut") {
-      return "Palomino";
-    }
-
-    if (baseColour === "Bay") {
-      return "Buckskin";
-    }
-
-    if (baseColour === "Black") {
-      return "Smokey Black";
-    }
+    if (baseColour === "Chestnut") return "Palomino";
+    if (baseColour === "Bay") return "Buckskin";
+    if (baseColour === "Black") return "Smokey Black";
 
   }
 
-  // Double cream
-
   if (cream === "Cr/Cr") {
 
-    if (baseColour === "Chestnut") {
-      return "Cremello";
-    }
-
-    if (baseColour === "Bay") {
-      return "Perlino";
-    }
-
-    if (baseColour === "Black") {
-      return "Smokey Cream";
-    }
+    if (baseColour === "Chestnut") return "Cremello";
+    if (baseColour === "Bay") return "Perlino";
+    if (baseColour === "Black") return "Smokey Cream";
 
   }
 
   return baseColour;
 
 }
-
 
 function applyHorseDun(baseColour, parsed) {
 
@@ -331,26 +310,25 @@ function applyHorseDun(baseColour, parsed) {
     dun === "D/n"
   ) {
 
-    if (baseColour === "Chestnut") {
-      return "Red Dun";
-    }
-
-    if (baseColour === "Bay") {
-      return "Bay Dun";
-    }
-
-    if (baseColour === "Black") {
-      return "Grullo";
-    }
+    if (baseColour === "Chestnut") return "Red Dun";
+    if (baseColour === "Bay") return "Bay Dun";
+    if (baseColour === "Black") return "Grullo";
 
     return baseColour + " Dun";
 
   }
 
+  if (
+    dun === "nd1/nd1" ||
+    dun === "nd1/nd2" ||
+    dun === "nd1/n"
+  ) {
+    return baseColour + " Primitive Markings";
+  }
+
   return baseColour;
 
 }
-
 
 function applyHorseChampagne(baseColour, parsed) {
 
@@ -360,22 +338,13 @@ function applyHorseChampagne(baseColour, parsed) {
     return baseColour;
   }
 
-  if (baseColour === "Chestnut") {
-    return "Gold Champagne";
-  }
-
-  if (baseColour === "Bay") {
-    return "Amber Champagne";
-  }
-
-  if (baseColour === "Black") {
-    return "Classic Champagne";
-  }
+  if (baseColour === "Chestnut") return "Gold Champagne";
+  if (baseColour === "Bay") return "Amber Champagne";
+  if (baseColour === "Black") return "Classic Champagne";
 
   return baseColour + " Champagne";
 
 }
-
 
 function applyHorseSilver(baseColour, parsed) {
 
@@ -385,18 +354,16 @@ function applyHorseSilver(baseColour, parsed) {
     return baseColour;
   }
 
-  if (baseColour === "Black") {
-    return "Silver Black";
-  }
-
-  if (baseColour === "Bay") {
-    return "Silver Bay";
-  }
+  if (baseColour === "Black") return "Silver Black";
+  if (baseColour === "Bay") return "Silver Bay";
+  if (baseColour === "Buckskin") return "Silver Buckskin";
+  if (baseColour === "Perlino") return "Silver Perlino";
+  if (baseColour === "Smokey Black") return "Silver Smokey Black";
+  if (baseColour === "Smokey Cream") return "Silver Smokey Cream";
 
   return "Silver " + baseColour;
 
 }
-
 
 function applyHorseRoan(baseColour, parsed) {
 
@@ -406,22 +373,13 @@ function applyHorseRoan(baseColour, parsed) {
     return baseColour;
   }
 
-  if (baseColour === "Chestnut") {
-    return "Red Roan";
-  }
-
-  if (baseColour === "Bay") {
-    return "Bay Roan";
-  }
-
-  if (baseColour === "Black") {
-    return "Blue Roan";
-  }
+  if (baseColour === "Chestnut") return "Red Roan";
+  if (baseColour === "Bay") return "Bay Roan";
+  if (baseColour === "Black") return "Blue Roan";
 
   return baseColour + " Roan";
 
 }
-
 
 /* =========================
    WHITE PATTERNS
