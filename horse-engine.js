@@ -199,6 +199,14 @@ Splash:
 Rabicano:
   findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
 
+     Appaloosa:
+  findGenePair(text, ["Lp/Lp", "Lp/n", "n/Lp", "n/n"], "n/n"),
+
+PATN1:
+  findGenePair(text, ["PATN1/PATN1", "PATN1/n", "n/PATN1", "n/n"], "n/n"),
+
+PATN2:
+  findGenePair(text, ["PATN2/PATN2", "PATN2/n", "n/PATN2", "n/n"], "n/n"),
   };
 
 }
@@ -345,6 +353,9 @@ function getHorseVisibleColourWithoutGrey(parsed) {
   colour =
     applyHorsePatterns(colour, parsed);
 
+   colour =
+  applyHorseAppaloosa(colour, parsed);
+   
   return colour.trim();
 
 }
@@ -524,6 +535,45 @@ function applyHorsePatterns(colour, parsed) {
   }
 
   return colour;
+function applyHorseAppaloosa(colour, parsed) {
+
+  const lp = parsed.Appaloosa;
+  const patn1 = parsed.PATN1;
+  const patn2 = parsed.PATN2;
+
+  const hasLp =
+    hasDominantGene(lp, "Lp");
+
+  const isLpLp =
+    lp === "Lp/Lp";
+
+  const hasPatn1 =
+    hasDominantGene(patn1, "PATN1");
+
+  const hasPatn2 =
+    hasDominantGene(patn2, "PATN2");
+
+  if (!hasLp) {
+    return colour;
+  }
+
+  if (hasPatn1 && isLpLp) {
+    return colour + " Few Spot";
+  }
+
+  if (hasPatn1) {
+    return colour + " Leopard";
+  }
+
+  if (hasPatn2 && isLpLp) {
+    return colour + " Snow Cap";
+  }
+
+  if (hasPatn2) {
+    return colour + " Blanket";
+  }
+
+  return colour + " Varnish Roan";
 
 }
 
