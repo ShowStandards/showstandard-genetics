@@ -216,6 +216,8 @@ function findGenePair(text, options, fallback) {
   return fallback;
 
 }
+
+
 /* =========================
    BASE COLOUR LOGIC
 ========================= */
@@ -233,6 +235,7 @@ function getHorseBaseColour(parsed) {
   return "Bay";
 
 }
+
 
 function getHorsePhenotype(parsed) {
 
@@ -266,6 +269,7 @@ function getHorsePhenotype(parsed) {
   return colour.trim();
 
 }
+
 
 /* =========================
    MODIFIER LOGIC
@@ -316,6 +320,107 @@ function applyHorseCream(baseColour, parsed) {
 }
 
 
+function applyHorseDun(baseColour, parsed) {
+
+  const dun = parsed.Dun;
+
+  if (
+    dun === "D/D" ||
+    dun === "D/nd1" ||
+    dun === "D/nd2" ||
+    dun === "D/n"
+  ) {
+
+    if (baseColour === "Chestnut") {
+      return "Red Dun";
+    }
+
+    if (baseColour === "Bay") {
+      return "Bay Dun";
+    }
+
+    if (baseColour === "Black") {
+      return "Grullo";
+    }
+
+    return baseColour + " Dun";
+
+  }
+
+  return baseColour;
+
+}
+
+
+function applyHorseChampagne(baseColour, parsed) {
+
+  const champagne = parsed.Champagne;
+
+  if (!hasDominantGene(champagne, "Ch")) {
+    return baseColour;
+  }
+
+  if (baseColour === "Chestnut") {
+    return "Gold Champagne";
+  }
+
+  if (baseColour === "Bay") {
+    return "Amber Champagne";
+  }
+
+  if (baseColour === "Black") {
+    return "Classic Champagne";
+  }
+
+  return baseColour + " Champagne";
+
+}
+
+
+function applyHorseSilver(baseColour, parsed) {
+
+  const silver = parsed.Silver;
+
+  if (!hasDominantGene(silver, "Z")) {
+    return baseColour;
+  }
+
+  if (baseColour === "Black") {
+    return "Silver Black";
+  }
+
+  if (baseColour === "Bay") {
+    return "Silver Bay";
+  }
+
+  return "Silver " + baseColour;
+
+}
+
+
+function applyHorseRoan(baseColour, parsed) {
+
+  const roan = parsed.Roan;
+
+  if (!hasDominantGene(roan, "Rn")) {
+    return baseColour;
+  }
+
+  if (baseColour === "Chestnut") {
+    return "Red Roan";
+  }
+
+  if (baseColour === "Bay") {
+    return "Bay Roan";
+  }
+
+  if (baseColour === "Black") {
+    return "Blue Roan";
+  }
+
+  return baseColour + " Roan";
+
+}
 
 
 /* =========================
