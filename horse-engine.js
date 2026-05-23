@@ -315,29 +315,7 @@ function applyHorseCream(baseColour, parsed) {
 
 }
 
-function applyHorseDun(baseColour, parsed) {
 
-  return baseColour;
-
-}
-
-function applyHorseChampagne(baseColour, parsed) {
-
-  return baseColour;
-
-}
-
-function applyHorseSilver(baseColour, parsed) {
-
-  return baseColour;
-
-}
-
-function applyHorseRoan(baseColour, parsed) {
-
-  return baseColour;
-
-}
 
 
 /* =========================
