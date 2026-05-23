@@ -319,6 +319,9 @@ function getHorsePhenotype(parsed) {
   colour =
     applyHorsePatterns(colour, parsed);
 
+  colour =
+    applyHorseAppaloosa(colour, parsed);
+
   return colour.trim();
 
 }
