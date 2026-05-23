@@ -185,7 +185,19 @@ Mushroom:
         text,
         ["G/G", "G/g", "g/g"],
         "g/g"
-      )
+      ),
+
+     Tobiano:
+  findGenePair(text, ["To/To", "To/n", "n/To", "n/n"], "n/n"),
+
+Frame:
+  findGenePair(text, ["OLW/OLW", "OLW/n", "n/OLW", "n/n"], "n/n"),
+
+Splash:
+  findGenePair(text, ["Spl/Spl", "Spl/n", "n/Spl", "n/n"], "n/n"),
+
+Rabicano:
+  findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
 
   };
 
@@ -483,6 +495,33 @@ function applyHorseRoan(baseColour, parsed) {
 ========================= */
 
 function applyHorsePatterns(colour, parsed) {
+
+  const patterns = [];
+
+  const hasTobiano =
+    hasDominantGene(parsed.Tobiano, "To");
+
+  const hasFrame =
+    hasDominantGene(parsed.Frame, "OLW");
+
+  if (hasTobiano && hasFrame) {
+    patterns.push("Tovero");
+  } else {
+    if (hasTobiano) patterns.push("Tobiano");
+    if (hasFrame) patterns.push("Frame Overo");
+  }
+
+  if (hasDominantGene(parsed.Splash, "Spl")) {
+    patterns.push("Splash");
+  }
+
+  if (hasDominantGene(parsed.Rabicano, "Rb")) {
+    patterns.push("Rabicano");
+  }
+
+  if (patterns.length > 0) {
+    return colour + " " + patterns.join(" ");
+  }
 
   return colour;
 
