@@ -62,10 +62,25 @@ function runHorsePhenotypeCalculator(inputs) {
   const phenotype =
     getHorsePhenotype(parsed);
 
+  const hiddenBase =
+    getHorseVisibleColourWithoutGrey(parsed);
+
+  let greyNote = "";
+
+  if (hasDominantGene(parsed.Grey, "G")) {
+
+    greyNote = `
+      <p><b>Hidden Base:</b> ${hiddenBase}</p>
+      <p><b>Note:</b> Grey is visually overriding the base colour.</p>
+    `;
+
+  }
+
   return renderHorseResults(
     "Phenotype Calculator",
     `
       <p><b>Phenotype:</b> ${phenotype}</p>
+      ${greyNote}
       <p><b>Genotype:</b> ${genotypeText}</p>
     `
   );
@@ -271,11 +286,13 @@ function getHorsePhenotype(parsed) {
 
   colour =
     applyHorseSilver(colour, parsed);
-colour =
-  applyHorsePearl(colour, parsed);
 
-colour =
-  applyHorseMushroom(colour, parsed);
+  colour =
+    applyHorsePearl(colour, parsed);
+
+  colour =
+    applyHorseMushroom(colour, parsed);
+
   colour =
     applyHorseRoan(colour, parsed);
 
@@ -286,6 +303,39 @@ colour =
 
 }
 
+
+function getHorseVisibleColourWithoutGrey(parsed) {
+
+  let colour =
+    getHorseBaseColour(parsed);
+
+  colour =
+    applyHorseCream(colour, parsed);
+
+  colour =
+    applyHorseDun(colour, parsed);
+
+  colour =
+    applyHorseChampagne(colour, parsed);
+
+  colour =
+    applyHorseSilver(colour, parsed);
+
+  colour =
+    applyHorsePearl(colour, parsed);
+
+  colour =
+    applyHorseMushroom(colour, parsed);
+
+  colour =
+    applyHorseRoan(colour, parsed);
+
+  colour =
+    applyHorsePatterns(colour, parsed);
+
+  return colour.trim();
+
+}
 
 /* =========================
    MODIFIER LOGIC
