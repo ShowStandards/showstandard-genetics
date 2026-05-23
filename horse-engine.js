@@ -145,7 +145,19 @@ function parseHorseGenotype(genotypeText) {
         ["Z/Z", "Z/n", "n/Z", "n/n"],
         "n/n"
       ),
+Pearl:
+  findGenePair(
+    text,
+    ["Prl/Prl", "Prl/n", "n/Prl", "n/n"],
+    "n/n"
+  ),
 
+Mushroom:
+  findGenePair(
+    text,
+    ["mu/mu", "Mu/mu", "Mu/Mu", "n/n"],
+    "n/n"
+  ),
     Roan:
       findGenePair(
         text,
@@ -259,7 +271,11 @@ function getHorsePhenotype(parsed) {
 
   colour =
     applyHorseSilver(colour, parsed);
+colour =
+  applyHorsePearl(colour, parsed);
 
+colour =
+  applyHorseMushroom(colour, parsed);
   colour =
     applyHorseRoan(colour, parsed);
 
@@ -363,6 +379,37 @@ function applyHorseSilver(baseColour, parsed) {
 
   return "Silver " + baseColour;
 
+}
+
+function applyHorsePearl(baseColour, parsed) {
+  const pearl = parsed.Pearl;
+
+  if (pearl === "Prl/Prl") {
+    if (baseColour === "Chestnut") return "Apricot";
+    if (baseColour === "Palomino") return "Pearl Palomino";
+    if (baseColour === "Buckskin") return "Pearl Buckskin";
+
+    return baseColour + " Pearl";
+  }
+
+  return baseColour;
+}
+
+function applyHorseMushroom(baseColour, parsed) {
+  const mushroom = parsed.Mushroom;
+
+  if (
+    mushroom !== "mu/mu" &&
+    mushroom !== "Mu/mu" &&
+    mushroom !== "Mu/Mu"
+  ) {
+    return baseColour;
+  }
+
+  if (baseColour === "Chestnut") return "Mushroom";
+  if (baseColour === "Palomino") return "Mushmello";
+
+  return baseColour;
 }
 
 function applyHorseRoan(baseColour, parsed) {
