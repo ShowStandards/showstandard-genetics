@@ -346,3 +346,5 @@ function findDogWhiteSpotting(text) {
 
 }
 window.runDogGenetics = runDogGenetics;
+
+console.log("DOG ENGINE VERSION: WHITE SPOTTING FIX");
