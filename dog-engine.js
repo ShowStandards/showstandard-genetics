@@ -88,7 +88,25 @@ function parseDogGenotype(genotypeText) {
       text,
       ["M/M", "M/m", "m/m"],
       "m/m"
-    )
+    ),
+
+     WhiteSpotting: findDogGenePair(
+  text,
+  ["S/S", "S/sp", "sp/sp", "sw/sw", "sp/sw", "S/sw"],
+  "S/S"
+),
+
+Ticking: findDogGenePair(
+  text,
+  ["T/T", "T/t", "t/t"],
+  "t/t"
+),
+
+Roan: findDogGenePair(
+  text,
+  ["R/R", "R/r", "r/r"],
+  "r/r"
+)
   };
 }
 
@@ -191,6 +209,36 @@ function applyDogModifiers(colour, parsed) {
 ========================= */
 
 function applyDogPatterns(colour, parsed) {
+  const patterns = [];
+
+  if (parsed.WhiteSpotting === "S/sp") {
+    patterns.push("Irish White");
+  }
+
+  if (parsed.WhiteSpotting === "sp/sp") {
+    patterns.push("Piebald");
+  }
+
+  if (
+    parsed.WhiteSpotting === "sw/sw" ||
+    parsed.WhiteSpotting === "sp/sw" ||
+    parsed.WhiteSpotting === "S/sw"
+  ) {
+    patterns.push("Extreme White");
+  }
+
+  if (parsed.Ticking === "T/T" || parsed.Ticking === "T/t") {
+    patterns.push("Ticked");
+  }
+
+  if (parsed.Roan === "R/R" || parsed.Roan === "R/r") {
+    patterns.push("Roan");
+  }
+
+  if (patterns.length > 0) {
+    return colour + " " + patterns.join(" ");
+  }
+
   return colour;
 }
 
