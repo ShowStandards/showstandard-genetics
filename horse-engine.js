@@ -93,6 +93,14 @@ function parseHorseGenotype(genotypeText) {
     Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
     Pearl: findGenePair(text, ["Prl/Prl", "Prl/n", "n/Prl", "n/n"], "n/n"),
     Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "Mu/Mu", "n/n"], "n/n"),
+     Flaxen:
+  findGenePair(text, ["F/F", "F/f", "f/f"], "F/F"),
+
+Sooty:
+  findGenePair(text, ["Sty/Sty", "Sty/n", "n/Sty", "n/n"], "n/n"),
+
+Pangare:
+  findGenePair(text, ["P/P", "P/n", "n/P", "n/n"], "n/n"),
     Roan: findGenePair(text, ["Rn/Rn", "Rn/n", "n/Rn", "n/n"], "n/n"),
     Grey: findGenePair(text, ["G/G", "G/g", "g/g"], "g/g"),
 
@@ -170,6 +178,14 @@ function buildHorseVisibleColour(parsed) {
   colour = applyHorseSilver(colour, parsed);
   colour = applyHorsePearl(colour, parsed);
   colour = applyHorseMushroom(colour, parsed);
+   colour =
+  applyHorseFlaxen(colour, parsed);
+
+colour =
+  applyHorseSooty(colour, parsed);
+
+colour =
+  applyHorsePangare(colour, parsed);
   colour = applyHorseRoan(colour, parsed);
   colour = applyHorsePatterns(colour, parsed);
   colour = applyHorseAppaloosa(colour, parsed);
@@ -284,6 +300,47 @@ function applyHorseMushroom(baseColour, parsed) {
   return baseColour;
 }
 
+function applyHorseFlaxen(baseColour, parsed) {
+
+  const flaxen = parsed.Flaxen;
+
+  if (flaxen !== "f/f") {
+    return baseColour;
+  }
+
+  if (baseColour === "Chestnut") {
+    return "Flaxen Chestnut";
+  }
+
+  return baseColour;
+
+}
+
+
+function applyHorseSooty(baseColour, parsed) {
+
+  const sooty = parsed.Sooty;
+
+  if (!hasDominantGene(sooty, "Sty")) {
+    return baseColour;
+  }
+
+  return "Sooty " + baseColour;
+
+}
+
+
+function applyHorsePangare(baseColour, parsed) {
+
+  const pangare = parsed.Pangare;
+
+  if (!hasDominantGene(pangare, "P")) {
+    return baseColour;
+  }
+
+  return "Pangare " + baseColour;
+
+}
 function applyHorseRoan(baseColour, parsed) {
   const roan = parsed.Roan;
 
