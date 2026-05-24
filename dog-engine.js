@@ -90,8 +90,7 @@ function parseDogGenotype(genotypeText) {
       "m/m"
     ),
 
-     WhiteSpotting: findDogGenePair(
-  text,
+   WhiteSpotting: findDogWhiteSpotting(text),
   ["S/S", "S/sp", "sp/sp", "sw/sw", "sp/sw", "S/sw"],
   "S/S"
 ),
@@ -325,4 +324,25 @@ function findDogKGene(text) {
   return "ky/ky";
 }
 
+function findDogWhiteSpotting(text) {
+
+  const tokens = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ");
+
+  for (const token of tokens) {
+
+    if (token === "S/S") return "S/S";
+    if (token === "S/sp") return "S/sp";
+    if (token === "sp/sp") return "sp/sp";
+    if (token === "sw/sw") return "sw/sw";
+    if (token === "sp/sw") return "sp/sw";
+    if (token === "S/sw") return "S/sw";
+
+  }
+
+  return "S/S";
+
+}
 window.runDogGenetics = runDogGenetics;
