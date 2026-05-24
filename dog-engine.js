@@ -106,9 +106,10 @@ Roan: findDogGenePair(
   ["R/R", "R/r", "r/r"],
   "r/r"
 )
-  };
-}
 
+  };
+
+}
 function parseDogPhenotype(phenotypeText) {
   return {
     base: "",
