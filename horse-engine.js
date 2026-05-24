@@ -93,14 +93,11 @@ function parseHorseGenotype(genotypeText) {
     Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
     Pearl: findGenePair(text, ["Prl/Prl", "Prl/n", "n/Prl", "n/n"], "n/n"),
     Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "Mu/Mu", "n/n"], "n/n"),
-     Flaxen:
-  findGenePair(text, ["F/F", "F/f", "f/f"], "F/F"),
 
-Sooty:
-  findGenePair(text, ["Sty/Sty", "Sty/n", "n/Sty", "n/n"], "n/n"),
+    Flaxen: findGenePair(text, ["F/F", "F/f", "f/f"], "F/F"),
+    Sooty: findGenePair(text, ["Sty/Sty", "Sty/n", "n/Sty", "n/n"], "n/n"),
+    Pangare: findGenePair(text, ["P/P", "P/n", "n/P", "n/n"], "n/n"),
 
-Pangare:
-  findGenePair(text, ["P/P", "P/n", "n/P", "n/n"], "n/n"),
     Roan: findGenePair(text, ["Rn/Rn", "Rn/n", "n/Rn", "n/n"], "n/n"),
     Grey: findGenePair(text, ["G/G", "G/g", "g/g"], "g/g"),
 
@@ -131,10 +128,16 @@ function findGenePair(text, options, fallback) {
   const tokens = cleanText.split(" ");
 
   for (const option of options) {
-    const compactOption = option.replace("/", "");
+    const compactOption = option.replace(/\//g, "");
 
     for (const token of tokens) {
-      if (token === option || token === compactOption) {
+      const compactToken = token.replace(/\//g, "");
+
+      if (
+        token === option ||
+        token === compactOption ||
+        compactToken === compactOption
+      ) {
         if (option.startsWith("n/")) {
           return option.split("/").reverse().join("/");
         }
@@ -172,21 +175,19 @@ function getHorseVisibleColourWithoutGrey(parsed) {
 function buildHorseVisibleColour(parsed) {
   let colour = getHorseBaseColour(parsed);
 
+  colour = applyHorseFlaxen(colour, parsed);
+
   colour = applyHorseCream(colour, parsed);
   colour = applyHorseDun(colour, parsed);
   colour = applyHorseChampagne(colour, parsed);
   colour = applyHorseSilver(colour, parsed);
   colour = applyHorsePearl(colour, parsed);
   colour = applyHorseMushroom(colour, parsed);
-   colour =
-  applyHorseFlaxen(colour, parsed);
 
-colour =
-  applyHorseSooty(colour, parsed);
-
-colour =
-  applyHorsePangare(colour, parsed);
+  colour = applyHorseSooty(colour, parsed);
+  colour = applyHorsePangare(colour, parsed);
   colour = applyHorseRoan(colour, parsed);
+
   colour = applyHorsePatterns(colour, parsed);
   colour = applyHorseAppaloosa(colour, parsed);
 
@@ -197,17 +198,29 @@ colour =
    MODIFIER LOGIC
 ========================= */
 
+function applyHorseFlaxen(baseColour, parsed) {
+  if (parsed.Flaxen !== "f/f") return baseColour;
+
+  if (baseColour === "Chestnut") {
+    return "Flaxen Chestnut";
+  }
+
+  return baseColour;
+}
+
 function applyHorseCream(baseColour, parsed) {
   const cream = parsed.Cream;
 
   if (cream === "Cr/n") {
     if (baseColour === "Chestnut") return "Palomino";
+    if (baseColour === "Flaxen Chestnut") return "Flaxen Palomino";
     if (baseColour === "Bay") return "Buckskin";
     if (baseColour === "Black") return "Smokey Black";
   }
 
   if (cream === "Cr/Cr") {
     if (baseColour === "Chestnut") return "Cremello";
+    if (baseColour === "Flaxen Chestnut") return "Flaxen Cremello";
     if (baseColour === "Bay") return "Perlino";
     if (baseColour === "Black") return "Smokey Cream";
   }
@@ -225,6 +238,7 @@ function applyHorseDun(baseColour, parsed) {
     dun === "D/n"
   ) {
     if (baseColour === "Chestnut") return "Red Dun";
+    if (baseColour === "Flaxen Chestnut") return "Flaxen Red Dun";
     if (baseColour === "Bay") return "Bay Dun";
     if (baseColour === "Black") return "Grullo";
 
@@ -243,11 +257,10 @@ function applyHorseDun(baseColour, parsed) {
 }
 
 function applyHorseChampagne(baseColour, parsed) {
-  const champagne = parsed.Champagne;
-
-  if (!hasDominantGene(champagne, "Ch")) return baseColour;
+  if (!hasDominantGene(parsed.Champagne, "Ch")) return baseColour;
 
   if (baseColour === "Chestnut") return "Gold Champagne";
+  if (baseColour === "Flaxen Chestnut") return "Flaxen Gold Champagne";
   if (baseColour === "Bay") return "Amber Champagne";
   if (baseColour === "Black") return "Classic Champagne";
 
@@ -255,9 +268,7 @@ function applyHorseChampagne(baseColour, parsed) {
 }
 
 function applyHorseSilver(baseColour, parsed) {
-  const silver = parsed.Silver;
-
-  if (!hasDominantGene(silver, "Z")) return baseColour;
+  if (!hasDominantGene(parsed.Silver, "Z")) return baseColour;
 
   if (baseColour === "Black") return "Silver Black";
   if (baseColour === "Bay") return "Silver Bay";
@@ -270,17 +281,14 @@ function applyHorseSilver(baseColour, parsed) {
 }
 
 function applyHorsePearl(baseColour, parsed) {
-  const pearl = parsed.Pearl;
+  if (parsed.Pearl !== "Prl/Prl") return baseColour;
 
-  if (pearl === "Prl/Prl") {
-    if (baseColour === "Chestnut") return "Apricot";
-    if (baseColour === "Palomino") return "Pearl Palomino";
-    if (baseColour === "Buckskin") return "Pearl Buckskin";
+  if (baseColour === "Chestnut") return "Apricot";
+  if (baseColour === "Flaxen Chestnut") return "Flaxen Apricot";
+  if (baseColour === "Palomino") return "Pearl Palomino";
+  if (baseColour === "Buckskin") return "Pearl Buckskin";
 
-    return baseColour + " Pearl";
-  }
-
-  return baseColour;
+  return baseColour + " Pearl";
 }
 
 function applyHorseMushroom(baseColour, parsed) {
@@ -295,58 +303,29 @@ function applyHorseMushroom(baseColour, parsed) {
   }
 
   if (baseColour === "Chestnut") return "Mushroom";
+  if (baseColour === "Flaxen Chestnut") return "Flaxen Mushroom";
   if (baseColour === "Palomino") return "Mushmello";
 
   return baseColour;
 }
 
-function applyHorseFlaxen(baseColour, parsed) {
-
-  const flaxen = parsed.Flaxen;
-
-  if (flaxen !== "f/f") {
-    return baseColour;
-  }
-
-  if (baseColour === "Chestnut") {
-    return "Flaxen Chestnut";
-  }
-
-  return baseColour;
-
-}
-
-
 function applyHorseSooty(baseColour, parsed) {
-
-  const sooty = parsed.Sooty;
-
-  if (!hasDominantGene(sooty, "Sty")) {
-    return baseColour;
-  }
+  if (!hasDominantGene(parsed.Sooty, "Sty")) return baseColour;
 
   return "Sooty " + baseColour;
-
 }
-
 
 function applyHorsePangare(baseColour, parsed) {
-
-  const pangare = parsed.Pangare;
-
-  if (!hasDominantGene(pangare, "P")) {
-    return baseColour;
-  }
+  if (!hasDominantGene(parsed.Pangare, "P")) return baseColour;
 
   return "Pangare " + baseColour;
-
 }
-function applyHorseRoan(baseColour, parsed) {
-  const roan = parsed.Roan;
 
-  if (!hasDominantGene(roan, "Rn")) return baseColour;
+function applyHorseRoan(baseColour, parsed) {
+  if (!hasDominantGene(parsed.Roan, "Rn")) return baseColour;
 
   if (baseColour === "Chestnut") return "Red Roan";
+  if (baseColour === "Flaxen Chestnut") return "Flaxen Red Roan";
   if (baseColour === "Bay") return "Bay Roan";
   if (baseColour === "Black") return "Blue Roan";
 
@@ -449,3 +428,5 @@ function sortHorseGenePair(alleles) {
     })
     .join("/");
 }
+
+window.runHorseGenetics = runHorseGenetics;
