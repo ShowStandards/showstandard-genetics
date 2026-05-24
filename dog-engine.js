@@ -112,7 +112,12 @@ function parseDogGenotype(genotypeText) {
         ],
         "a/a"
       ),
-
+K:
+  findDogGenePair(
+    text,
+    ["K/K", "K/kbr", "K/ky", "kbr/kbr", "kbr/ky", "ky/ky"],
+    "ky/ky"
+  ),
     Brown:
       findDogGenePair(
         text,
@@ -174,41 +179,36 @@ function getDogPhenotype(parsed) {
 
 function getDogBaseColour(parsed) {
 
-  // Recessive red
-
   if (parsed.Extension === "e/e") {
     return "Red";
   }
 
-  // Fawn / sable
+  if (
+    parsed.K === "K/K" ||
+    parsed.K === "K/kbr" ||
+    parsed.K === "K/ky"
+  ) {
+    return "Black";
+  }
 
   if (
     parsed.Agouti === "Ay/Ay" ||
     parsed.Agouti === "Ay/at" ||
     parsed.Agouti === "Ay/a"
   ) {
-
     return "Fawn";
-
   }
-
-  // Tan point
 
   if (
     parsed.Agouti === "at/at" ||
     parsed.Agouti === "at/a"
   ) {
-
     return "Tan Point";
-
   }
-
-  // Recessive black
 
   return "Black";
 
 }
-
 
 /* =========================
    MODIFIER LOGIC
@@ -270,6 +270,16 @@ function applyDogModifiers(colour, parsed) {
     colour = "Double Merle " + colour;
   }
 
+   if (
+  colour !== "Red" &&
+  (
+    parsed.K === "kbr/kbr" ||
+    parsed.K === "kbr/ky" ||
+    parsed.K === "K/kbr"
+  )
+) {
+  colour = colour + " Brindle";
+}
   return colour;
 
 }
