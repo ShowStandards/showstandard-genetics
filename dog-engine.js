@@ -28,10 +28,17 @@ function runDogRoll(inputs) {
 }
 
 function runDogPhenotypeCalculator(inputs) {
-  return `
-    <h4>Dog Phenotype Calculator</h4>
-    <p>Dog phenotype calculator coming next.</p>
-  `;
+  const genotypeText = inputs.singleGenotype;
+  const parsed = parseDogGenotype(genotypeText);
+  const phenotype = getDogPhenotype(parsed);
+
+  return renderDogResults(
+    "Dog Phenotype Calculator",
+    `
+      <p><b>Phenotype:</b> ${phenotype}</p>
+      <p><b>Genotype:</b> ${genotypeText}</p>
+    `
+  );
 }
 
 function runDogGenotypeBuilder(inputs) {
