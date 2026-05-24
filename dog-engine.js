@@ -45,13 +45,44 @@ function runDogGenotypeBuilder(inputs) {
    PARSERS
 ========================= */
 
-function parseDogGenotype(genotypeText) {
-  const text = String(genotypeText || "")
-    .replace(/\s+/g, " ")
-    .trim();
+return {
 
-  return {};
-}
+  Extension:
+    findDogGenePair(
+      text,
+      ["E/E", "E/e", "e/e"],
+      "e/e"
+    ),
+
+  Agouti:
+    findDogGenePair(
+      text,
+      ["Ay/Ay", "Ay/at", "Ay/a", "at/at", "at/a", "a/a"],
+      "a/a"
+    ),
+
+  Brown:
+    findDogGenePair(
+      text,
+      ["B/B", "B/b", "b/b"],
+      "B/B"
+    ),
+
+  Dilute:
+    findDogGenePair(
+      text,
+      ["D/D", "D/d", "d/d"],
+      "D/D"
+    ),
+
+  Merle:
+    findDogGenePair(
+      text,
+      ["M/M", "M/m", "m/m"],
+      "m/m"
+    )
+
+};
 
 function parseDogPhenotype(phenotypeText) {
   return {
@@ -66,14 +97,33 @@ function parseDogPhenotype(phenotypeText) {
    PHENOTYPE PIPELINE
 ========================= */
 
-function getDogPhenotype(parsed) {
-  let colour = getDogBaseColour(parsed);
+function getDogBaseColour(parsed) {
 
-  colour = applyDogModifiers(colour, parsed);
-  colour = applyDogPatterns(colour, parsed);
-  colour = applyDogCoatTraits(colour, parsed);
+  // Recessive red
 
-  return colour.trim();
+  if (parsed.Extension === "e/e") {
+    return "Red";
+  }
+
+  // Agouti hierarchy
+
+  if (
+    parsed.Agouti === "Ay/Ay" ||
+    parsed.Agouti === "Ay/at" ||
+    parsed.Agouti === "Ay/a"
+  ) {
+    return "Fawn";
+  }
+
+  if (
+    parsed.Agouti === "at/at" ||
+    parsed.Agouti === "at/a"
+  ) {
+    return "Tan Point";
+  }
+
+  return "Black";
+
 }
 
 function getDogBaseColour(parsed) {
@@ -85,7 +135,63 @@ function getDogBaseColour(parsed) {
 ========================= */
 
 function applyDogModifiers(colour, parsed) {
+
+  // Brown
+
+  if (parsed.Brown === "b/b") {
+
+    if (colour === "Black") {
+      colour = "Chocolate";
+    }
+
+    if (colour === "Tan Point") {
+      colour = "Chocolate Tan";
+    }
+
+  }
+
+  // Dilute
+
+  if (parsed.Dilute === "d/d") {
+
+    if (colour === "Black") {
+      colour = "Blue";
+    }
+
+    if (colour === "Chocolate") {
+      colour = "Lilac";
+    }
+
+    if (colour === "Tan Point") {
+      colour = "Blue Tan";
+    }
+
+    if (colour === "Chocolate Tan") {
+      colour = "Lilac Tan";
+    }
+
+    if (colour === "Red") {
+      colour = "Isabella Red";
+    }
+
+    if (colour === "Fawn") {
+      colour = "Blue Fawn";
+    }
+
+  }
+
+  // Merle
+
+  if (parsed.Merle === "M/m") {
+    colour = colour + " Merle";
+  }
+
+  if (parsed.Merle === "M/M") {
+    colour = "Double Merle " + colour;
+  }
+
   return colour;
+
 }
 
 /* =========================
