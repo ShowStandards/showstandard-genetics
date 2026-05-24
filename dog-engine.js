@@ -115,7 +115,7 @@ function parseDogGenotype(genotypeText) {
 K:
   findDogGenePair(
     text,
-    ["K/K", "K/kbr", "K/ky", "kbr/kbr", "kbr/ky", "ky/ky"],
+    ["ky/ky", "kbr/kbr", "kbr/ky", "K/kbr", "K/ky", "K/K"],
     "ky/ky"
   ),
     Brown:
