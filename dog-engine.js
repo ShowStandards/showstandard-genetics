@@ -30,7 +30,6 @@ function runDogRoll(inputs) {
 function runDogPhenotypeCalculator(inputs) {
   const genotypeText = inputs.singleGenotype;
   const parsed = parseDogGenotype(genotypeText);
-   console.log(parsed);
   const phenotype = getDogPhenotype(parsed);
 
   return renderDogResults(
@@ -101,6 +100,18 @@ function parseDogGenotype(genotypeText) {
       "h/h"
     ),
 
+    Intensity: findDogGenePair(
+      text,
+      ["I/I", "I/i", "i/i"],
+      "I/I"
+    ),
+
+    Greying: findDogGenePair(
+      text,
+      ["G/G", "G/g", "g/g"],
+      "g/g"
+    ),
+
     LongCoat: findDogGenePair(
       text,
       ["L/L", "L/l", "l/l"],
@@ -135,6 +146,14 @@ function parseDogPhenotype(phenotypeText) {
 ========================= */
 
 function getDogPhenotype(parsed) {
+  if (
+    parsed.Extension === "e/e" &&
+    parsed.WhiteSpotting === "sw/sw" &&
+    parsed.Intensity === "i/i"
+  ) {
+    return "White";
+  }
+
   let colour = getDogBaseColour(parsed);
 
   colour = applyDogModifiers(colour, parsed);
@@ -158,9 +177,21 @@ function getDogBaseColour(parsed) {
   }
 
   if (
+    hasDogGene(parsed.Extension, "Eg") &&
+    parsed.Agouti === "at/at"
+  ) {
+    return "Grizzle";
+  }
+
+  if (parsed.Agouti === "asa/asa") {
+    return "Saddle Tan";
+  }
+
+  if (
     parsed.Agouti === "Ay/Ay" ||
     parsed.Agouti === "Ay/aw" ||
     parsed.Agouti === "Ay/at" ||
+    parsed.Agouti === "Ay/asa" ||
     parsed.Agouti === "Ay/a"
   ) {
     return "Fawn";
@@ -169,6 +200,7 @@ function getDogBaseColour(parsed) {
   if (
     parsed.Agouti === "aw/aw" ||
     parsed.Agouti === "aw/at" ||
+    parsed.Agouti === "aw/asa" ||
     parsed.Agouti === "aw/a"
   ) {
     return "Wolf Sable";
@@ -176,6 +208,7 @@ function getDogBaseColour(parsed) {
 
   if (
     parsed.Agouti === "at/at" ||
+    parsed.Agouti === "at/asa" ||
     parsed.Agouti === "at/a"
   ) {
     return "Tan Point";
@@ -193,6 +226,7 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Black") colour = "Chocolate";
     if (colour === "Tan Point") colour = "Chocolate Tan";
     if (colour === "Wolf Sable") colour = "Chocolate Wolf Sable";
+    if (colour === "Saddle Tan") colour = "Chocolate Saddle Tan";
   }
 
   if (parsed.Dilute === "d/d") {
@@ -204,6 +238,15 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Fawn") colour = "Blue Fawn";
     if (colour === "Wolf Sable") colour = "Blue Wolf Sable";
     if (colour === "Chocolate Wolf Sable") colour = "Lilac Wolf Sable";
+    if (colour === "Saddle Tan") colour = "Blue Saddle Tan";
+    if (colour === "Chocolate Saddle Tan") colour = "Lilac Saddle Tan";
+  }
+
+  if (parsed.Intensity === "i/i") {
+    if (colour === "Red") colour = "Cream";
+    if (colour === "Fawn") colour = "Pale Fawn";
+    if (colour === "Blue Fawn") colour = "Pale Blue Fawn";
+    if (colour === "Isabella Red") colour = "Isabella Cream";
   }
 
   if (parsed.Merle === "M/m") {
@@ -214,7 +257,7 @@ function applyDogModifiers(colour, parsed) {
     colour = "Double Merle " + colour;
   }
 
-  if (hasDogGene(parsed.Extension, "Em") && colour !== "Red") {
+  if (hasDogGene(parsed.Extension, "Em") && colour !== "Red" && colour !== "Cream") {
     colour = colour + " Mask";
   }
 
@@ -227,12 +270,17 @@ function applyDogModifiers(colour, parsed) {
 
   if (
     colour !== "Red" &&
+    colour !== "Cream" &&
     (
       parsed.K === "kbr/kbr" ||
       parsed.K === "kbr/ky"
     )
   ) {
     colour = colour + " Brindle";
+  }
+
+  if (parsed.Greying === "G/G" || parsed.Greying === "G/g") {
+    colour = "Faded " + colour;
   }
 
   return colour;
@@ -367,10 +415,19 @@ function findDogExtensionGene(text) {
 
   for (const token of tokens) {
     if (token === "Em/Em") return "Em/Em";
+    if (token === "Em/Eg") return "Em/Eg";
+    if (token === "Eg/Em") return "Em/Eg";
     if (token === "Em/E") return "Em/E";
     if (token === "E/Em") return "Em/E";
     if (token === "Em/e") return "Em/e";
     if (token === "e/Em") return "Em/e";
+
+    if (token === "Eg/Eg") return "Eg/Eg";
+    if (token === "Eg/E") return "Eg/E";
+    if (token === "E/Eg") return "Eg/E";
+    if (token === "Eg/e") return "Eg/e";
+    if (token === "e/Eg") return "Eg/e";
+
     if (token === "E/E") return "E/E";
     if (token === "E/e") return "E/e";
     if (token === "e/E") return "E/e";
@@ -392,18 +449,28 @@ function findDogAgoutiGene(text) {
     if (token === "aw/Ay") return "Ay/aw";
     if (token === "Ay/at") return "Ay/at";
     if (token === "at/Ay") return "Ay/at";
+    if (token === "Ay/asa") return "Ay/asa";
+    if (token === "asa/Ay") return "Ay/asa";
     if (token === "Ay/a") return "Ay/a";
     if (token === "a/Ay") return "Ay/a";
 
     if (token === "aw/aw") return "aw/aw";
     if (token === "aw/at") return "aw/at";
     if (token === "at/aw") return "aw/at";
+    if (token === "aw/asa") return "aw/asa";
+    if (token === "asa/aw") return "aw/asa";
     if (token === "aw/a") return "aw/a";
     if (token === "a/aw") return "aw/a";
 
     if (token === "at/at") return "at/at";
+    if (token === "at/asa") return "at/asa";
+    if (token === "asa/at") return "at/asa";
     if (token === "at/a") return "at/a";
     if (token === "a/at") return "at/a";
+
+    if (token === "asa/asa") return "asa/asa";
+    if (token === "asa/a") return "asa/a";
+    if (token === "a/asa") return "asa/a";
 
     if (token === "a/a") return "a/a";
   }
