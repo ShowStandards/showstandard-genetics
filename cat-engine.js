@@ -146,13 +146,19 @@ function parseCatGenotype(genotypeText) {
         "sp/sp"
       ),
 
-    Ticked:
-      findCatGenePair(
-        text,
-        ["Ta/Ta", "Ta/ta", "ta/ta"],
-        "ta/ta"
-      )
+Ticked:
+  findCatGenePair(
+    text,
+    ["Ta/Ta", "Ta/ta", "ta/ta"],
+    "ta/ta"
+  ),
 
+Polydactyl:
+  findCatGenePair(
+    text,
+    ["Pd/Pd", "Pd/pd", "pd/pd"],
+    "pd/pd"
+  )
   };
 
 }
@@ -187,8 +193,11 @@ function getCatPhenotype(parsed) {
   colour =
     applyCatTabby(colour, parsed);
 
-  colour =
-    applyCatWhiteSpotting(colour, parsed);
+colour =
+  applyCatWhiteSpotting(colour, parsed);
+
+colour =
+  applyCatPolydactyl(colour, parsed);
 
   return colour.trim();
 
