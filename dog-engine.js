@@ -102,7 +102,37 @@ function parseDogGenotype(genotypeText) {
       text,
       ["R/R", "R/r", "r/r"],
       "r/r"
-    )
+    ),
+
+     Mask: findDogGenePair(
+  text,
+  ["Em/Em", "Em/E", "Em/e", "E/E", "E/e", "e/e"],
+  "E/E"
+),
+
+Harlequin: findDogGenePair(
+  text,
+  ["H/H", "H/h", "h/h"],
+  "h/h"
+),
+
+LongCoat: findDogGenePair(
+  text,
+  ["L/L", "L/l", "l/l"],
+  "L/L"
+),
+
+Furnishings: findDogGenePair(
+  text,
+  ["F/F", "F/n", "n/F", "n/n"],
+  "n/n"
+),
+
+Curl: findDogGenePair(
+  text,
+  ["Cu/Cu", "Cu/n", "n/Cu", "n/n"],
+  "n/n"
+)
   };
 }
 
@@ -187,6 +217,16 @@ function applyDogModifiers(colour, parsed) {
     colour = "Double Merle " + colour;
   }
 
+   if (hasDogGene(parsed.Mask, "Em") && colour !== "Red") {
+  colour = colour + " Mask";
+}
+
+if (
+  parsed.Harlequin === "H/h" &&
+  parsed.Merle === "M/m"
+) {
+  colour = colour.replace("Merle", "Harlequin");
+}
   if (
     colour !== "Red" &&
     (
@@ -243,6 +283,24 @@ function applyDogPatterns(colour, parsed) {
 ========================= */
 
 function applyDogCoatTraits(colour, parsed) {
+  const traits = [];
+
+  if (parsed.LongCoat === "l/l") {
+    traits.push("Long Coat");
+  }
+
+  if (hasDogGene(parsed.Furnishings, "F")) {
+    traits.push("Furnished");
+  }
+
+  if (hasDogGene(parsed.Curl, "Cu")) {
+    traits.push("Curly");
+  }
+
+  if (traits.length > 0) {
+    return colour + " " + traits.join(" ");
+  }
+
   return colour;
 }
 
