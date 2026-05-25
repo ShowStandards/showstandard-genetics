@@ -98,17 +98,13 @@ function parseDogGenotype(genotypeText) {
       "t/t"
     ),
 
-    Roan: findDogGenePair(
-      text,
-      ["R/R", "R/r", "r/r"],
-      "r/r"
-    ),
-
-     Mask: findDogGenePair(
+  Roan: findDogGenePair(
   text,
-  ["Em/Em", "Em/E", "Em/e", "E/E", "E/e", "e/e"],
-  "E/E"
+  ["R/R", "R/r", "r/r"],
+  "r/r"
 ),
+
+Mask: findDogMaskGene(text),
 
 Harlequin: findDogGenePair(
   text,
@@ -380,21 +376,47 @@ function findDogKGene(text) {
 }
 
 function findDogWhiteSpotting(text) {
+
   const tokens = String(text || "")
     .replace(/\s+/g, " ")
     .trim()
     .split(" ");
 
   for (const token of tokens) {
+
     if (token === "S/S") return "S/S";
     if (token === "S/sp") return "S/sp";
     if (token === "sp/sp") return "sp/sp";
     if (token === "sw/sw") return "sw/sw";
     if (token === "sp/sw") return "sp/sw";
     if (token === "S/sw") return "S/sw";
+
   }
 
   return "S/S";
+
+}
+
+function findDogMaskGene(text) {
+
+  const tokens = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ");
+
+  for (const token of tokens) {
+
+    if (token === "Em/Em") return "Em/Em";
+    if (token === "Em/E") return "Em/E";
+    if (token === "Em/e") return "Em/e";
+    if (token === "E/E") return "E/E";
+    if (token === "E/e") return "E/e";
+    if (token === "e/e") return "e/e";
+
+  }
+
+  return "E/E";
+
 }
 
 window.runDogGenetics = runDogGenetics;
