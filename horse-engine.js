@@ -64,6 +64,16 @@ function runHorsePhenotypeCalculator(inputs) {
     `;
   }
 
+  return renderHorseResults(
+    "Phenotype Calculator",
+    `
+      <p><b>Phenotype:</b> ${phenotype}</p>
+      ${greyNote}
+      <p><b>Genotype:</b> ${genotypeText}</p>
+    `
+  );
+}
+
 function runHorseGenotypeBuilder(inputs) {
   const phenotype = String(inputs.phenotype || "").toLowerCase();
   const suggestions = [];
@@ -98,15 +108,6 @@ function runHorseGenotypeBuilder(inputs) {
     hidden.push("Chestnut can be carried: E/e");
   }
 
-  if (phenotype.includes("palomino")) {
-    suggestions.push("Base: e/e");
-    suggestions.push("Cream: Cr/n");
-    examples.push("e/e A/A Cr/n");
-    examples.push("e/e A/a Cr/n Z/n");
-    examples.push("e/e a/a Cr/n Prl/n");
-    hidden.push("Agouti and Silver can be hidden on red-based horses.");
-  }
-
   if (phenotype.includes("buckskin")) {
     suggestions.push("Base: E/- A/-");
     suggestions.push("Cream: Cr/n");
@@ -117,30 +118,8 @@ function runHorseGenotypeBuilder(inputs) {
     hidden.push("Recessive black can be carried: A/a");
   }
 
-  if (phenotype.includes("cremello")) {
-    suggestions.push("Base: e/e");
-    suggestions.push("Cream: Cr/Cr");
-    examples.push("e/e A/A Cr/Cr");
-    examples.push("e/e A/a Cr/Cr Z/n");
-  }
-
-  if (phenotype.includes("perlino")) {
-    suggestions.push("Base: E/- A/-");
-    suggestions.push("Cream: Cr/Cr");
-    examples.push("E/E A/A Cr/Cr");
-    examples.push("E/e A/a Cr/Cr");
-  }
-
-  if (phenotype.includes("grey")) suggestions.push("Grey: G/-");
-  if (phenotype.includes("dun")) suggestions.push("Dun: D/-");
-  if (phenotype.includes("roan")) suggestions.push("Roan: Rn/-");
-  if (phenotype.includes("tobiano")) suggestions.push("Tobiano: To/-");
-  if (phenotype.includes("frame")) suggestions.push("Frame: OLW/-");
-  if (phenotype.includes("splash")) suggestions.push("Splash: Spl/-");
-  if (phenotype.includes("leopard")) suggestions.push("Appaloosa: Lp/- with PATN1/-");
-  if (phenotype.includes("blanket")) suggestions.push("Appaloosa: Lp/- with PATN2/-");
-
   if (phenotype.includes("tobiano")) {
+    suggestions.push("Tobiano: To/-");
     examples.forEach((example, index) => {
       examples[index] = example + " To/n";
     });
@@ -156,41 +135,15 @@ function runHorseGenotypeBuilder(inputs) {
       <p><b>Phenotype:</b> ${inputs.phenotype}</p>
 
       <p><b>Likely Required Genes:</b></p>
-      <ul>
-        ${suggestions.map(item => `<li>${item}</li>`).join("")}
-      </ul>
+      <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
 
       <p><b>Possible Example Genotypes:</b></p>
-      <ul>
-        ${
-          examples.length > 0
-            ? examples.map(item => `<li>${item}</li>`).join("")
-            : "<li>No example genotypes generated yet.</li>"
-        }
-      </ul>
+      <ul>${examples.length ? examples.map(item => `<li>${item}</li>`).join("") : "<li>No example genotypes generated yet.</li>"}</ul>
 
       <p><b>Possible Hidden Traits:</b></p>
-      <ul>
-        ${
-          hidden.length > 0
-            ? hidden.map(item => `<li>${item}</li>`).join("")
-            : "<li>No common hidden traits listed yet.</li>"
-        }
-      </ul>
+      <ul>${hidden.length ? hidden.map(item => `<li>${item}</li>`).join("") : "<li>No common hidden traits listed yet.</li>"}</ul>
 
       <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
-    `
-  );
-}
-
-  return renderHorseResults(
-    "Genotype Builder",
-    `
-      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
-      <ul>
-        ${suggestions.map(item => `<li>${item}</li>`).join("")}
-      </ul>
-      <p><b>Note:</b> This gives likely genotype requirements, not a guaranteed full genotype.</p>
     `
   );
 }
