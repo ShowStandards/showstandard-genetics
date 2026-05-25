@@ -549,5 +549,8 @@ function calculateHorseGeneOutcomes(sirePair, damPair) {
     })
     .join("<br>");
 }
-
+window.runHorsePredictor = runHorsePredictor;
+window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
+window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
+window.runHorseGenetics = runHorseGenetics;
 window.runHorseGenetics = runHorseGenetics;
