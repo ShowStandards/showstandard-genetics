@@ -30,6 +30,7 @@ function runDogRoll(inputs) {
 function runDogPhenotypeCalculator(inputs) {
   const genotypeText = inputs.singleGenotype;
   const parsed = parseDogGenotype(genotypeText);
+   console.log(parsed);
   const phenotype = getDogPhenotype(parsed);
 
   return renderDogResults(
