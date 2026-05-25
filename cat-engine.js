@@ -227,42 +227,6 @@ function applyCatDilute(colour, parsed) {
   return colour;
 }
 
-function applyCatPointModifier(colour, parsed) {
-  const point = parsed.Colourpoint;
-
-  if (point === "ca/ca") return "Blue-Eyed Albino";
-  if (point === "c/c") return "Red-Eyed Albino";
-
-  if (point === "cb/cb") return colour + " Burmese";
-  if (point === "cb/cs") return colour + " Mink";
-
-  if (point === "cs/cs") {
-    if (colour === "Black") return "Seal Point";
-    if (colour === "Blue") return "Blue Point";
-    if (colour === "Chocolate") return "Chocolate Point";
-    if (colour === "Lilac") return "Lilac Point";
-    if (colour === "Red") return "Flame Point";
-    if (colour === "Cream") return "Cream Point";
-    if (colour === "Tortie") return "Tortie Point";
-    if (colour === "Blue Tortie") return "Blue Tortie Point";
-
-    return colour + " Point";
-  }
-
-  return colour;
-}
-
-function applyCatSilver(colour, parsed) {
-  if (
-    parsed.Silver === "I/I" ||
-    parsed.Silver === "I/i"
-  ) {
-    return "Silver";
-  }
-
-  return colour;
-}
-
 function applyCatColourModifiers(colour, parsed) {
   if (
     colour === "Blue-Eyed Albino" ||
@@ -271,18 +235,7 @@ function applyCatColourModifiers(colour, parsed) {
   ) {
     return colour;
   }
-if (
-  (
-    modifiers.includes("Sunshine") ||
-    modifiers.includes("Extreme Sunshine")
-  ) &&
-  (
-    parsed.Silver === "I/I" ||
-    parsed.Silver === "I/i"
-  )
-) {
-  return "Bimetallic";
-}
+
   const modifiers = [];
 
   if (
@@ -339,83 +292,33 @@ if (
     modifiers.push("Karpati");
   }
 
-// Standalone colour overrides
-
-if (
-  modifiers.includes("Extreme Sunshine")
-) {
-  return "Extreme Sunshine";
-}
-
-if (
-  modifiers.includes("Sunshine")
-) {
-  return "Sunshine";
-}
-
-if (
-  modifiers.includes("Amber")
-) {
-  return "Amber";
-}
-
-// Remaining modifiers stack normally
-
-if (modifiers.length > 0) {
-  return modifiers.join(" ") + " " + colour;
-}
-  return colour;
-}
-
-function applyCatTabby(colour, parsed) {
-  if (parsed.Agouti === "a/a") return colour;
-
-  let pattern = "Mackerel Tabby";
-
   if (
-    parsed.Ticked === "Ta/Ta" ||
-    parsed.Ticked === "Ta/ta"
+    (
+      modifiers.includes("Sunshine") ||
+      modifiers.includes("Extreme Sunshine")
+    ) &&
+    (
+      parsed.Silver === "I/I" ||
+      parsed.Silver === "I/i"
+    )
   ) {
-    pattern = "Ticked Tabby";
+    return "Bimetallic";
   }
 
-  else if (
-    parsed.Spotted === "Sp/Sp" ||
-    parsed.Spotted === "Sp/sp"
-  ) {
-    pattern = "Spotted Tabby";
+  if (modifiers.includes("Extreme Sunshine")) {
+    return "Extreme Sunshine";
   }
 
-  else if (parsed.Tabby === "mc/mc") {
-    pattern = "Classic Tabby";
+  if (modifiers.includes("Sunshine")) {
+    return "Sunshine";
   }
 
-  return colour + " " + pattern;
-}
-
-function applyCatWhiteSpotting(colour, parsed) {
-  const hasWhite =
-    parsed.WhiteSpotting === "S/S" ||
-    parsed.WhiteSpotting === "S/s";
-
-  if (!hasWhite) return colour;
-
-  if (colour === "Tortie") return "Calico";
-  if (colour === "Blue Tortie") return "Dilute Calico";
-
-  if (parsed.WhiteSpotting === "S/S") {
-    return colour + " High White";
+  if (modifiers.includes("Amber")) {
+    return "Amber";
   }
 
-  return colour + " White";
-}
-
-function applyCatPolydactyl(colour, parsed) {
-  if (
-    parsed.Polydactyl === "Pd/Pd" ||
-    parsed.Polydactyl === "Pd/pd"
-  ) {
-    return colour + " Polydactyl";
+  if (modifiers.length > 0) {
+    return modifiers.join(" ") + " " + colour;
   }
 
   return colour;
