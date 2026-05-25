@@ -6,7 +6,6 @@ function runHorseGenetics(inputs) {
   const mode = inputs.mode;
 
   if (mode === "predictor") return runHorsePredictor(inputs);
-  if (mode === "roll") return runHorseRoll(inputs);
   if (mode === "phenotypeFromGenotype") return runHorsePhenotypeCalculator(inputs);
   if (mode === "genotypeFromPhenotype") return runHorseGenotypeBuilder(inputs);
 
@@ -14,12 +13,36 @@ function runHorseGenetics(inputs) {
 }
 
 function runHorsePredictor(inputs) {
-  return `
-    <h4>Horse Predictor</h4>
-    <p>Horse predictor engine coming next.</p>
-  `;
-}
+  const sire = parseHorseGenotype(inputs.sireGenotype);
+  const dam = parseHorseGenotype(inputs.damGenotype);
 
+  const rows = [
+    horseOutcomeRow("Extension", sire.Extension, dam.Extension),
+    horseOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
+    horseOutcomeRow("Cream", sire.Cream, dam.Cream),
+    horseOutcomeRow("Dun", sire.Dun, dam.Dun),
+    horseOutcomeRow("Grey", sire.Grey, dam.Grey),
+    horseOutcomeRow("Roan", sire.Roan, dam.Roan),
+    horseOutcomeRow("Tobiano", sire.Tobiano, dam.Tobiano),
+    horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa)
+  ].join("");
+
+  return renderHorseResults(
+    "Horse Predictor",
+    `
+      <p><b>Sire:</b> ${inputs.sireGenotype}</p>
+      <p><b>Dam:</b> ${inputs.damGenotype}</p>
+
+      <table class="breed-table">
+        <tr>
+          <th>Gene</th>
+          <th>Possible Outcomes</th>
+        </tr>
+        ${rows}
+      </table>
+    `
+  );
+}
 function runHorseRoll(inputs) {
   return `
     <h4>Horse Roll</h4>
@@ -52,10 +75,41 @@ function runHorsePhenotypeCalculator(inputs) {
 }
 
 function runHorseGenotypeBuilder(inputs) {
-  return `
-    <h4>Genotype Builder</h4>
-    <p>Genotype builder coming next.</p>
-  `;
+  const phenotype = String(inputs.phenotype || "").toLowerCase();
+  const suggestions = [];
+
+  if (phenotype.includes("chestnut")) suggestions.push("Extension: e/e");
+  if (phenotype.includes("bay")) suggestions.push("Extension: E/- and Agouti: A/-");
+  if (phenotype.includes("black")) suggestions.push("Extension: E/- and Agouti: a/a");
+
+  if (phenotype.includes("palomino")) suggestions.push("Cream: Cr/n on chestnut base");
+  if (phenotype.includes("buckskin")) suggestions.push("Cream: Cr/n on bay base");
+  if (phenotype.includes("cremello")) suggestions.push("Cream: Cr/Cr on chestnut base");
+  if (phenotype.includes("perlino")) suggestions.push("Cream: Cr/Cr on bay base");
+
+  if (phenotype.includes("grey")) suggestions.push("Grey: G/-");
+  if (phenotype.includes("dun")) suggestions.push("Dun: D/-");
+  if (phenotype.includes("roan")) suggestions.push("Roan: Rn/-");
+  if (phenotype.includes("tobiano")) suggestions.push("Tobiano: To/-");
+  if (phenotype.includes("frame")) suggestions.push("Frame: OLW/-");
+  if (phenotype.includes("splash")) suggestions.push("Splash: Spl/-");
+  if (phenotype.includes("leopard")) suggestions.push("Appaloosa: Lp/- with PATN1/-");
+  if (phenotype.includes("blanket")) suggestions.push("Appaloosa: Lp/- with PATN2/-");
+
+  if (suggestions.length === 0) {
+    suggestions.push("No simple genotype match found yet.");
+  }
+
+  return renderHorseResults(
+    "Genotype Builder",
+    `
+      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
+      <ul>
+        ${suggestions.map(item => `<li>${item}</li>`).join("")}
+      </ul>
+      <p><b>Note:</b> This gives likely genotype requirements, not a guaranteed full genotype.</p>
+    `
+  );
 }
 
 /* =========================
@@ -427,6 +481,37 @@ function sortHorseGenePair(alleles) {
       return a.localeCompare(b);
     })
     .join("/");
+}
+function horseOutcomeRow(label, sirePair, damPair) {
+  const outcomes = calculateHorseGeneOutcomes(sirePair, damPair);
+
+  return `
+    <tr>
+      <td>${label}</td>
+      <td>${outcomes}</td>
+    </tr>
+  `;
+}
+
+function calculateHorseGeneOutcomes(sirePair, damPair) {
+  const sireAlleles = String(sirePair || "n/n").split("/");
+  const damAlleles = String(damPair || "n/n").split("/");
+
+  const counts = {};
+
+  for (const sireAllele of sireAlleles) {
+    for (const damAllele of damAlleles) {
+      const pair = sortHorseGenePair([sireAllele, damAllele]);
+      counts[pair] = (counts[pair] || 0) + 1;
+    }
+  }
+
+  return Object.entries(counts)
+    .map(([pair, count]) => {
+      const percent = Math.round((count / 4) * 100);
+      return `${pair}: ${percent}%`;
+    })
+    .join("<br>");
 }
 
 window.runHorseGenetics = runHorseGenetics;
