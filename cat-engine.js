@@ -180,8 +180,8 @@ function getCatPhenotype(parsed) {
 
   colour = applyCatDilute(colour, parsed);
   colour = applyCatPointModifier(colour, parsed);
-  colour = applyCatSilver(colour, parsed);
   colour = applyCatColourModifiers(colour, parsed);
+     colour = applyCatSilver(colour, parsed);
   colour = applyCatTabby(colour, parsed);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
