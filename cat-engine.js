@@ -279,10 +279,66 @@ function applyCatPointModifier(colour, parsed) {
   const point =
     parsed.Colourpoint;
 
-  if (
-    point === "cs/cs"
-  ) {
+  // Albino overrides
+
+  if (point === "ca/ca") {
+    return "Blue-Eyed Albino";
+  }
+
+  if (point === "c/c") {
+    return "Red-Eyed Albino";
+  }
+
+  // Burmese
+
+  if (point === "cb/cb") {
+    return colour + " Burmese";
+  }
+
+  // Tonkinese
+
+  if (point === "cb/cs") {
+    return colour + " Mink";
+  }
+
+  // Siamese
+
+  if (point === "cs/cs") {
+
+    if (colour === "Black") {
+      return "Seal Point";
+    }
+
+    if (colour === "Blue") {
+      return "Blue Point";
+    }
+
+    if (colour === "Chocolate") {
+      return "Chocolate Point";
+    }
+
+    if (colour === "Lilac") {
+      return "Lilac Point";
+    }
+
+    if (colour === "Red") {
+      return "Flame Point";
+    }
+
+    if (colour === "Cream") {
+      return "Cream Point";
+    }
+
+    if (colour === "Tortie") {
+      return "Tortie Point";
+    }
+
+    if (colour === "Blue Tortie") {
+      return "Blue Tortie Point";
+    }
+
     return colour + " Point";
+
   }
 
   return colour;
@@ -292,16 +348,26 @@ function applyCatPointModifier(colour, parsed) {
 function applyCatSilver(colour, parsed) {
 
   if (
-    parsed.Silver === "I/I" ||
-    parsed.Silver === "I/i"
+    parsed.Silver !== "I/I" &&
+    parsed.Silver !== "I/i"
+  ) {
+    return colour;
+  }
+
+  // Tabbies become Silver Tabbies later
+
+  if (
+    parsed.Agouti === "A/A" ||
+    parsed.Agouti === "A/a"
   ) {
     return "Silver " + colour;
   }
 
-  return colour;
+  // Solids become Smoke
+
+  return colour + " Smoke";
 
 }
-
 function applyCatTabby(colour, parsed) {
 
   if (parsed.Agouti === "a/a") {
@@ -340,22 +406,31 @@ function applyCatTabby(colour, parsed) {
 
 function applyCatWhiteSpotting(colour, parsed) {
 
-  if (
-    parsed.WhiteSpotting === "S/S"
-  ) {
+  const hasWhite =
+    parsed.WhiteSpotting === "S/S" ||
+    parsed.WhiteSpotting === "S/s";
+
+  if (!hasWhite) {
+    return colour;
+  }
+
+  // Torties with white become Calico
+
+  if (colour === "Tortie") {
+    return "Calico";
+  }
+
+  if (colour === "Blue Tortie") {
+    return "Dilute Calico";
+  }
+
+  if (parsed.WhiteSpotting === "S/S") {
     return colour + " High White";
   }
 
-  if (
-    parsed.WhiteSpotting === "S/s"
-  ) {
-    return colour + " White";
-  }
-
-  return colour;
+  return colour + " White";
 
 }
-
 /* =========================
    OUTPUT HELPERS
 ========================= */
