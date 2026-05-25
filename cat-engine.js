@@ -328,10 +328,31 @@ function applyCatColourModifiers(colour, parsed) {
     modifiers.push("Karpati");
   }
 
-  if (modifiers.length > 0) {
-    return modifiers.join(" ") + " " + colour;
-  }
+// Standalone colour overrides
 
+if (
+  modifiers.includes("Extreme Sunshine")
+) {
+  return "Extreme Sunshine";
+}
+
+if (
+  modifiers.includes("Sunshine")
+) {
+  return "Sunshine";
+}
+
+if (
+  modifiers.includes("Amber")
+) {
+  return "Amber";
+}
+
+// Remaining modifiers stack normally
+
+if (modifiers.length > 0) {
+  return modifiers.join(" ") + " " + colour;
+}
   return colour;
 }
 
