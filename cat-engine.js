@@ -252,16 +252,7 @@ function applyCatSilver(colour, parsed) {
     return colour;
   }
 
-  if (
-    parsed.Sunshine === "Su/Su" ||
-    parsed.Sunshine === "Su/n" ||
-    parsed.ExtremeSunshine === "Es/Es" ||
-    parsed.ExtremeSunshine === "Es/n"
-  ) {
-    return "Bimetallic";
-  }
-
-  return "Silver";
+  return "Silver " + colour;
 
 }
 function applyCatColourModifiers(colour, parsed) {
