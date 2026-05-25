@@ -435,6 +435,18 @@ function applyCatWhiteSpotting(colour, parsed) {
 
 }
 
+function applyCatPolydactyl(colour, parsed) {
+
+  if (
+    parsed.Polydactyl === "Pd/Pd" ||
+    parsed.Polydactyl === "Pd/pd"
+  ) {
+    return colour + " Polydactyl";
+  }
+
+  return colour;
+
+}
 /* =========================
    OUTPUT HELPERS
 ========================= */
