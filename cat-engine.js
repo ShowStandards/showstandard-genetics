@@ -181,7 +181,28 @@ function getCatPhenotype(parsed) {
   colour = applyCatDilute(colour, parsed);
   colour = applyCatPointModifier(colour, parsed);
   colour = applyCatColourModifiers(colour, parsed);
-     colour = applyCatSilver(colour, parsed);
+function applyCatSilver(colour, parsed) {
+
+  const hasSilver =
+    parsed.Silver === "I/I" ||
+    parsed.Silver === "I/i";
+
+  if (!hasSilver) {
+    return colour;
+  }
+
+  if (
+    parsed.Sunshine === "Su/Su" ||
+    parsed.Sunshine === "Su/n" ||
+    parsed.ExtremeSunshine === "Es/Es" ||
+    parsed.ExtremeSunshine === "Es/n"
+  ) {
+    return "Bimetallic";
+  }
+
+  return "Silver";
+
+}
   colour = applyCatTabby(colour, parsed);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
