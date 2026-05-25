@@ -234,7 +234,6 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Chocolate") colour = "Lilac";
     if (colour === "Tan Point") colour = "Blue Tan";
     if (colour === "Chocolate Tan") colour = "Lilac Tan";
-    if (colour === "Red") colour = "Isabella Red";
     if (colour === "Fawn") colour = "Blue Fawn";
     if (colour === "Wolf Sable") colour = "Blue Wolf Sable";
     if (colour === "Chocolate Wolf Sable") colour = "Lilac Wolf Sable";
@@ -246,7 +245,6 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Red") colour = "Cream";
     if (colour === "Fawn") colour = "Pale Fawn";
     if (colour === "Blue Fawn") colour = "Pale Blue Fawn";
-    if (colour === "Isabella Red") colour = "Isabella Cream";
   }
 
   if (parsed.Merle === "M/m") {
