@@ -271,7 +271,18 @@ function applyCatColourModifiers(colour, parsed) {
   ) {
     return colour;
   }
-
+if (
+  (
+    modifiers.includes("Sunshine") ||
+    modifiers.includes("Extreme Sunshine")
+  ) &&
+  (
+    parsed.Silver === "I/I" ||
+    parsed.Silver === "I/i"
+  )
+) {
+  return "Bimetallic";
+}
   const modifiers = [];
 
   if (
