@@ -169,6 +169,7 @@ function parseCatGenotype(genotypeText) {
 ========================= */
 
 function getCatPhenotype(parsed) {
+
   if (
     parsed.White === "W/W" ||
     parsed.White === "W/w"
@@ -176,38 +177,32 @@ function getCatPhenotype(parsed) {
     return applyCatPolydactyl("White", parsed);
   }
 
-  let colour = getCatBaseColour(parsed);
+  let colour =
+    getCatBaseColour(parsed);
 
-  colour = applyCatDilute(colour, parsed);
-  colour = applyCatPointModifier(colour, parsed);
-  colour = applyCatColourModifiers(colour, parsed);
-function applyCatSilver(colour, parsed) {
+  colour =
+    applyCatDilute(colour, parsed);
 
-  const hasSilver =
-    parsed.Silver === "I/I" ||
-    parsed.Silver === "I/i";
+  colour =
+    applyCatPointModifier(colour, parsed);
 
-  if (!hasSilver) {
-    return colour;
-  }
+  colour =
+    applyCatSilver(colour, parsed);
 
-  if (
-    parsed.Sunshine === "Su/Su" ||
-    parsed.Sunshine === "Su/n" ||
-    parsed.ExtremeSunshine === "Es/Es" ||
-    parsed.ExtremeSunshine === "Es/n"
-  ) {
-    return "Bimetallic";
-  }
+  colour =
+    applyCatColourModifiers(colour, parsed);
 
-  return "Silver";
+  colour =
+    applyCatTabby(colour, parsed);
 
-}
-  colour = applyCatTabby(colour, parsed);
-  colour = applyCatWhiteSpotting(colour, parsed);
-  colour = applyCatPolydactyl(colour, parsed);
+  colour =
+    applyCatWhiteSpotting(colour, parsed);
+
+  colour =
+    applyCatPolydactyl(colour, parsed);
 
   return colour.trim();
+
 }
 
 /* =========================
@@ -247,7 +242,28 @@ function applyCatDilute(colour, parsed) {
 
   return colour;
 }
+function applyCatSilver(colour, parsed) {
 
+  const hasSilver =
+    parsed.Silver === "I/I" ||
+    parsed.Silver === "I/i";
+
+  if (!hasSilver) {
+    return colour;
+  }
+
+  if (
+    parsed.Sunshine === "Su/Su" ||
+    parsed.Sunshine === "Su/n" ||
+    parsed.ExtremeSunshine === "Es/Es" ||
+    parsed.ExtremeSunshine === "Es/n"
+  ) {
+    return "Bimetallic";
+  }
+
+  return "Silver";
+
+}
 function applyCatColourModifiers(colour, parsed) {
   if (
     colour === "Blue-Eyed Albino" ||
