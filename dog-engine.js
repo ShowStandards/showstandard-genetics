@@ -167,6 +167,9 @@ function getDogBaseColour(parsed) {
   if (parsed.Extension === "e/e") {
     return "Red";
   }
+ if (parsed.Agouti === "asa/asa") {
+    return "Saddle Tan";
+  }
 
   if (
     parsed.K === "K/K" ||
@@ -183,10 +186,7 @@ function getDogBaseColour(parsed) {
     return "Grizzle";
   }
 
-  if (parsed.Agouti === "asa/asa") {
-    return "Saddle Tan";
-  }
-
+ 
   if (
     parsed.Agouti === "Ay/Ay" ||
     parsed.Agouti === "Ay/aw" ||
