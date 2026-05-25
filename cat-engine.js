@@ -56,6 +56,8 @@ function runCatPhenotypeCalculator(inputs) {
   const parsed =
     parseCatGenotype(genotypeText);
 
+  console.log(parsed);
+
   const phenotype =
     getCatPhenotype(parsed);
 
@@ -368,6 +370,7 @@ function applyCatSilver(colour, parsed) {
   return colour + " Smoke";
 
 }
+
 function applyCatTabby(colour, parsed) {
 
   if (parsed.Agouti === "a/a") {
@@ -431,6 +434,7 @@ function applyCatWhiteSpotting(colour, parsed) {
   return colour + " White";
 
 }
+
 /* =========================
    OUTPUT HELPERS
 ========================= */
@@ -558,18 +562,42 @@ function findCatColourpointGene(text) {
 
   for (const token of tokens) {
 
-    if (token === "C/C") return "C/C";
+    // Full colour
 
-    if (token === "cb/cb") return "cb/cb";
+    if (token === "C/C") {
+      return "C/C";
+    }
 
-    if (token === "cs/cs") return "cs/cs";
+    // Burmese
 
-    if (token === "cb/cs") return "cb/cs";
-    if (token === "cs/cb") return "cb/cs";
+    if (token === "cb/cb") {
+      return "cb/cb";
+    }
 
-    if (token === "ca/ca") return "ca/ca";
+    // Siamese
 
-    if (token === "c/c") return "c/c";
+    if (token === "cs/cs") {
+      return "cs/cs";
+    }
+
+    // Tonkinese
+
+    if (
+      token === "cb/cs" ||
+      token === "cs/cb"
+    ) {
+      return "cb/cs";
+    }
+
+    // Albino
+
+    if (token === "ca/ca") {
+      return "ca/ca";
+    }
+
+    if (token === "c/c") {
+      return "c/c";
+    }
 
   }
 
