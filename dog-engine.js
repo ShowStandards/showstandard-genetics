@@ -90,26 +90,22 @@ function parseDogGenotype(genotypeText) {
       "m/m"
     ),
 
-   WhiteSpotting: findDogWhiteSpotting(text),
-  ["S/S", "S/sp", "sp/sp", "sw/sw", "sp/sw", "S/sw"],
-  "S/S"
-),
+    WhiteSpotting: findDogWhiteSpotting(text),
 
-Ticking: findDogGenePair(
-  text,
-  ["T/T", "T/t", "t/t"],
-  "t/t"
-),
+    Ticking: findDogGenePair(
+      text,
+      ["T/T", "T/t", "t/t"],
+      "t/t"
+    ),
 
-Roan: findDogGenePair(
-  text,
-  ["R/R", "R/r", "r/r"],
-  "r/r"
-)
-
+    Roan: findDogGenePair(
+      text,
+      ["R/R", "R/r", "r/r"],
+      "r/r"
+    )
   };
-
 }
+
 function parseDogPhenotype(phenotypeText) {
   return {
     base: "",
@@ -326,26 +322,21 @@ function findDogKGene(text) {
 }
 
 function findDogWhiteSpotting(text) {
-
   const tokens = String(text || "")
     .replace(/\s+/g, " ")
     .trim()
     .split(" ");
 
   for (const token of tokens) {
-
     if (token === "S/S") return "S/S";
     if (token === "S/sp") return "S/sp";
     if (token === "sp/sp") return "sp/sp";
     if (token === "sw/sw") return "sw/sw";
     if (token === "sp/sw") return "sp/sw";
     if (token === "S/sw") return "S/sw";
-
   }
 
   return "S/S";
-
 }
-window.runDogGenetics = runDogGenetics;
 
-console.log("DOG ENGINE VERSION: WHITE SPOTTING FIX");
+window.runDogGenetics = runDogGenetics;
