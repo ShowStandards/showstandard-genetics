@@ -14,10 +14,42 @@ function runDogGenetics(inputs) {
 }
 
 function runDogPredictor(inputs) {
-  return `
-    <h4>Dog Predictor</h4>
-    <p>Dog predictor engine coming next.</p>
-  `;
+  const sire = parseDogGenotype(inputs.sireGenotype);
+  const dam = parseDogGenotype(inputs.damGenotype);
+
+  const rows = [
+    dogOutcomeRow("Extension", sire.Extension, dam.Extension),
+    dogOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
+    dogOutcomeRow("K", sire.K, dam.K),
+    dogOutcomeRow("Brown", sire.Brown, dam.Brown),
+    dogOutcomeRow("Dilute", sire.Dilute, dam.Dilute),
+    dogOutcomeRow("Merle", sire.Merle, dam.Merle),
+    dogOutcomeRow("White Spotting", sire.WhiteSpotting, dam.WhiteSpotting),
+    dogOutcomeRow("Ticking", sire.Ticking, dam.Ticking),
+    dogOutcomeRow("Roan", sire.Roan, dam.Roan),
+    dogOutcomeRow("Harlequin", sire.Harlequin, dam.Harlequin),
+    dogOutcomeRow("Intensity", sire.Intensity, dam.Intensity),
+    dogOutcomeRow("Greying", sire.Greying, dam.Greying),
+    dogOutcomeRow("Long Coat", sire.LongCoat, dam.LongCoat),
+    dogOutcomeRow("Furnishings", sire.Furnishings, dam.Furnishings),
+    dogOutcomeRow("Curl", sire.Curl, dam.Curl)
+  ].join("");
+
+  return renderDogResults(
+    "Dog Predictor",
+    `
+      <p><b>Sire:</b> ${inputs.sireGenotype}</p>
+      <p><b>Dam:</b> ${inputs.damGenotype}</p>
+
+      <table class="breed-table">
+        <tr>
+          <th>Gene</th>
+          <th>Possible Outcomes</th>
+        </tr>
+        ${rows}
+      </table>
+    `
+  );
 }
 
 function runDogRoll(inputs) {
@@ -42,10 +74,218 @@ function runDogPhenotypeCalculator(inputs) {
 }
 
 function runDogGenotypeBuilder(inputs) {
-  return `
-    <h4>Dog Genotype Builder</h4>
-    <p>Dog genotype builder coming next.</p>
-  `;
+  const phenotype = String(inputs.phenotype || "").toLowerCase();
+  const suggestions = [];
+  const examples = [];
+  const hidden = [];
+
+  function addSuggestion(item) {
+    if (!suggestions.includes(item)) suggestions.push(item);
+  }
+
+  function addExample(item) {
+    if (!examples.includes(item)) examples.push(item);
+  }
+
+  function addHidden(item) {
+    if (!hidden.includes(item)) hidden.push(item);
+  }
+
+  function addToExamples(gene) {
+    if (examples.length === 0) {
+      examples.push(gene);
+      return;
+    }
+
+    examples.forEach((example, index) => {
+      examples[index] = example + " " + gene;
+    });
+  }
+
+  if (phenotype.includes("white") && !phenotype.includes("irish")) {
+    addSuggestion("Extension: e/e");
+    addSuggestion("White Spotting: sw/sw");
+    addSuggestion("Intensity: i/i");
+    addExample("e/e sw/sw i/i");
+  }
+
+  if (phenotype.includes("cream")) {
+    addSuggestion("Extension: e/e");
+    addSuggestion("Intensity: i/i");
+    addExample("e/e i/i");
+    addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
+  }
+
+  if (phenotype.includes("red")) {
+    addSuggestion("Extension: e/e");
+    addExample("e/e");
+    addExample("e/e B/b D/d");
+    addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
+  }
+
+  if (phenotype.includes("black")) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Black: K/- OR ky/ky with a/a");
+    addExample("E/E K/ky");
+    addExample("E/e ky/ky a/a");
+    addHidden("Brown can be carried: B/b");
+    addHidden("Dilute can be carried: D/d");
+  }
+
+  if (phenotype.includes("chocolate")) {
+    addSuggestion("Brown: b/b");
+    addExample("E/E K/ky b/b");
+    addExample("E/e ky/ky a/a b/b");
+  }
+
+  if (phenotype.includes("blue")) {
+    addSuggestion("Dilute: d/d");
+    addExample("E/E K/ky d/d");
+    addExample("E/e ky/ky a/a d/d");
+  }
+
+  if (phenotype.includes("lilac")) {
+    addSuggestion("Brown: b/b");
+    addSuggestion("Dilute: d/d");
+    addExample("E/E K/ky b/b d/d");
+    addExample("E/e ky/ky a/a b/b d/d");
+  }
+
+  if (phenotype.includes("fawn")) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("K locus: ky/ky or kbr/ky");
+    addExample("E/E Ay/a ky/ky");
+    addExample("E/e Ay/at ky/ky");
+  }
+
+  if (phenotype.includes("pale fawn")) {
+    addSuggestion("Intensity: i/i");
+    addToExamples("i/i");
+  }
+
+  if (phenotype.includes("blue fawn")) {
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Agouti: Ay/-");
+    addToExamples("d/d");
+  }
+
+  if (phenotype.includes("tan")) {
+    addSuggestion("Agouti: at/at or at/a");
+    addSuggestion("K locus: ky/ky or kbr/ky");
+    addExample("E/E at/a ky/ky");
+    addExample("E/e at/at ky/ky");
+  }
+
+  if (phenotype.includes("saddle")) {
+    addSuggestion("Agouti: asa/asa");
+    addExample("E/E asa/asa ky/ky");
+  }
+
+  if (phenotype.includes("wolf sable")) {
+    addSuggestion("Agouti: aw/-");
+    addExample("E/E aw/a ky/ky");
+    addExample("E/e aw/at ky/ky");
+  }
+
+  if (phenotype.includes("grizzle")) {
+    addSuggestion("Extension: Eg/-");
+    addSuggestion("Agouti: at/at");
+    addExample("Eg/E at/at ky/ky");
+    addExample("Eg/e at/at ky/ky");
+  }
+
+  if (phenotype.includes("brindle")) {
+    addSuggestion("K locus: kbr/kbr or kbr/ky");
+    addToExamples("kbr/ky");
+  }
+
+  if (phenotype.includes("mask")) {
+    addSuggestion("Extension: Em/-");
+    addToExamples("Em/E");
+  }
+
+  if (phenotype.includes("merle")) {
+    if (phenotype.includes("double")) {
+      addSuggestion("Merle: M/M");
+      addToExamples("M/M");
+    } else {
+      addSuggestion("Merle: M/m");
+      addToExamples("M/m");
+    }
+  }
+
+  if (phenotype.includes("harlequin")) {
+    addSuggestion("Merle: M/m");
+    addSuggestion("Harlequin: H/h");
+    addToExamples("M/m H/h");
+  }
+
+  if (phenotype.includes("irish")) {
+    addSuggestion("White Spotting: S/sp");
+    addToExamples("S/sp");
+  }
+
+  if (phenotype.includes("piebald")) {
+    addSuggestion("White Spotting: sp/sp");
+    addToExamples("sp/sp");
+  }
+
+  if (phenotype.includes("extreme white")) {
+    addSuggestion("White Spotting: sw/sw, sp/sw, or S/sw");
+    addToExamples("sw/sw");
+  }
+
+  if (phenotype.includes("ticked")) {
+    addSuggestion("Ticking: T/-");
+    addToExamples("T/t");
+  }
+
+  if (phenotype.includes("roan")) {
+    addSuggestion("Roan: R/-");
+    addToExamples("R/r");
+  }
+
+  if (phenotype.includes("faded")) {
+    addSuggestion("Greying: G/-");
+    addToExamples("G/g");
+  }
+
+  if (phenotype.includes("long coat")) {
+    addSuggestion("Long Coat: l/l");
+    addToExamples("l/l");
+  }
+
+  if (phenotype.includes("furnished")) {
+    addSuggestion("Furnishings: F/-");
+    addToExamples("F/n");
+  }
+
+  if (phenotype.includes("curly")) {
+    addSuggestion("Curl: Cu/-");
+    addToExamples("Cu/n");
+  }
+
+  if (suggestions.length === 0) {
+    suggestions.push("No simple genotype match found yet.");
+  }
+
+  return renderDogResults(
+    "Dog Genotype Builder",
+    `
+      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
+
+      <p><b>Likely Required Genes:</b></p>
+      <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
+
+      <p><b>Possible Example Genotypes:</b></p>
+      <ul>${examples.length ? examples.map(item => `<li>${item}</li>`).join("") : "<li>No example genotypes generated yet.</li>"}</ul>
+
+      <p><b>Possible Hidden Traits:</b></p>
+      <ul>${hidden.length ? hidden.map(item => `<li>${item}</li>`).join("") : "<li>No common hidden traits listed yet.</li>"}</ul>
+
+      <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
+    `
+  );
 }
 
 /* =========================
@@ -517,5 +757,63 @@ function findDogWhiteSpotting(text) {
 
   return "S/S";
 }
+function dogOutcomeRow(label, sirePair, damPair) {
+  const outcomes = calculateDogGeneOutcomes(sirePair, damPair);
 
+  return `
+    <tr>
+      <td>${label}</td>
+      <td>${outcomes}</td>
+    </tr>
+  `;
+}
+
+function calculateDogGeneOutcomes(sirePair, damPair) {
+  const sireAlleles = String(sirePair || "n/n").split("/");
+  const damAlleles = String(damPair || "n/n").split("/");
+
+  const counts = {};
+
+  for (const sireAllele of sireAlleles) {
+    for (const damAllele of damAlleles) {
+      const pair = sortDogGenePair([sireAllele, damAllele]);
+      counts[pair] = (counts[pair] || 0) + 1;
+    }
+  }
+
+  return Object.entries(counts)
+    .map(([pair, count]) => {
+      const percent = Math.round((count / 4) * 100);
+      return `${pair}: ${percent}%`;
+    })
+    .join("<br>");
+}
+
+function sortDogGenePair(alleles) {
+  return alleles
+    .sort((a, b) => {
+      const order = [
+        "Em", "Eg", "E", "e",
+        "Ay", "aw", "at", "asa", "a",
+        "K", "kbr", "ky",
+        "B", "b",
+        "D", "d",
+        "M", "m",
+        "S", "sp", "sw",
+        "T", "t",
+        "R", "r",
+        "H", "h",
+        "I", "i",
+        "G", "g",
+        "L", "l",
+        "F", "Cu", "n"
+      ];
+
+      return order.indexOf(a) - order.indexOf(b);
+    })
+    .join("/");
+}
+window.runDogPredictor = runDogPredictor;
+window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
+window.runDogGenotypeBuilder = runDogGenotypeBuilder;
 window.runDogGenetics = runDogGenetics;
