@@ -14,10 +14,47 @@ function runCatGenetics(inputs) {
 }
 
 function runCatPredictor(inputs) {
-  return `
-    <h4>Cat Predictor</h4>
-    <p>Cat predictor engine coming next.</p>
-  `;
+  const sire = parseCatGenotype(inputs.sireGenotype);
+  const dam = parseCatGenotype(inputs.damGenotype);
+
+  const rows = [
+    catOutcomeRow("Orange", sire.Orange, dam.Orange),
+    catOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
+    catOutcomeRow("Brown", sire.Brown, dam.Brown),
+    catOutcomeRow("Dilute", sire.Dilute, dam.Dilute),
+    catOutcomeRow("White", sire.White, dam.White),
+    catOutcomeRow("White Spotting", sire.WhiteSpotting, dam.WhiteSpotting),
+    catOutcomeRow("Silver", sire.Silver, dam.Silver),
+    catOutcomeRow("Colourpoint", sire.Colourpoint, dam.Colourpoint),
+    catOutcomeRow("Tabby", sire.Tabby, dam.Tabby),
+    catOutcomeRow("Spotted", sire.Spotted, dam.Spotted),
+    catOutcomeRow("Ticked", sire.Ticked, dam.Ticked),
+    catOutcomeRow("Polydactyl", sire.Polydactyl, dam.Polydactyl),
+    catOutcomeRow("Amber", sire.Amber, dam.Amber),
+    catOutcomeRow("Sunshine", sire.Sunshine, dam.Sunshine),
+    catOutcomeRow("Extreme Sunshine", sire.ExtremeSunshine, dam.ExtremeSunshine),
+    catOutcomeRow("Charcoal", sire.Charcoal, dam.Charcoal),
+    catOutcomeRow("Wideband", sire.Wideband, dam.Wideband),
+    catOutcomeRow("Rufousing", sire.Rufousing, dam.Rufousing),
+    catOutcomeRow("Glitter", sire.Glitter, dam.Glitter),
+    catOutcomeRow("Karpati", sire.Karpati, dam.Karpati)
+  ].join("");
+
+  return renderCatResults(
+    "Cat Predictor",
+    `
+      <p><b>Sire:</b> ${inputs.sireGenotype}</p>
+      <p><b>Dam:</b> ${inputs.damGenotype}</p>
+
+      <table class="breed-table">
+        <tr>
+          <th>Gene</th>
+          <th>Possible Outcomes</th>
+        </tr>
+        ${rows}
+      </table>
+    `
+  );
 }
 
 function runCatRoll(inputs) {
@@ -42,10 +79,255 @@ function runCatPhenotypeCalculator(inputs) {
 }
 
 function runCatGenotypeBuilder(inputs) {
-  return `
-    <h4>Cat Genotype Builder</h4>
-    <p>Cat genotype builder coming next.</p>
-  `;
+  const phenotype = String(inputs.phenotype || "").toLowerCase();
+
+  const suggestions = [];
+  const examples = [];
+  const hidden = [];
+
+  function addSuggestion(item) {
+    if (!suggestions.includes(item)) suggestions.push(item);
+  }
+
+  function addExample(item) {
+    if (!examples.includes(item)) examples.push(item);
+  }
+
+  function addHidden(item) {
+    if (!hidden.includes(item)) hidden.push(item);
+  }
+
+  function addToExamples(gene) {
+    if (examples.length === 0) {
+      examples.push(gene);
+      return;
+    }
+
+    examples.forEach((example, index) => {
+      examples[index] += " " + gene;
+    });
+  }
+
+  // BASE COLOURS
+
+  if (phenotype.includes("black")) {
+    addSuggestion("Orange: o/Y or o/o");
+    addSuggestion("Brown: B/-");
+    addExample("o/Y B/B D/D");
+    addExample("o/o B/B D/D");
+    addHidden("Dilute can be carried: D/d");
+  }
+
+  if (phenotype.includes("blue")) {
+    addSuggestion("Dilute: d/d");
+    addExample("o/Y B/B d/d");
+    addExample("o/o B/B d/d");
+  }
+
+  if (phenotype.includes("chocolate")) {
+    addSuggestion("Brown: b/b");
+    addExample("o/Y b/b D/D");
+    addExample("o/o b/b D/D");
+  }
+
+  if (phenotype.includes("lilac")) {
+    addSuggestion("Brown: b/b");
+    addSuggestion("Dilute: d/d");
+    addExample("o/Y b/b d/d");
+    addExample("o/o b/b d/d");
+  }
+
+  if (phenotype.includes("cinnamon")) {
+    addSuggestion("Brown: bl/bl");
+    addExample("o/Y bl/bl D/D");
+    addExample("o/o bl/bl D/D");
+  }
+
+  if (phenotype.includes("fawn")) {
+    addSuggestion("Brown: bl/bl");
+    addSuggestion("Dilute: d/d");
+    addExample("o/Y bl/bl d/d");
+    addExample("o/o bl/bl d/d");
+  }
+
+  if (phenotype.includes("red")) {
+    addSuggestion("Orange: O/Y or O/O");
+    addExample("O/Y B/B D/D");
+    addExample("O/O B/B D/D");
+    addHidden("Black-based genes can be hidden beneath red.");
+  }
+
+  if (phenotype.includes("cream")) {
+    addSuggestion("Orange: O/Y or O/O");
+    addSuggestion("Dilute: d/d");
+    addExample("O/Y B/B d/d");
+    addExample("O/O B/B d/d");
+  }
+
+  if (phenotype.includes("tortie")) {
+    addSuggestion("Orange: O/o");
+    addExample("O/o B/B D/D");
+    addHidden("Can genetically be black, chocolate, or cinnamon based.");
+  }
+
+  if (phenotype.includes("blue tortie")) {
+    addSuggestion("Orange: O/o");
+    addSuggestion("Dilute: d/d");
+    addExample("O/o B/B d/d");
+  }
+
+  // WHITE
+
+  if (phenotype.includes("white")) {
+    addSuggestion("White: W/- OR White Spotting");
+    addExample("W/w");
+    addExample("S/S");
+  }
+
+  if (phenotype.includes("calico")) {
+    addSuggestion("Orange: O/o");
+    addSuggestion("White Spotting: S/-");
+    addExample("O/o B/B D/D S/s");
+  }
+
+  // POINTS
+
+  if (phenotype.includes("burmese")) {
+    addSuggestion("Colourpoint: cb/cb");
+    addToExamples("cb/cb");
+  }
+
+  if (phenotype.includes("siamese") || phenotype.includes("point")) {
+    addSuggestion("Colourpoint: cs/cs");
+    addToExamples("cs/cs");
+  }
+
+  if (phenotype.includes("mink")) {
+    addSuggestion("Colourpoint: cb/cs");
+    addToExamples("cb/cs");
+  }
+
+  if (phenotype.includes("blue-eyed albino")) {
+    addSuggestion("Colourpoint: ca/ca");
+    addToExamples("ca/ca");
+  }
+
+  if (phenotype.includes("red-eyed albino")) {
+    addSuggestion("Colourpoint: c/c");
+    addToExamples("c/c");
+  }
+
+  // SILVER / SUNSHINE
+
+  if (phenotype.includes("silver")) {
+    addSuggestion("Silver: I/-");
+    addToExamples("I/i");
+  }
+
+  if (phenotype.includes("amber")) {
+    addSuggestion("Amber: Amb/-");
+    addToExamples("Amb/n");
+  }
+
+  if (phenotype.includes("sunshine")) {
+    addSuggestion("Sunshine: Su/-");
+    addToExamples("Su/n");
+  }
+
+  if (phenotype.includes("extreme sunshine")) {
+    addSuggestion("Extreme Sunshine: Es/-");
+    addToExamples("Es/n");
+  }
+
+  if (phenotype.includes("bimetallic")) {
+    addSuggestion("Silver: I/-");
+    addSuggestion("Sunshine or Extreme Sunshine");
+    addToExamples("I/i Su/n");
+  }
+
+  // MODIFIERS
+
+  if (phenotype.includes("charcoal")) {
+    addSuggestion("Charcoal: Ch/-");
+    addToExamples("Ch/n");
+  }
+
+  if (phenotype.includes("shaded")) {
+    addSuggestion("Wideband: Wb/-");
+    addToExamples("Wb/n");
+  }
+
+  if (phenotype.includes("rufoused")) {
+    addSuggestion("Rufousing: Rf/-");
+    addToExamples("Rf/n");
+  }
+
+  if (phenotype.includes("glitter")) {
+    addSuggestion("Glitter: Gl/-");
+    addToExamples("Gl/n");
+  }
+
+  if (phenotype.includes("karpati")) {
+    addSuggestion("Karpati: Kp/-");
+    addToExamples("Kp/n");
+  }
+
+  // TABBY
+
+  if (phenotype.includes("tabby")) {
+    addSuggestion("Agouti: A/-");
+    addToExamples("A/a");
+  }
+
+  if (phenotype.includes("classic")) {
+    addSuggestion("Tabby: mc/mc");
+    addToExamples("mc/mc");
+  }
+
+  if (phenotype.includes("spotted")) {
+    addSuggestion("Spotted: Sp/-");
+    addToExamples("Sp/sp");
+  }
+
+  if (phenotype.includes("ticked")) {
+    addSuggestion("Ticked: Ta/-");
+    addToExamples("Ta/ta");
+  }
+
+  // POLYDACTYL
+
+  if (phenotype.includes("polydactyl")) {
+    addSuggestion("Polydactyl: Pd/-");
+    addToExamples("Pd/pd");
+  }
+
+  if (suggestions.length === 0) {
+    suggestions.push("No simple genotype match found yet.");
+  }
+
+  return renderCatResults(
+    "Cat Genotype Builder",
+    `
+      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
+
+      <p><b>Likely Required Genes:</b></p>
+      <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
+
+      <p><b>Possible Example Genotypes:</b></p>
+      <ul>${examples.length
+        ? examples.map(item => `<li>${item}</li>`).join("")
+        : "<li>No example genotypes generated yet.</li>"
+      }</ul>
+
+      <p><b>Possible Hidden Traits:</b></p>
+      <ul>${hidden.length
+        ? hidden.map(item => `<li>${item}</li>`).join("")
+        : "<li>No common hidden traits listed yet.</li>"
+      }</ul>
+
+      <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
+    `
+  );
 }
 
 /* =========================
@@ -496,4 +778,44 @@ function findCatTabbyGene(text) {
   return "Mc/Mc";
 }
 
+function catOutcomeRow(label, sirePair, damPair) {
+  const outcomes = calculateCatGeneOutcomes(sirePair, damPair);
+
+  return `
+    <tr>
+      <td>${label}</td>
+      <td>${outcomes}</td>
+    </tr>
+  `;
+}
+
+function calculateCatGeneOutcomes(sirePair, damPair) {
+  const sireAlleles = String(sirePair || "n/n").split("/");
+  const damAlleles = String(damPair || "n/n").split("/");
+
+  const counts = {};
+
+  for (const sireAllele of sireAlleles) {
+    for (const damAllele of damAlleles) {
+      const pair = sortCatGenePair([sireAllele, damAllele]);
+
+      counts[pair] = (counts[pair] || 0) + 1;
+    }
+  }
+
+  return Object.entries(counts)
+    .map(([pair, count]) => {
+      const percent = Math.round((count / 4) * 100);
+      return `${pair}: ${percent}%`;
+    })
+    .join("<br>");
+}
+
+function sortCatGenePair(alleles) {
+  return alleles.sort().join("/");
+}
+window.runCatPredictor = runCatPredictor;
+window.runCatRoll = runCatRoll;
+window.runCatPhenotypeCalculator = runCatPhenotypeCalculator;
+window.runCatGenotypeBuilder = runCatGenotypeBuilder;
 window.runCatGenetics = runCatGenetics;
