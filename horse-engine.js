@@ -220,12 +220,19 @@ function runHorseGenotypeBuilder(inputs) {
     addSuggestion("Champagne: Ch/-");
     addExample("E/E a/a Ch/n");
     addExample("E/e a/a Ch/n");
-  } else if (phenotype.includes("champagne")) {
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E A/A Ch/n");
-    addExample("E/e A/a Ch/n");
-    addExample("e/e A/a Ch/n");
-  }
+} else if (phenotype.includes("champagne")) {
+
+  addSuggestion("Champagne: Ch/-");
+
+  addExample("E/E A/A Ch/n");
+  addExample("E/e A/a Ch/n");
+  addExample("E/E a/a Ch/n");
+  addExample("E/e a/a Ch/n");
+  addExample("e/e A/A Ch/n");
+  addExample("e/e A/a Ch/n");
+
+  addHidden("Champagne can occur on any base colour.");
+}
 
   // Silver
 
