@@ -80,49 +80,273 @@ function runHorseGenotypeBuilder(inputs) {
   const examples = [];
   const hidden = [];
 
-  if (phenotype.includes("chestnut")) {
-    suggestions.push("Extension: e/e");
-    examples.push("e/e A/A");
-    examples.push("e/e A/a Z/n");
-    examples.push("e/e a/a Prl/n");
-    hidden.push("Agouti can be hidden on chestnut: A/A, A/a, or a/a");
-    hidden.push("Silver can be hidden on chestnut: Z/n or Z/Z");
+  function addSuggestion(item) {
+    if (!suggestions.includes(item)) suggestions.push(item);
+  }
+
+  function addExample(item) {
+    if (!examples.includes(item)) examples.push(item);
+  }
+
+  function addHidden(item) {
+    if (!hidden.includes(item)) hidden.push(item);
+  }
+
+  function addToExamples(gene) {
+    if (examples.length === 0) {
+      examples.push(gene);
+      return;
+    }
+
+    examples.forEach((example, index) => {
+      examples[index] = example + " " + gene;
+    });
+  }
+
+  // Base colours
+
+  if (phenotype.includes("chestnut") || phenotype.includes("red")) {
+    addSuggestion("Extension: e/e");
+    addExample("e/e A/A");
+    addExample("e/e A/a");
+    addExample("e/e a/a");
+    addHidden("Agouti can be hidden on chestnut: A/A, A/a, or a/a");
+    addHidden("Silver can be hidden on chestnut: Z/n or Z/Z");
+  }
+
+  if (phenotype.includes("black") && !phenotype.includes("silver black")) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Agouti: a/a");
+    addExample("E/E a/a");
+    addExample("E/e a/a");
+    addHidden("Chestnut can be carried: E/e");
   }
 
   if (phenotype.includes("bay")) {
-    suggestions.push("Extension: E/-");
-    suggestions.push("Agouti: A/-");
-    examples.push("E/E A/A");
-    examples.push("E/e A/a");
-    examples.push("E/e A/A Prl/n");
-    hidden.push("Chestnut can be carried: E/e");
-    hidden.push("Recessive black can be carried: A/a");
+    addSuggestion("Extension: E/-");
+    addSuggestion("Agouti: A/-");
+    addExample("E/E A/A");
+    addExample("E/e A/a");
+    addHidden("Chestnut can be carried: E/e");
+    addHidden("Recessive black can be carried: A/a");
   }
 
-  if (phenotype.includes("black")) {
-    suggestions.push("Extension: E/-");
-    suggestions.push("Agouti: a/a");
-    examples.push("E/E a/a");
-    examples.push("E/e a/a");
-    examples.push("E/e a/a Prl/n");
-    hidden.push("Chestnut can be carried: E/e");
+  // Cream
+
+  if (phenotype.includes("palomino")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Cream: Cr/n");
+    addExample("e/e A/A Cr/n");
+    addExample("e/e A/a Cr/n");
+    addExample("e/e a/a Cr/n");
+    addHidden("Agouti and Silver can be hidden on red-based horses.");
   }
 
   if (phenotype.includes("buckskin")) {
-    suggestions.push("Base: E/- A/-");
-    suggestions.push("Cream: Cr/n");
-    examples.push("E/E A/A Cr/n");
-    examples.push("E/e A/a Cr/n");
-    examples.push("E/e A/A Cr/n Prl/n");
-    hidden.push("Chestnut can be carried: E/e");
-    hidden.push("Recessive black can be carried: A/a");
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Cream: Cr/n");
+    addExample("E/E A/A Cr/n");
+    addExample("E/e A/a Cr/n");
+    addHidden("Chestnut can be carried: E/e");
+    addHidden("Recessive black can be carried: A/a");
   }
 
+  if (phenotype.includes("smokey black")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Cream: Cr/n");
+    addExample("E/E a/a Cr/n");
+    addExample("E/e a/a Cr/n");
+    addHidden("Chestnut can be carried: E/e");
+  }
+
+  if (phenotype.includes("cremello")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Cream: Cr/Cr");
+    addExample("e/e A/A Cr/Cr");
+    addExample("e/e A/a Cr/Cr");
+    addHidden("Agouti and Silver can be hidden on red-based horses.");
+  }
+
+  if (phenotype.includes("perlino")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Cream: Cr/Cr");
+    addExample("E/E A/A Cr/Cr");
+    addExample("E/e A/a Cr/Cr");
+  }
+
+  if (phenotype.includes("smokey cream")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Cream: Cr/Cr");
+    addExample("E/E a/a Cr/Cr");
+    addExample("E/e a/a Cr/Cr");
+  }
+
+  // Dun
+
+  if (phenotype.includes("red dun")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Dun: D/-");
+    addExample("e/e A/A D/n");
+    addExample("e/e A/a D/n");
+  } else if (phenotype.includes("bay dun")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Dun: D/-");
+    addExample("E/E A/A D/n");
+    addExample("E/e A/a D/n");
+  } else if (phenotype.includes("grullo") || phenotype.includes("grulla")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Dun: D/-");
+    addExample("E/E a/a D/n");
+    addExample("E/e a/a D/n");
+  } else if (phenotype.includes("dun")) {
+    addSuggestion("Dun: D/-");
+    addToExamples("D/n");
+  }
+
+  // Champagne
+
+  if (phenotype.includes("gold champagne")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Champagne: Ch/-");
+    addExample("e/e A/A Ch/n");
+    addExample("e/e A/a Ch/n");
+  } else if (phenotype.includes("amber champagne")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E A/A Ch/n");
+    addExample("E/e A/a Ch/n");
+  } else if (phenotype.includes("classic champagne")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E a/a Ch/n");
+    addExample("E/e a/a Ch/n");
+  } else if (phenotype.includes("champagne")) {
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E A/A Ch/n");
+    addExample("E/e A/a Ch/n");
+    addExample("e/e A/a Ch/n");
+  }
+
+  // Silver
+
+  if (phenotype.includes("silver black")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E a/a Z/n");
+    addExample("E/e a/a Z/n");
+  } else if (phenotype.includes("silver bay")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E A/A Z/n");
+    addExample("E/e A/a Z/n");
+  } else if (phenotype.includes("silver")) {
+    addSuggestion("Silver: Z/-");
+    addToExamples("Z/n");
+  }
+
+  // Pearl / Mushroom
+
+  if (phenotype.includes("apricot")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Pearl: Prl/Prl");
+    addExample("e/e A/A Prl/Prl");
+    addExample("e/e A/a Prl/Prl");
+  } else if (phenotype.includes("pearl")) {
+    addSuggestion("Pearl: Prl/Prl or Cr/n + Prl/n depending on phenotype");
+    addToExamples("Prl/n");
+  }
+
+  if (phenotype.includes("mushmello")) {
+    addSuggestion("Base: e/e with Cream");
+    addSuggestion("Mushroom: mu/mu");
+    addExample("e/e A/A Cr/n mu/mu");
+  } else if (phenotype.includes("mushroom")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Mushroom: mu/mu");
+    addExample("e/e A/A mu/mu");
+    addExample("e/e A/a mu/mu");
+  }
+
+  // Other modifiers
+
+  if (phenotype.includes("flaxen")) {
+    addSuggestion("Flaxen: f/f");
+    addToExamples("f/f");
+  }
+
+  if (phenotype.includes("sooty")) {
+    addSuggestion("Sooty: Sty/-");
+    addToExamples("Sty/n");
+  }
+
+  if (phenotype.includes("pangare")) {
+    addSuggestion("Pangare: P/-");
+    addToExamples("P/n");
+  }
+
+  if (phenotype.includes("grey") || phenotype.includes("gray")) {
+    addSuggestion("Grey: G/-");
+    addToExamples("G/g");
+    addHidden("Grey visually overrides the base colour, so the base may be genetically hidden.");
+  }
+
+  if (phenotype.includes("roan")) {
+    addSuggestion("Roan: Rn/-");
+    addToExamples("Rn/n");
+  }
+
+  // White patterns
+
   if (phenotype.includes("tobiano")) {
-    suggestions.push("Tobiano: To/-");
-    examples.forEach((example, index) => {
-      examples[index] = example + " To/n";
-    });
+    addSuggestion("Tobiano: To/-");
+    addToExamples("To/n");
+  }
+
+  if (phenotype.includes("frame")) {
+    addSuggestion("Frame Overo: OLW/-");
+    addToExamples("OLW/n");
+  }
+
+  if (phenotype.includes("splash")) {
+    addSuggestion("Splash: Spl/-");
+    addToExamples("Spl/n");
+  }
+
+  if (phenotype.includes("rabicano")) {
+    addSuggestion("Rabicano: Rb/-");
+    addToExamples("Rb/n");
+  }
+
+  if (phenotype.includes("tovero")) {
+    addSuggestion("Tobiano: To/-");
+    addSuggestion("Frame Overo: OLW/-");
+    addToExamples("To/n OLW/n");
+  }
+
+  // Appaloosa
+
+  if (phenotype.includes("few spot")) {
+    addSuggestion("Appaloosa: Lp/Lp");
+    addSuggestion("PATN1: PATN1/-");
+    addToExamples("Lp/Lp PATN1/n");
+  } else if (phenotype.includes("leopard")) {
+    addSuggestion("Appaloosa: Lp/-");
+    addSuggestion("PATN1: PATN1/-");
+    addToExamples("Lp/n PATN1/n");
+  } else if (phenotype.includes("snow cap")) {
+    addSuggestion("Appaloosa: Lp/Lp");
+    addSuggestion("PATN2: PATN2/-");
+    addToExamples("Lp/Lp PATN2/n");
+  } else if (phenotype.includes("blanket")) {
+    addSuggestion("Appaloosa: Lp/-");
+    addSuggestion("PATN2: PATN2/-");
+    addToExamples("Lp/n PATN2/n");
+  } else if (
+    phenotype.includes("appaloosa") ||
+    phenotype.includes("varnish")
+  ) {
+    addSuggestion("Appaloosa: Lp/-");
+    addToExamples("Lp/n");
   }
 
   if (suggestions.length === 0) {
