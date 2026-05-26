@@ -814,6 +814,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 window.runDogPredictor = runDogPredictor;
+window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
 window.runDogGenotypeBuilder = runDogGenotypeBuilder;
 window.runDogGenetics = runDogGenetics;
