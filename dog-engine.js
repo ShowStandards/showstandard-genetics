@@ -102,11 +102,15 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
-  if (phenotype.includes("white") && !phenotype.includes("irish")) {
+  // True genetic white should only trigger when the phenotype is just "white".
+  // Phrases like "Chocolate and White" mean a coloured dog with white spotting,
+  // not e/e red/cream/white, because e/e hides black/chocolate pigment and merle.
+  if (phenotype.trim() === "white") {
     addSuggestion("Extension: e/e");
     addSuggestion("White Spotting: sw/sw");
     addSuggestion("Intensity: i/i");
     addExample("e/e sw/sw i/i");
+    addHidden("Agouti, K, Brown, Dilute, and Merle can be hidden by e/e.");
   }
 
   if (phenotype.includes("cream")) {
@@ -224,6 +228,21 @@ function runDogGenotypeBuilder(inputs) {
     addSuggestion("K locus: ky/ky or kbr/ky");
     addExample("E/E at/a ky/ky");
     addExample("E/e at/at ky/ky");
+  }
+
+  const wantsGenericWhiteSpotting =
+    phenotype.includes("and white") ||
+    phenotype.includes("with white") ||
+    phenotype.includes("white markings");
+
+  if (
+    wantsGenericWhiteSpotting &&
+    !phenotype.includes("irish") &&
+    !phenotype.includes("piebald") &&
+    !phenotype.includes("extreme white")
+  ) {
+    addSuggestion("White Spotting: S/sp, sp/sp, or S/sw");
+    addToExamples("S/sp");
   }
 
   if (phenotype.includes("saddle")) {
