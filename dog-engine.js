@@ -132,20 +132,70 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Dilute can be carried: D/d");
   }
 
-  if (phenotype.includes("chocolate")) {
-    addSuggestion("Brown: b/b");
-    addExample("E/E K/ky b/b");
-    addExample("E/e ky/ky a/a b/b");
+  const wantsBrownBase =
+    phenotype.includes("chocolate") ||
+    phenotype.includes("liver") ||
+    phenotype.includes("brown");
+
+  const wantsTanPoint =
+    phenotype.includes("tan") ||
+    phenotype.includes("tri") ||
+    phenotype.includes("tricolor") ||
+    phenotype.includes("tricolour");
+
+  const wantsBlueMerle = phenotype.includes("blue merle");
+  const wantsSlateMerle = phenotype.includes("slate merle") || phenotype.includes("slate");
+
+  const wantsBlueBase =
+    phenotype.includes("blue") &&
+    !wantsBlueMerle;
+
+  if (wantsBrownBase) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Brown/Liver/Chocolate: b/b");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: ky/ky or kbr/ky");
+      addExample("E/E at/a ky/ky b/b");
+      addExample("E/e at/at ky/ky b/b");
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+      addExample("E/E K/ky b/b");
+      addExample("E/e ky/ky a/a b/b");
+    }
+
+    addHidden("Dilute can be carried: D/d");
   }
 
-  if (phenotype.includes("blue")) {
+  if (wantsBlueMerle) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+    addSuggestion("Merle: M/m");
+    addSuggestion("Dilute: not d/d — use D/D or D/d");
+    addExample("E/E K/ky D/D M/m");
+    addExample("E/e ky/ky a/a D/d M/m");
+    addHidden("Brown can be carried: B/b");
+  }
+
+  if (wantsSlateMerle) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Merle: M/m");
+    addExample("E/E K/ky d/d M/m");
+    addExample("E/e ky/ky a/a d/d M/m");
+    addHidden("Brown can be carried: B/b");
+  }
+
+  if (wantsBlueBase) {
     addSuggestion("Dilute: d/d");
     addExample("E/E K/ky d/d");
     addExample("E/e ky/ky a/a d/d");
   }
 
-  if (phenotype.includes("lilac")) {
-    addSuggestion("Brown: b/b");
+  if (phenotype.includes("lilac") || phenotype.includes("isabella")) {
+    addSuggestion("Brown/Liver/Chocolate: b/b");
     addSuggestion("Dilute: d/d");
     addExample("E/E K/ky b/b d/d");
     addExample("E/e ky/ky a/a b/b d/d");
@@ -169,7 +219,7 @@ function runDogGenotypeBuilder(inputs) {
     addToExamples("d/d");
   }
 
-  if (phenotype.includes("tan")) {
+  if (wantsTanPoint && !wantsBrownBase) {
     addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addExample("E/E at/a ky/ky");
@@ -204,7 +254,7 @@ function runDogGenotypeBuilder(inputs) {
     addToExamples("Em/E");
   }
 
-  if (phenotype.includes("merle")) {
+  if (phenotype.includes("merle") && !wantsBlueMerle && !wantsSlateMerle) {
     if (phenotype.includes("double")) {
       addSuggestion("Merle: M/M");
       addToExamples("M/M");
