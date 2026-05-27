@@ -462,14 +462,28 @@ function getDogBaseColour(parsed) {
 ========================= */
 
 function applyDogModifiers(colour, parsed) {
-  if (parsed.Brown === "b/b") {
+  const isBrown = parsed.Brown === "b/b";
+  const isDilute = parsed.Dilute === "d/d";
+  const isSingleMerle = parsed.Merle === "M/m";
+  const isDoubleMerle = parsed.Merle === "M/M";
+
+  /* =========================
+     BROWN MODIFIER
+     b/b may be called Chocolate, Liver, or Brown.
+  ========================= */
+
+  if (isBrown) {
     if (colour === "Black") colour = "Chocolate";
     if (colour === "Tan Point") colour = "Chocolate Tan";
     if (colour === "Wolf Sable") colour = "Chocolate Wolf Sable";
     if (colour === "Saddle Tan") colour = "Chocolate Saddle Tan";
   }
 
-  if (parsed.Dilute === "d/d") {
+  /* =========================
+     DILUTE MODIFIER
+  ========================= */
+
+  if (isDilute) {
     if (colour === "Black") colour = "Blue";
     if (colour === "Chocolate") colour = "Lilac";
     if (colour === "Tan Point") colour = "Blue Tan";
@@ -481,27 +495,62 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Chocolate Saddle Tan") colour = "Lilac Saddle Tan";
   }
 
+  /* =========================
+     INTENSITY MODIFIER
+  ========================= */
+
   if (parsed.Intensity === "i/i") {
     if (colour === "Red") colour = "Cream";
     if (colour === "Fawn") colour = "Pale Fawn";
     if (colour === "Blue Fawn") colour = "Pale Blue Fawn";
   }
 
-  if (parsed.Merle === "M/m") {
-    colour = colour + " Merle";
+  /* =========================
+     MERLE MODIFIER
+
+     Blue Merle is black-based and NOT dilute.
+     A black-based d/d merle is Slate Merle.
+  ========================= */
+
+  if (isSingleMerle) {
+    if (colour === "Black") {
+      colour = "Blue Merle";
+    } else if (colour === "Blue") {
+      colour = "Slate Merle";
+    } else if (colour === "Chocolate") {
+      colour = "Chocolate Merle";
+    } else if (colour === "Lilac") {
+      colour = "Lilac Merle";
+    } else {
+      colour = colour + " Merle";
+    }
   }
 
-  if (parsed.Merle === "M/M") {
-    colour = "Double Merle " + colour;
+  if (isDoubleMerle) {
+    if (colour === "Black") {
+      colour = "Double Blue Merle";
+    } else if (colour === "Blue") {
+      colour = "Double Slate Merle";
+    } else if (colour === "Chocolate") {
+      colour = "Double Chocolate Merle";
+    } else if (colour === "Lilac") {
+      colour = "Double Lilac Merle";
+    } else {
+      colour = "Double Merle " + colour;
+    }
   }
 
-  if (hasDogGene(parsed.Extension, "Em") && colour !== "Red" && colour !== "Cream") {
+  if (
+    hasDogGene(parsed.Extension, "Em") &&
+    colour !== "Red" &&
+    colour !== "Cream"
+  ) {
     colour = colour + " Mask";
   }
 
   if (
     parsed.Harlequin === "H/h" &&
-    parsed.Merle === "M/m"
+    isSingleMerle
   ) {
     colour = colour.replace("Merle", "Harlequin");
   }
