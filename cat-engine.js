@@ -224,6 +224,17 @@ function runCatGenotypeBuilder(inputs) {
     addToExamples("I/i");
   }
 
+  if (phenotype.includes("cameo")) {
+    addSuggestion("Orange: O/Y or O/O");
+    addSuggestion("Silver: I/-");
+    addSuggestion("Agouti: A/-");
+
+    addExample("O/Y I/i A/a");
+    addExample("O/O I/i A/a");
+
+    addHidden("Wideband may enhance cameo appearance.");
+  }
+
   if (phenotype.includes("amber")) {
     addSuggestion("Amber: Amb/-");
     addToExamples("Amb/n");
