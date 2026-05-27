@@ -219,21 +219,21 @@ function runCatGenotypeBuilder(inputs) {
 
   // SILVER / SUNSHINE
 
-  if (phenotype.includes("silver")) {
-    addSuggestion("Silver: I/-");
-    addToExamples("I/i");
-  }
+if (phenotype.includes("silver")) {
+  addSuggestion("Silver: I/-");
+  addToExamples("I/i");
+}
 
-  if (phenotype.includes("cameo")) {
-    addSuggestion("Orange: O/Y or O/O");
-    addSuggestion("Silver: I/-");
-    addSuggestion("Agouti: A/-");
+if (phenotype.includes("cameo")) {
+  addSuggestion("Orange: O/Y or O/O");
+  addSuggestion("Silver: I/-");
+  addSuggestion("Agouti: A/-");
 
-    addExample("O/Y I/i A/a");
-    addExample("O/O I/i A/a");
+  addExample("O/Y I/i A/a");
+  addExample("O/O I/i A/a");
 
-    addHidden("Wideband may enhance cameo appearance.");
-  }
+  addHidden("Wideband may enhance cameo appearance.");
+}
 
   if (phenotype.includes("amber")) {
     addSuggestion("Amber: Amb/-");
