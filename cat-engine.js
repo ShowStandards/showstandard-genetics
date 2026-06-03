@@ -407,19 +407,45 @@ function getCatPhenotype(parsed) {
 ========================= */
 
 function getCatBaseColour(parsed) {
-  if (parsed.Orange === "O/Y") return "Red";
+
+  if (parsed.Orange === "O/Y") {
+    return "Red";
+  }
 
   if (parsed.Orange === "o/Y") {
-    if (parsed.Brown === "b/b") return "Chocolate";
-    if (parsed.Brown === "bl/bl") return "Cinnamon";
+
+    if (
+      parsed.Brown === "b/b" ||
+      parsed.Brown === "b/bl"
+    ) {
+      return "Chocolate";
+    }
+
+    if (parsed.Brown === "bl/bl") {
+      return "Cinnamon";
+    }
+
     return "Black";
   }
 
-  if (parsed.Orange === "O/O") return "Red";
-  if (parsed.Orange === "O/o") return "Tortie";
+  if (parsed.Orange === "O/O") {
+    return "Red";
+  }
 
-  if (parsed.Brown === "b/b") return "Chocolate";
-  if (parsed.Brown === "bl/bl") return "Cinnamon";
+  if (parsed.Orange === "O/o") {
+    return "Tortie";
+  }
+
+  if (
+    parsed.Brown === "b/b" ||
+    parsed.Brown === "b/bl"
+  ) {
+    return "Chocolate";
+  }
+
+  if (parsed.Brown === "bl/bl") {
+    return "Cinnamon";
+  }
 
   return "Black";
 }
