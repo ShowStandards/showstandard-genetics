@@ -108,8 +108,6 @@ function runCatGenotypeBuilder(inputs) {
     });
   }
 
-  // BASE COLOURS
-
   if (phenotype.includes("black")) {
     addSuggestion("Orange: o/Y or o/o");
     addSuggestion("Brown: B/-");
@@ -176,8 +174,6 @@ function runCatGenotypeBuilder(inputs) {
     addExample("O/o B/B d/d");
   }
 
-  // WHITE
-
   if (phenotype.includes("white")) {
     addSuggestion("White: W/- OR White Spotting");
     addExample("W/w");
@@ -189,8 +185,6 @@ function runCatGenotypeBuilder(inputs) {
     addSuggestion("White Spotting: S/-");
     addExample("O/o B/B D/D S/s");
   }
-
-  // POINTS
 
   if (phenotype.includes("burmese")) {
     addSuggestion("Colourpoint: cb/cb");
@@ -217,23 +211,19 @@ function runCatGenotypeBuilder(inputs) {
     addToExamples("c/c");
   }
 
-  // SILVER / SUNSHINE
+  if (phenotype.includes("silver")) {
+    addSuggestion("Silver: I/-");
+    addToExamples("I/i");
+  }
 
-if (phenotype.includes("silver")) {
-  addSuggestion("Silver: I/-");
-  addToExamples("I/i");
-}
-
-if (phenotype.includes("cameo")) {
-  addSuggestion("Orange: O/Y or O/O");
-  addSuggestion("Silver: I/-");
-  addSuggestion("Agouti: A/-");
-
-  addExample("O/Y I/i A/a");
-  addExample("O/O I/i A/a");
-
-  addHidden("Wideband may enhance cameo appearance.");
-}
+  if (phenotype.includes("cameo")) {
+    addSuggestion("Orange: O/Y or O/O");
+    addSuggestion("Silver: I/-");
+    addSuggestion("Agouti: A/-");
+    addExample("O/Y I/i A/a");
+    addExample("O/O I/i A/a");
+    addHidden("Wideband may enhance cameo appearance.");
+  }
 
   if (phenotype.includes("amber")) {
     addSuggestion("Amber: Amb/-");
@@ -255,8 +245,6 @@ if (phenotype.includes("cameo")) {
     addSuggestion("Sunshine or Extreme Sunshine");
     addToExamples("I/i Su/n");
   }
-
-  // MODIFIERS
 
   if (phenotype.includes("charcoal")) {
     addSuggestion("Charcoal: Ch/-");
@@ -283,8 +271,6 @@ if (phenotype.includes("cameo")) {
     addToExamples("Kp/n");
   }
 
-  // TABBY
-
   if (phenotype.includes("tabby")) {
     addSuggestion("Agouti: A/-");
     addToExamples("A/a");
@@ -304,8 +290,6 @@ if (phenotype.includes("cameo")) {
     addSuggestion("Ticked: Ta/-");
     addToExamples("Ta/ta");
   }
-
-  // POLYDACTYL
 
   if (phenotype.includes("polydactyl")) {
     addSuggestion("Polydactyl: Pd/-");
@@ -353,107 +337,43 @@ function parseCatGenotype(genotypeText) {
   return {
     Orange: findCatOrangeGene(text),
 
-    Agouti: findCatGenePair(
-      text,
-      ["A/A", "A/a", "a/a"],
-      "a/a"
-    ),
+    Agouti: findCatGenePair(text, ["A/A", "A/a", "a/a"], "a/a"),
 
     Brown: findCatBrownGene(text),
 
-    Dilute: findCatGenePair(
-      text,
-      ["D/D", "D/d", "d/d"],
-      "D/D"
-    ),
+    Dilute: findCatGenePair(text, ["D/D", "D/d", "d/d"], "D/D"),
 
-    White: findCatGenePair(
-      text,
-      ["W/W", "W/w", "w/w"],
-      "w/w"
-    ),
+    White: findCatGenePair(text, ["W/W", "W/w", "w/w"], "w/w"),
 
-    WhiteSpotting: findCatGenePair(
-      text,
-      ["S/S", "S/s", "s/s"],
-      "s/s"
-    ),
+    WhiteSpotting: findCatGenePair(text, ["S/S", "S/s", "s/s"], "s/s"),
 
-    Silver: findCatGenePair(
-      text,
-      ["I/I", "I/i", "i/i"],
-      "i/i"
-    ),
+    Silver: findCatGenePair(text, ["I/I", "I/i", "i/i"], "i/i"),
 
     Colourpoint: findCatColourpointGene(text),
 
     Tabby: findCatTabbyGene(text),
 
-    Spotted: findCatGenePair(
-      text,
-      ["Sp/Sp", "Sp/sp", "sp/sp"],
-      "sp/sp"
-    ),
+    Spotted: findCatGenePair(text, ["Sp/Sp", "Sp/sp", "sp/sp"], "sp/sp"),
 
-    Ticked: findCatGenePair(
-      text,
-      ["Ta/Ta", "Ta/ta", "ta/ta"],
-      "ta/ta"
-    ),
+    Ticked: findCatGenePair(text, ["Ta/Ta", "Ta/ta", "ta/ta"], "ta/ta"),
 
-    Polydactyl: findCatGenePair(
-      text,
-      ["Pd/Pd", "Pd/pd", "pd/pd"],
-      "pd/pd"
-    ),
+    Polydactyl: findCatGenePair(text, ["Pd/Pd", "Pd/pd", "pd/pd"], "pd/pd"),
 
-    Amber: findCatGenePair(
-      text,
-      ["Amb/Amb", "Amb/n", "n/Amb", "n/n"],
-      "n/n"
-    ),
+    Amber: findCatGenePair(text, ["Amb/Amb", "Amb/n", "n/Amb", "n/n"], "n/n"),
 
-    Sunshine: findCatGenePair(
-      text,
-      ["Su/Su", "Su/n", "n/Su", "n/n"],
-      "n/n"
-    ),
+    Sunshine: findCatGenePair(text, ["Su/Su", "Su/n", "n/Su", "n/n"], "n/n"),
 
-    ExtremeSunshine: findCatGenePair(
-      text,
-      ["Es/Es", "Es/n", "n/Es", "n/n"],
-      "n/n"
-    ),
+    ExtremeSunshine: findCatGenePair(text, ["Es/Es", "Es/n", "n/Es", "n/n"], "n/n"),
 
-    Charcoal: findCatGenePair(
-      text,
-      ["Ch/Ch", "Ch/n", "n/Ch", "n/n"],
-      "n/n"
-    ),
+    Charcoal: findCatGenePair(text, ["Ch/Ch", "Ch/n", "n/Ch", "n/n"], "n/n"),
 
-    Wideband: findCatGenePair(
-      text,
-      ["Wb/Wb", "Wb/n", "n/Wb", "n/n"],
-      "n/n"
-    ),
+    Wideband: findCatGenePair(text, ["Wb/Wb", "Wb/n", "n/Wb", "n/n"], "n/n"),
 
-    Rufousing: findCatGenePair(
-      text,
-      ["Rf/Rf", "Rf/n", "n/Rf", "n/n"],
-      "n/n"
-    ),
+    Rufousing: findCatGenePair(text, ["Rf/Rf", "Rf/n", "n/Rf", "n/n"], "n/n"),
 
-    Glitter: findCatGenePair(
-      text,
-      ["Gl/Gl", "Gl/n", "n/Gl", "n/n"],
-      "n/n"
-    ),
+    Glitter: findCatGenePair(text, ["Gl/Gl", "Gl/n", "n/Gl", "n/n"], "n/n"),
 
-    Karpati: findCatGenePair(
-      text,
-      ["Kp/Kp", "Kp/n", "n/Kp", "n/n"],
-      "n/n"
-    )
+    Karpati: findCatGenePair(text, ["Kp/Kp", "Kp/n", "n/Kp", "n/n"], "n/n")
   };
 }
 
@@ -462,7 +382,6 @@ function parseCatGenotype(genotypeText) {
 ========================= */
 
 function getCatPhenotype(parsed) {
-
   if (
     parsed.White === "W/W" ||
     parsed.White === "W/w"
@@ -470,32 +389,17 @@ function getCatPhenotype(parsed) {
     return applyCatPolydactyl("White", parsed);
   }
 
-  let colour =
-    getCatBaseColour(parsed);
+  let colour = getCatBaseColour(parsed);
 
-  colour =
-    applyCatDilute(colour, parsed);
-
-  colour =
-    applyCatPointModifier(colour, parsed);
-
-  colour =
-    applyCatSilver(colour, parsed);
-
-  colour =
-    applyCatColourModifiers(colour, parsed);
-
-  colour =
-    applyCatTabby(colour, parsed);
-
-  colour =
-    applyCatWhiteSpotting(colour, parsed);
-
-  colour =
-    applyCatPolydactyl(colour, parsed);
+  colour = applyCatDilute(colour, parsed);
+  colour = applyCatPointModifier(colour, parsed);
+  colour = applyCatSilver(colour, parsed);
+  colour = applyCatColourModifiers(colour, parsed);
+  colour = applyCatTabby(colour, parsed);
+  colour = applyCatWhiteSpotting(colour, parsed);
+  colour = applyCatPolydactyl(colour, parsed);
 
   return colour.trim();
-
 }
 
 /* =========================
@@ -535,8 +439,34 @@ function applyCatDilute(colour, parsed) {
 
   return colour;
 }
-function applyCatSilver(colour, parsed) {
 
+function applyCatPointModifier(colour, parsed) {
+  if (!parsed || parsed.Colourpoint === "C/C") return colour;
+
+  if (parsed.Colourpoint === "cb/cb") {
+    return "Burmese " + colour;
+  }
+
+  if (parsed.Colourpoint === "cs/cs") {
+    return "Pointed " + colour;
+  }
+
+  if (parsed.Colourpoint === "cb/cs") {
+    return "Mink " + colour;
+  }
+
+  if (parsed.Colourpoint === "ca/ca") {
+    return "Blue-Eyed Albino";
+  }
+
+  if (parsed.Colourpoint === "c/c") {
+    return "Red-Eyed Albino";
+  }
+
+  return colour;
+}
+
+function applyCatSilver(colour, parsed) {
   const hasSilver =
     parsed.Silver === "I/I" ||
     parsed.Silver === "I/i";
@@ -546,8 +476,8 @@ function applyCatSilver(colour, parsed) {
   }
 
   return "Silver " + colour;
-
 }
+
 function applyCatColourModifiers(colour, parsed) {
   if (
     colour === "Blue-Eyed Albino" ||
@@ -640,6 +570,78 @@ function applyCatColourModifiers(colour, parsed) {
 
   if (modifiers.length > 0) {
     return modifiers.join(" ") + " " + colour;
+  }
+
+  return colour;
+}
+
+function applyCatTabby(colour, parsed) {
+  if (
+    colour === "Blue-Eyed Albino" ||
+    colour === "Red-Eyed Albino" ||
+    colour === "White"
+  ) {
+    return colour;
+  }
+
+  const hasAgouti =
+    parsed.Agouti === "A/A" ||
+    parsed.Agouti === "A/a" ||
+    colour.includes("Red") ||
+    colour.includes("Cream") ||
+    colour.includes("Tortie");
+
+  if (!hasAgouti) {
+    return colour;
+  }
+
+  if (
+    parsed.Ticked === "Ta/Ta" ||
+    parsed.Ticked === "Ta/ta"
+  ) {
+    return "Ticked Tabby " + colour;
+  }
+
+  if (
+    parsed.Spotted === "Sp/Sp" ||
+    parsed.Spotted === "Sp/sp"
+  ) {
+    return "Spotted Tabby " + colour;
+  }
+
+  if (parsed.Tabby === "mc/mc") {
+    return "Classic Tabby " + colour;
+  }
+
+  return "Mackerel Tabby " + colour;
+}
+
+function applyCatWhiteSpotting(colour, parsed) {
+  if (
+    colour === "Blue-Eyed Albino" ||
+    colour === "Red-Eyed Albino" ||
+    colour === "White"
+  ) {
+    return colour;
+  }
+
+  if (parsed.WhiteSpotting === "S/S") {
+    return colour + " and High White";
+  }
+
+  if (parsed.WhiteSpotting === "S/s") {
+    return colour + " and White";
+  }
+
+  return colour;
+}
+
+function applyCatPolydactyl(colour, parsed) {
+  if (
+    parsed.Polydactyl === "Pd/Pd" ||
+    parsed.Polydactyl === "Pd/pd"
+  ) {
+    return colour + " Polydactyl";
   }
 
   return colour;
@@ -752,9 +754,7 @@ function findCatColourpointGene(text) {
 
   for (const token of tokens) {
     if (token === "C/C") return "C/C";
-
     if (token === "cb/cb") return "cb/cb";
-
     if (token === "cs/cs") return "cs/cs";
 
     if (
@@ -779,10 +779,8 @@ function findCatTabbyGene(text) {
 
   for (const token of tokens) {
     if (token === "Mc/Mc") return "Mc/Mc";
-
     if (token === "Mc/mc") return "Mc/mc";
     if (token === "mc/Mc") return "Mc/mc";
-
     if (token === "mc/mc") return "mc/mc";
   }
 
@@ -825,8 +823,18 @@ function calculateCatGeneOutcomes(sirePair, damPair) {
 function sortCatGenePair(alleles) {
   return alleles.sort().join("/");
 }
+
+/* =========================
+   EXPORTS
+========================= */
+
 window.runCatPredictor = runCatPredictor;
 window.runCatRoll = runCatRoll;
 window.runCatPhenotypeCalculator = runCatPhenotypeCalculator;
 window.runCatGenotypeBuilder = runCatGenotypeBuilder;
 window.runCatGenetics = runCatGenetics;
+
+window.applyCatPointModifier = applyCatPointModifier;
+window.applyCatTabby = applyCatTabby;
+window.applyCatWhiteSpotting = applyCatWhiteSpotting;
+window.applyCatPolydactyl = applyCatPolydactyl;
