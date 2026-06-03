@@ -112,9 +112,24 @@ function runDogGenotypeBuilder(inputs) {
     cleanPhenotype === "recessive white" ||
     cleanPhenotype === "cream white";
 
-  // True genetic white should only trigger for plain white-type phenotypes.
-  // Phrases like "Chocolate and White" mean a coloured dog with white spotting,
-  // not e/e red/cream/white, because e/e hides black/chocolate pigment and merle.
+  const wantsBrownBase =
+    phenotype.includes("chocolate") ||
+    phenotype.includes("liver") ||
+    phenotype.includes("brown");
+
+  const wantsTanPoint =
+    phenotype.includes("tan") ||
+    phenotype.includes("tri") ||
+    phenotype.includes("tricolor") ||
+    phenotype.includes("tricolour");
+
+  const wantsBlueMerle = phenotype.includes("blue merle");
+  const wantsSlateMerle = phenotype.includes("slate merle") || phenotype.includes("slate");
+
+  const wantsBlueBase =
+    phenotype.includes("blue") &&
+    !wantsBlueMerle;
+
   if (isPlainGeneticWhite) {
     addSuggestion("Extension: e/e");
     addSuggestion("White Spotting: sw/sw");
@@ -137,7 +152,12 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
   }
 
-  if (phenotype.includes("black")) {
+  if (
+    phenotype.includes("black") &&
+    !phenotype.includes("silver black") &&
+    !wantsBlueMerle &&
+    !wantsSlateMerle
+  ) {
     addSuggestion("Extension: E/-");
     addSuggestion("Black: K/- OR ky/ky with a/a");
     addExample("E/E K/ky");
@@ -145,24 +165,6 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Brown can be carried: B/b");
     addHidden("Dilute can be carried: D/d");
   }
-
-  const wantsBrownBase =
-    phenotype.includes("chocolate") ||
-    phenotype.includes("liver") ||
-    phenotype.includes("brown");
-
-  const wantsTanPoint =
-    phenotype.includes("tan") ||
-    phenotype.includes("tri") ||
-    phenotype.includes("tricolor") ||
-    phenotype.includes("tricolour");
-
-  const wantsBlueMerle = phenotype.includes("blue merle");
-  const wantsSlateMerle = phenotype.includes("slate merle") || phenotype.includes("slate");
-
-  const wantsBlueBase =
-    phenotype.includes("blue") &&
-    !wantsBlueMerle;
 
   if (wantsBrownBase) {
     addSuggestion("Extension: E/-");
@@ -184,21 +186,47 @@ function runDogGenotypeBuilder(inputs) {
 
   if (wantsBlueMerle) {
     addSuggestion("Extension: E/-");
-    addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
     addSuggestion("Merle: M/m");
     addSuggestion("Dilute: not d/d — use D/D or D/d");
-    addExample("E/E K/ky D/D M/m");
-    addExample("E/e ky/ky a/a D/d M/m");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: K/-");
+
+      addExample("E/E K/ky at/a D/D M/m");
+      addExample("E/e K/K at/at D/d M/m");
+      addExample("E/E K/K at/a D/D M/m S/sp");
+      addExample("E/e K/ky at/at D/d M/m S/sp");
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+
+      addExample("E/E K/ky D/D M/m");
+      addExample("E/e ky/ky a/a D/d M/m");
+    }
+
     addHidden("Brown can be carried: B/b");
   }
 
   if (wantsSlateMerle) {
     addSuggestion("Extension: E/-");
-    addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
     addSuggestion("Dilute: d/d");
     addSuggestion("Merle: M/m");
-    addExample("E/E K/ky d/d M/m");
-    addExample("E/e ky/ky a/a d/d M/m");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: K/-");
+
+      addExample("E/E K/ky at/a d/d M/m");
+      addExample("E/e K/K at/at d/d M/m");
+      addExample("E/E K/K at/a d/d M/m S/sp");
+      addExample("E/e K/ky at/at d/d M/m S/sp");
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+
+      addExample("E/E K/ky d/d M/m");
+      addExample("E/e ky/ky a/a d/d M/m");
+    }
+
     addHidden("Brown can be carried: B/b");
   }
 
@@ -233,7 +261,12 @@ function runDogGenotypeBuilder(inputs) {
     addToExamples("d/d");
   }
 
-  if (wantsTanPoint && !wantsBrownBase) {
+  if (
+    wantsTanPoint &&
+    !wantsBrownBase &&
+    !wantsBlueMerle &&
+    !wantsSlateMerle
+  ) {
     addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addExample("E/E at/a ky/ky");
@@ -243,7 +276,9 @@ function runDogGenotypeBuilder(inputs) {
   const wantsGenericWhiteSpotting =
     phenotype.includes("and white") ||
     phenotype.includes("with white") ||
-    phenotype.includes("white markings");
+    phenotype.includes("white markings") ||
+    phenotype.includes("tricolour") ||
+    phenotype.includes("tricolor");
 
   if (
     wantsGenericWhiteSpotting &&
@@ -385,19 +420,19 @@ function parseDogGenotype(genotypeText) {
 
     Brown: findDogGenePair(
       text,
-      ["B/B", "B/b", "b/b"],
+      ["B/B", "B/b", "b/B", "b/b"],
       "B/B"
     ),
 
     Dilute: findDogGenePair(
       text,
-      ["D/D", "D/d", "d/d"],
+      ["D/D", "D/d", "d/D", "d/d"],
       "D/D"
     ),
 
     Merle: findDogGenePair(
       text,
-      ["M/M", "M/m", "m/m"],
+      ["M/M", "M/m", "m/M", "m/m"],
       "m/m"
     ),
 
@@ -405,37 +440,37 @@ function parseDogGenotype(genotypeText) {
 
     Ticking: findDogGenePair(
       text,
-      ["T/T", "T/t", "t/t"],
+      ["T/T", "T/t", "t/T", "t/t"],
       "t/t"
     ),
 
     Roan: findDogGenePair(
       text,
-      ["R/R", "R/r", "r/r"],
+      ["R/R", "R/r", "r/R", "r/r"],
       "r/r"
     ),
 
     Harlequin: findDogGenePair(
       text,
-      ["H/H", "H/h", "h/h"],
+      ["H/H", "H/h", "h/H", "h/h"],
       "h/h"
     ),
 
     Intensity: findDogGenePair(
       text,
-      ["I/I", "I/i", "i/i"],
+      ["I/I", "I/i", "i/I", "i/i"],
       "I/I"
     ),
 
     Greying: findDogGenePair(
       text,
-      ["G/G", "G/g", "g/g"],
+      ["G/G", "G/g", "g/G", "g/g"],
       "g/g"
     ),
 
     LongCoat: findDogGenePair(
       text,
-      ["L/L", "L/l", "l/l"],
+      ["L/L", "L/l", "l/L", "l/l"],
       "L/L"
     ),
 
@@ -488,7 +523,8 @@ function getDogBaseColour(parsed) {
   if (parsed.Extension === "e/e") {
     return "Red";
   }
- if (parsed.Agouti === "asa/asa") {
+
+  if (parsed.Agouti === "asa/asa") {
     return "Saddle Tan";
   }
 
@@ -507,7 +543,6 @@ function getDogBaseColour(parsed) {
     return "Grizzle";
   }
 
- 
   if (
     parsed.Agouti === "Ay/Ay" ||
     parsed.Agouti === "Ay/aw" ||
@@ -548,21 +583,12 @@ function applyDogModifiers(colour, parsed) {
   const isSingleMerle = parsed.Merle === "M/m";
   const isDoubleMerle = parsed.Merle === "M/M";
 
-  /* =========================
-     BROWN MODIFIER
-     b/b may be called Chocolate, Liver, or Brown.
-  ========================= */
-
   if (isBrown) {
     if (colour === "Black") colour = "Chocolate";
     if (colour === "Tan Point") colour = "Chocolate Tan";
     if (colour === "Wolf Sable") colour = "Chocolate Wolf Sable";
     if (colour === "Saddle Tan") colour = "Chocolate Saddle Tan";
   }
-
-  /* =========================
-     DILUTE MODIFIER
-  ========================= */
 
   if (isDilute) {
     if (colour === "Black") colour = "Blue";
@@ -576,22 +602,11 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Chocolate Saddle Tan") colour = "Lilac Saddle Tan";
   }
 
-  /* =========================
-     INTENSITY MODIFIER
-  ========================= */
-
   if (parsed.Intensity === "i/i") {
     if (colour === "Red") colour = "Cream";
     if (colour === "Fawn") colour = "Pale Fawn";
     if (colour === "Blue Fawn") colour = "Pale Blue Fawn";
   }
-
-  /* =========================
-     MERLE MODIFIER
-
-     Blue Merle is black-based and NOT dilute.
-     A black-based d/d merle is Slate Merle.
-  ========================= */
 
   if (isSingleMerle) {
     if (colour === "Black") {
@@ -767,6 +782,16 @@ function findDogGenePair(text, options, fallback) {
           return option.split("/").reverse().join("/");
         }
 
+        if (option === "b/B") return "B/b";
+        if (option === "d/D") return "D/d";
+        if (option === "m/M") return "M/m";
+        if (option === "t/T") return "T/t";
+        if (option === "r/R") return "R/r";
+        if (option === "h/H") return "H/h";
+        if (option === "i/I") return "I/i";
+        if (option === "g/G") return "G/g";
+        if (option === "l/L") return "L/l";
+
         return option;
       }
     }
@@ -887,6 +912,7 @@ function findDogWhiteSpotting(text) {
 
   return "S/S";
 }
+
 function dogOutcomeRow(label, sirePair, damPair) {
   const outcomes = calculateDogGeneOutcomes(sirePair, damPair);
 
@@ -943,6 +969,7 @@ function sortDogGenePair(alleles) {
     })
     .join("/");
 }
+
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
