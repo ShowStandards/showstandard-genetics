@@ -391,11 +391,11 @@ function getCatPhenotype(parsed) {
 
   let colour = getCatBaseColour(parsed);
 
-  colour = applyCatDilute(colour, parsed);
-  colour = applyCatPointModifier(colour, parsed);
-  colour = applyCatSilver(colour, parsed);
-  colour = applyCatColourModifiers(colour, parsed);
-  colour = applyCatTabby(colour, parsed);
+colour = applyCatDilute(colour, parsed);
+colour = applyCatPointModifier(colour, parsed);
+colour = applyCatColourModifiers(colour, parsed);
+colour = applyCatTabby(colour, parsed);
+colour = applyCatSilver(colour, parsed);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
 
@@ -501,7 +501,24 @@ function applyCatSilver(colour, parsed) {
     return colour;
   }
 
-  return "Silver " + colour;
+  const isRedBased =
+    colour.includes("Red") ||
+    colour.includes("Cream");
+
+  if (isRedBased) {
+    return colour
+      .replace("Red", "Cameo")
+      .replace("Cream", "Cream Cameo");
+  }
+
+  const isTabby =
+    colour.includes("Tabby");
+
+  if (isTabby) {
+    return "Silver " + colour;
+  }
+
+  return "Smoke " + colour;
 }
 
 function applyCatColourModifiers(colour, parsed) {
