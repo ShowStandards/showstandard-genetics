@@ -73,8 +73,14 @@ function runDogPhenotypeCalculator(inputs) {
   );
 }
 
+/* =========================
+   CLEAN DOG GENOTYPE BUILDER
+========================= */
+
 function runDogGenotypeBuilder(inputs) {
-  const phenotype = String(inputs.phenotype || "").toLowerCase();
+  const phenotypeRaw = String(inputs.phenotype || "");
+  const phenotype = phenotypeRaw.toLowerCase();
+
   const suggestions = [];
   const examples = [];
   const hidden = [];
@@ -91,26 +97,14 @@ function runDogGenotypeBuilder(inputs) {
     if (!hidden.includes(item)) hidden.push(item);
   }
 
-  function addToExamples(gene) {
-    if (examples.length === 0) {
-      examples.push(gene);
-      return;
-    }
-
-    examples.forEach((example, index) => {
-      examples[index] = example + " " + gene;
-    });
-  }
-
   const cleanPhenotype = phenotype
     .replace(/[^a-z\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
-  const isPlainGeneticWhite =
-    cleanPhenotype === "white" ||
-    cleanPhenotype === "recessive white" ||
-    cleanPhenotype === "cream white";
+  const wantsMask =
+    phenotype.includes("mask") ||
+    phenotype.includes("masked");
 
   const wantsBrownBase =
     phenotype.includes("chocolate") ||
@@ -123,12 +117,175 @@ function runDogGenotypeBuilder(inputs) {
     phenotype.includes("tricolor") ||
     phenotype.includes("tricolour");
 
-  const wantsBlueMerle = phenotype.includes("blue merle");
-  const wantsSlateMerle = phenotype.includes("slate merle") || phenotype.includes("slate");
+  const wantsBlueMerle =
+    phenotype.includes("blue merle");
+
+  const wantsSlateMerle =
+    phenotype.includes("slate merle") ||
+    phenotype.includes("slate");
+
+  const wantsChocolateMerle =
+    phenotype.includes("chocolate merle") ||
+    phenotype.includes("liver merle") ||
+    phenotype.includes("brown merle");
+
+  const wantsLilacMerle =
+    phenotype.includes("lilac merle") ||
+    phenotype.includes("isabella merle");
+
+  const wantsGenericMerle =
+    phenotype.includes("merle") &&
+    !wantsBlueMerle &&
+    !wantsSlateMerle &&
+    !wantsChocolateMerle &&
+    !wantsLilacMerle;
 
   const wantsBlueBase =
     phenotype.includes("blue") &&
-    !wantsBlueMerle;
+    !wantsBlueMerle &&
+    !wantsSlateMerle &&
+    !phenotype.includes("blue fawn");
+
+  const wantsLilac =
+    phenotype.includes("lilac") ||
+    phenotype.includes("isabella");
+
+  const wantsWhiteSpotting =
+    phenotype.includes("and white") ||
+    phenotype.includes("with white") ||
+    phenotype.includes("white markings") ||
+    phenotype.includes("irish") ||
+    phenotype.includes("piebald") ||
+    phenotype.includes("extreme white") ||
+    phenotype.includes("tricolour") ||
+    phenotype.includes("tricolor");
+
+  const wantsIrish =
+    phenotype.includes("irish");
+
+  const wantsPiebald =
+    phenotype.includes("piebald");
+
+  const wantsExtremeWhite =
+    phenotype.includes("extreme white");
+
+  const wantsTicking =
+    phenotype.includes("ticked") ||
+    phenotype.includes("ticking");
+
+  const wantsRoan =
+    phenotype.includes("roan");
+
+  const wantsHarlequin =
+    phenotype.includes("harlequin");
+
+  const wantsBrindle =
+    phenotype.includes("brindle");
+
+  const wantsFaded =
+    phenotype.includes("faded");
+
+  const wantsLongCoat =
+    phenotype.includes("long coat") ||
+    phenotype.includes("longcoat");
+
+  const wantsFurnished =
+    phenotype.includes("furnished") ||
+    phenotype.includes("furnishings");
+
+  const wantsCurly =
+    phenotype.includes("curly") ||
+    phenotype.includes("curl");
+
+  const isPlainGeneticWhite =
+    cleanPhenotype === "white" ||
+    cleanPhenotype === "recessive white" ||
+    cleanPhenotype === "cream white";
+
+  const baseExamples = [];
+
+  function buildExample(parts) {
+    const geneParts = [];
+
+    geneParts.push(parts.Extension || "E/E");
+    geneParts.push(parts.K || "K/ky");
+
+    if (parts.Agouti) geneParts.push(parts.Agouti);
+    if (parts.Brown) geneParts.push(parts.Brown);
+    if (parts.Dilute) geneParts.push(parts.Dilute);
+    if (parts.Merle) geneParts.push(parts.Merle);
+    if (parts.WhiteSpotting) geneParts.push(parts.WhiteSpotting);
+    if (parts.Ticking) geneParts.push(parts.Ticking);
+    if (parts.Roan) geneParts.push(parts.Roan);
+    if (parts.Harlequin) geneParts.push(parts.Harlequin);
+    if (parts.Intensity) geneParts.push(parts.Intensity);
+    if (parts.Greying) geneParts.push(parts.Greying);
+    if (parts.LongCoat) geneParts.push(parts.LongCoat);
+    if (parts.Furnishings) geneParts.push(parts.Furnishings);
+    if (parts.Curl) geneParts.push(parts.Curl);
+
+    return geneParts.join(" ");
+  }
+
+  function extensionBase(defaultExtension) {
+    if (wantsMask) {
+      if (defaultExtension === "e/e") return "Em/e";
+      return "Em/E";
+    }
+
+    return defaultExtension || "E/E";
+  }
+
+  function whiteSpottingGene() {
+    if (wantsExtremeWhite) return "sw/sw";
+    if (wantsPiebald) return "sp/sp";
+    if (wantsIrish) return "S/sp";
+    if (wantsWhiteSpotting) return "S/sp";
+    return "";
+  }
+
+  function addPatternGenes(parts) {
+    const copy = Object.assign({}, parts);
+
+    const white = whiteSpottingGene();
+    if (white) copy.WhiteSpotting = white;
+
+    if (wantsTicking) copy.Ticking = "T/t";
+    if (wantsRoan) copy.Roan = "R/r";
+    if (wantsFaded) copy.Greying = "G/g";
+    if (wantsLongCoat) copy.LongCoat = "l/l";
+    if (wantsFurnished) copy.Furnishings = "F/n";
+    if (wantsCurly) copy.Curl = "Cu/n";
+
+    return copy;
+  }
+
+  function addBuiltExample(parts) {
+    addExample(buildExample(addPatternGenes(parts)));
+  }
+
+  function addGeneralPatternSuggestions() {
+    if (wantsWhiteSpotting) {
+      if (wantsExtremeWhite) {
+        addSuggestion("White Spotting: sw/sw, sp/sw, or S/sw");
+      } else if (wantsPiebald) {
+        addSuggestion("White Spotting: sp/sp");
+      } else if (wantsIrish) {
+        addSuggestion("White Spotting: S/sp");
+      } else {
+        addSuggestion("White Spotting: S/sp, sp/sp, or S/sw");
+      }
+    }
+
+    if (wantsTicking) addSuggestion("Ticking: T/-");
+    if (wantsRoan) addSuggestion("Roan: R/-");
+    if (wantsFaded) addSuggestion("Greying: G/-");
+    if (wantsLongCoat) addSuggestion("Long Coat: l/l");
+    if (wantsFurnished) addSuggestion("Furnishings: F/-");
+    if (wantsCurly) addSuggestion("Curl: Cu/-");
+  }
+
+  /* Plain white / cream / red */
 
   if (isPlainGeneticWhite) {
     addSuggestion("Extension: e/e");
@@ -138,51 +295,38 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Agouti, K, Brown, Dilute, and Merle can be hidden by e/e.");
   }
 
-  if (phenotype.includes("cream")) {
+  if (!isPlainGeneticWhite && phenotype.includes("cream")) {
     addSuggestion("Extension: e/e");
     addSuggestion("Intensity: i/i");
-    addExample("e/e i/i");
+
+    addBuiltExample({
+      Extension: "e/e",
+      K: "K/ky",
+      Intensity: "i/i"
+    });
+
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
   }
 
-  if (phenotype.includes("red")) {
+  if (!isPlainGeneticWhite && phenotype.includes("red")) {
     addSuggestion("Extension: e/e");
-    addExample("e/e");
-    addExample("e/e B/b D/d");
+
+    addBuiltExample({
+      Extension: "e/e",
+      K: "K/ky"
+    });
+
+    addBuiltExample({
+      Extension: "e/e",
+      K: "ky/ky",
+      Brown: "B/b",
+      Dilute: "D/d"
+    });
+
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
   }
 
-  if (
-    phenotype.includes("black") &&
-    !phenotype.includes("silver black") &&
-    !wantsBlueMerle &&
-    !wantsSlateMerle
-  ) {
-    addSuggestion("Extension: E/-");
-    addSuggestion("Black: K/- OR ky/ky with a/a");
-    addExample("E/E K/ky");
-    addExample("E/e ky/ky a/a");
-    addHidden("Brown can be carried: B/b");
-    addHidden("Dilute can be carried: D/d");
-  }
-
-  if (wantsBrownBase) {
-    addSuggestion("Extension: E/-");
-    addSuggestion("Brown/Liver/Chocolate: b/b");
-
-    if (wantsTanPoint) {
-      addSuggestion("Agouti: at/at or at/a");
-      addSuggestion("K locus: ky/ky or kbr/ky");
-      addExample("E/E at/a ky/ky b/b");
-      addExample("E/e at/at ky/ky b/b");
-    } else {
-      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
-      addExample("E/E K/ky b/b");
-      addExample("E/e ky/ky a/a b/b");
-    }
-
-    addHidden("Dilute can be carried: D/d");
-  }
+  /* Merle combinations */
 
   if (wantsBlueMerle) {
     addSuggestion("Extension: E/-");
@@ -193,15 +337,43 @@ function runDogGenotypeBuilder(inputs) {
       addSuggestion("Agouti: at/at or at/a");
       addSuggestion("K locus: K/-");
 
-      addExample("E/E K/ky at/a D/D M/m");
-      addExample("E/e K/K at/at D/d M/m");
-      addExample("E/E K/K at/a D/D M/m S/sp");
-      addExample("E/e K/ky at/at D/d M/m S/sp");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "at/a",
+        Brown: "B/B",
+        Dilute: "D/D",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "K/K",
+        Agouti: "at/at",
+        Brown: "B/b",
+        Dilute: "D/d",
+        Merle: "M/m"
+      });
     } else {
       addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
 
-      addExample("E/E K/ky D/D M/m");
-      addExample("E/e ky/ky a/a D/d M/m");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Brown: "B/B",
+        Dilute: "D/D",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "a/a",
+        Brown: "B/b",
+        Dilute: "D/d",
+        Merle: "M/m"
+      });
     }
 
     addHidden("Brown can be carried: B/b");
@@ -216,170 +388,433 @@ function runDogGenotypeBuilder(inputs) {
       addSuggestion("Agouti: at/at or at/a");
       addSuggestion("K locus: K/-");
 
-      addExample("E/E K/ky at/a d/d M/m");
-      addExample("E/e K/K at/at d/d M/m");
-      addExample("E/E K/K at/a d/d M/m S/sp");
-      addExample("E/e K/ky at/at d/d M/m S/sp");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "at/a",
+        Brown: "B/B",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "K/K",
+        Agouti: "at/at",
+        Brown: "B/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
     } else {
       addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
 
-      addExample("E/E K/ky d/d M/m");
-      addExample("E/e ky/ky a/a d/d M/m");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Brown: "B/B",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "a/a",
+        Brown: "B/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
     }
 
     addHidden("Brown can be carried: B/b");
   }
 
-  if (wantsBlueBase) {
-    addSuggestion("Dilute: d/d");
-    addExample("E/E K/ky d/d");
-    addExample("E/e ky/ky a/a d/d");
+  if (wantsChocolateMerle) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Brown/Liver/Chocolate: b/b");
+    addSuggestion("Merle: M/m");
+    addSuggestion("Dilute: not d/d");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: K/-");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "at/a",
+        Brown: "b/b",
+        Dilute: "D/D",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "K/K",
+        Agouti: "at/at",
+        Brown: "b/b",
+        Dilute: "D/d",
+        Merle: "M/m"
+      });
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Brown: "b/b",
+        Dilute: "D/D",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "a/a",
+        Brown: "b/b",
+        Dilute: "D/d",
+        Merle: "M/m"
+      });
+    }
   }
 
-  if (phenotype.includes("lilac") || phenotype.includes("isabella")) {
+  if (wantsLilacMerle) {
+    addSuggestion("Extension: E/-");
     addSuggestion("Brown/Liver/Chocolate: b/b");
     addSuggestion("Dilute: d/d");
-    addExample("E/E K/ky b/b d/d");
-    addExample("E/e ky/ky a/a b/b d/d");
+    addSuggestion("Merle: M/m");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: K/-");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "at/a",
+        Brown: "b/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "K/K",
+        Agouti: "at/at",
+        Brown: "b/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Brown: "b/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "a/a",
+        Brown: "b/b",
+        Dilute: "d/d",
+        Merle: "M/m"
+      });
+    }
+  }
+
+  if (wantsGenericMerle) {
+    addSuggestion("Merle: M/m");
+
+    if (phenotype.includes("double")) {
+      addSuggestion("Merle: M/M");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Merle: "M/M"
+      });
+    } else {
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Merle: "M/m"
+      });
+    }
+  }
+
+  if (wantsHarlequin) {
+    addSuggestion("Merle: M/m");
+    addSuggestion("Harlequin: H/h");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "K/ky",
+      Agouti: "a/a",
+      Merle: "M/m",
+      Harlequin: "H/h"
+    });
+  }
+
+  /* Non-merle bases */
+
+  if (
+    phenotype.includes("black") &&
+    !phenotype.includes("silver black") &&
+    !wantsBlueMerle &&
+    !wantsSlateMerle &&
+    !wantsChocolateMerle &&
+    !wantsLilacMerle &&
+    !wantsGenericMerle
+  ) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Black: K/- OR ky/ky with a/a");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "K/ky",
+      Agouti: "a/a"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "a/a"
+    });
+
+    addHidden("Brown can be carried: B/b");
+    addHidden("Dilute can be carried: D/d");
+  }
+
+  if (
+    wantsBrownBase &&
+    !wantsChocolateMerle &&
+    !wantsLilacMerle
+  ) {
+    addSuggestion("Extension: E/-");
+    addSuggestion("Brown/Liver/Chocolate: b/b");
+
+    if (wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addSuggestion("K locus: ky/ky or kbr/ky");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "ky/ky",
+        Agouti: "at/a",
+        Brown: "b/b"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "at/at",
+        Brown: "b/b"
+      });
+    } else {
+      addSuggestion("Black pigment base: K/- OR ky/ky with a/a");
+
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "K/ky",
+        Agouti: "a/a",
+        Brown: "b/b"
+      });
+
+      addBuiltExample({
+        Extension: extensionBase("E/e"),
+        K: "ky/ky",
+        Agouti: "a/a",
+        Brown: "b/b"
+      });
+    }
+
+    addHidden("Dilute can be carried: D/d");
+  }
+
+  if (
+    wantsBlueBase &&
+    !wantsSlateMerle &&
+    !wantsBlueMerle
+  ) {
+    addSuggestion("Dilute: d/d");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "K/ky",
+      Agouti: "a/a",
+      Dilute: "d/d"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "a/a",
+      Dilute: "d/d"
+    });
+  }
+
+  if (
+    wantsLilac &&
+    !wantsLilacMerle
+  ) {
+    addSuggestion("Brown/Liver/Chocolate: b/b");
+    addSuggestion("Dilute: d/d");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "K/ky",
+      Agouti: "a/a",
+      Brown: "b/b",
+      Dilute: "d/d"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "a/a",
+      Brown: "b/b",
+      Dilute: "d/d"
+    });
   }
 
   if (phenotype.includes("fawn")) {
     addSuggestion("Agouti: Ay/-");
     addSuggestion("K locus: ky/ky or kbr/ky");
-    addExample("E/E Ay/a ky/ky");
-    addExample("E/e Ay/at ky/ky");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "Ay/at"
+    });
   }
 
   if (phenotype.includes("pale fawn")) {
     addSuggestion("Intensity: i/i");
-    addToExamples("i/i");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Intensity: "i/i"
+    });
   }
 
   if (phenotype.includes("blue fawn")) {
     addSuggestion("Dilute: d/d");
     addSuggestion("Agouti: Ay/-");
-    addToExamples("d/d");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Dilute: "d/d"
+    });
   }
 
   if (
     wantsTanPoint &&
     !wantsBrownBase &&
     !wantsBlueMerle &&
-    !wantsSlateMerle
+    !wantsSlateMerle &&
+    !wantsChocolateMerle &&
+    !wantsLilacMerle
   ) {
     addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
-    addExample("E/E at/a ky/ky");
-    addExample("E/e at/at ky/ky");
-  }
 
-  const wantsGenericWhiteSpotting =
-    phenotype.includes("and white") ||
-    phenotype.includes("with white") ||
-    phenotype.includes("white markings") ||
-    phenotype.includes("tricolour") ||
-    phenotype.includes("tricolor");
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "at/a"
+    });
 
-  if (
-    wantsGenericWhiteSpotting &&
-    !phenotype.includes("irish") &&
-    !phenotype.includes("piebald") &&
-    !phenotype.includes("extreme white")
-  ) {
-    const randomWhiteSpotting = randomDogFrom(["S/sp", "sp/sp", "S/sw"]);
-
-    addSuggestion("White Spotting: S/sp, sp/sp, or S/sw");
-    addToExamples(randomWhiteSpotting);
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "at/at"
+    });
   }
 
   if (phenotype.includes("saddle")) {
     addSuggestion("Agouti: asa/asa");
-    addExample("E/E asa/asa ky/ky");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "asa/asa"
+    });
   }
 
   if (phenotype.includes("wolf sable")) {
     addSuggestion("Agouti: aw/-");
-    addExample("E/E aw/a ky/ky");
-    addExample("E/e aw/at ky/ky");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "aw/a"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "aw/at"
+    });
   }
 
   if (phenotype.includes("grizzle")) {
     addSuggestion("Extension: Eg/-");
     addSuggestion("Agouti: at/at");
-    addExample("Eg/E at/at ky/ky");
-    addExample("Eg/e at/at ky/ky");
+
+    addBuiltExample({
+      Extension: "Eg/E",
+      K: "ky/ky",
+      Agouti: "at/at"
+    });
+
+    addBuiltExample({
+      Extension: "Eg/e",
+      K: "ky/ky",
+      Agouti: "at/at"
+    });
   }
 
-  if (phenotype.includes("brindle")) {
+  if (wantsBrindle) {
     addSuggestion("K locus: kbr/kbr or kbr/ky");
-    addToExamples("kbr/ky");
-  }
 
-  if (phenotype.includes("mask")) {
-    addSuggestion("Extension: Em/-");
-    addToExamples("Em/E");
-  }
-
-  if (phenotype.includes("merle") && !wantsBlueMerle && !wantsSlateMerle) {
-    if (phenotype.includes("double")) {
-      addSuggestion("Merle: M/M");
-      addToExamples("M/M");
+    if (examples.length) {
+      for (let i = 0; i < examples.length; i++) {
+        examples[i] = examples[i].replace(/\bK\/ky\b|\bK\/K\b|\bky\/ky\b/g, "kbr/ky");
+      }
     } else {
-      addSuggestion("Merle: M/m");
-      addToExamples("M/m");
+      addBuiltExample({
+        Extension: extensionBase("E/E"),
+        K: "kbr/ky",
+        Agouti: "Ay/a"
+      });
     }
   }
 
-  if (phenotype.includes("harlequin")) {
-    addSuggestion("Merle: M/m");
-    addSuggestion("Harlequin: H/h");
-    addToExamples("M/m H/h");
+  if (wantsMask) {
+    addSuggestion("Extension: Em/-");
+    addHidden("Mask is part of the Extension locus and should replace E, not be added as a separate gene.");
   }
 
-  if (phenotype.includes("irish")) {
-    addSuggestion("White Spotting: S/sp");
-    addToExamples("S/sp");
-  }
-
-  if (phenotype.includes("piebald")) {
-    addSuggestion("White Spotting: sp/sp");
-    addToExamples("sp/sp");
-  }
-
-  if (phenotype.includes("extreme white")) {
-    addSuggestion("White Spotting: sw/sw, sp/sw, or S/sw");
-    addToExamples("sw/sw");
-  }
-
-  if (phenotype.includes("ticked")) {
-    addSuggestion("Ticking: T/-");
-    addToExamples("T/t");
-  }
-
-  if (phenotype.includes("roan")) {
-    addSuggestion("Roan: R/-");
-    addToExamples("R/r");
-  }
-
-  if (phenotype.includes("faded")) {
-    addSuggestion("Greying: G/-");
-    addToExamples("G/g");
-  }
-
-  if (phenotype.includes("long coat")) {
-    addSuggestion("Long Coat: l/l");
-    addToExamples("l/l");
-  }
-
-  if (phenotype.includes("furnished")) {
-    addSuggestion("Furnishings: F/-");
-    addToExamples("F/n");
-  }
-
-  if (phenotype.includes("curly")) {
-    addSuggestion("Curl: Cu/-");
-    addToExamples("Cu/n");
-  }
+  addGeneralPatternSuggestions();
 
   if (suggestions.length === 0) {
     suggestions.push("No simple genotype match found yet.");
