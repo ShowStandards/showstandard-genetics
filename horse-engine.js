@@ -24,7 +24,9 @@ function runHorsePredictor(inputs) {
     horseOutcomeRow("Grey", sire.Grey, dam.Grey),
     horseOutcomeRow("Roan", sire.Roan, dam.Roan),
     horseOutcomeRow("Tobiano", sire.Tobiano, dam.Tobiano),
-    horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa)
+    horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa),
+    horseOutcomeRow("PATN1", sire.PATN1, dam.PATN1),
+    horseOutcomeRow("PATN2", sire.PATN2, dam.PATN2)
   ].join("");
 
   return renderHorseResults(
@@ -43,6 +45,7 @@ function runHorsePredictor(inputs) {
     `
   );
 }
+
 function runHorseRoll(inputs) {
   return `
     <h4>Horse Roll</h4>
@@ -103,8 +106,6 @@ function runHorseGenotypeBuilder(inputs) {
     });
   }
 
-  // Base colours
-
   if (phenotype.includes("chestnut") || phenotype.includes("red")) {
     addSuggestion("Extension: e/e");
     addExample("e/e A/A");
@@ -130,8 +131,6 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Chestnut can be carried: E/e");
     addHidden("Recessive black can be carried: A/a");
   }
-
-  // Cream
 
   if (phenotype.includes("palomino")) {
     addSuggestion("Base: e/e");
@@ -181,8 +180,6 @@ function runHorseGenotypeBuilder(inputs) {
     addExample("E/e a/a Cr/Cr");
   }
 
-  // Dun
-
   if (phenotype.includes("red dun")) {
     addSuggestion("Base: e/e");
     addSuggestion("Dun: D/-");
@@ -203,8 +200,6 @@ function runHorseGenotypeBuilder(inputs) {
     addToExamples("D/n");
   }
 
-  // Champagne
-
   if (phenotype.includes("gold champagne")) {
     addSuggestion("Base: e/e");
     addSuggestion("Champagne: Ch/-");
@@ -220,21 +215,16 @@ function runHorseGenotypeBuilder(inputs) {
     addSuggestion("Champagne: Ch/-");
     addExample("E/E a/a Ch/n");
     addExample("E/e a/a Ch/n");
-} else if (phenotype.includes("champagne")) {
-
-  addSuggestion("Champagne: Ch/-");
-
-  addExample("E/E A/A Ch/n");
-  addExample("E/e A/a Ch/n");
-  addExample("E/E a/a Ch/n");
-  addExample("E/e a/a Ch/n");
-  addExample("e/e A/A Ch/n");
-  addExample("e/e A/a Ch/n");
-
-  addHidden("Champagne can occur on any base colour.");
-}
-
-  // Silver
+  } else if (phenotype.includes("champagne")) {
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E A/A Ch/n");
+    addExample("E/e A/a Ch/n");
+    addExample("E/E a/a Ch/n");
+    addExample("E/e a/a Ch/n");
+    addExample("e/e A/A Ch/n");
+    addExample("e/e A/a Ch/n");
+    addHidden("Champagne can occur on any base colour.");
+  }
 
   if (phenotype.includes("silver black")) {
     addSuggestion("Base: E/- a/a");
@@ -250,8 +240,6 @@ function runHorseGenotypeBuilder(inputs) {
     addSuggestion("Silver: Z/-");
     addToExamples("Z/n");
   }
-
-  // Pearl / Mushroom
 
   if (phenotype.includes("apricot")) {
     addSuggestion("Base: e/e");
@@ -273,8 +261,6 @@ function runHorseGenotypeBuilder(inputs) {
     addExample("e/e A/A mu/mu");
     addExample("e/e A/a mu/mu");
   }
-
-  // Other modifiers
 
   if (phenotype.includes("flaxen")) {
     addSuggestion("Flaxen: f/f");
@@ -302,8 +288,6 @@ function runHorseGenotypeBuilder(inputs) {
     addToExamples("Rn/n");
   }
 
-  // White patterns
-
   if (phenotype.includes("tobiano")) {
     addSuggestion("Tobiano: To/-");
     addToExamples("To/n");
@@ -330,30 +314,28 @@ function runHorseGenotypeBuilder(inputs) {
     addToExamples("To/n OLW/n");
   }
 
-  // Appaloosa
-
   if (phenotype.includes("few spot")) {
     addSuggestion("Appaloosa: Lp/Lp");
     addSuggestion("PATN1: PATN1/-");
-    addToExamples("Lp/Lp PATN1/n");
+    addToExamples("Lp/Lp PATN1/patn1");
   } else if (phenotype.includes("leopard")) {
     addSuggestion("Appaloosa: Lp/-");
     addSuggestion("PATN1: PATN1/-");
-    addToExamples("Lp/n PATN1/n");
+    addToExamples("Lp/lp PATN1/patn1");
   } else if (phenotype.includes("snow cap")) {
     addSuggestion("Appaloosa: Lp/Lp");
     addSuggestion("PATN2: PATN2/-");
-    addToExamples("Lp/Lp PATN2/n");
+    addToExamples("Lp/Lp PATN2/patn2");
   } else if (phenotype.includes("blanket")) {
     addSuggestion("Appaloosa: Lp/-");
     addSuggestion("PATN2: PATN2/-");
-    addToExamples("Lp/n PATN2/n");
+    addToExamples("Lp/lp PATN2/patn2");
   } else if (
     phenotype.includes("appaloosa") ||
     phenotype.includes("varnish")
   ) {
     addSuggestion("Appaloosa: Lp/-");
-    addToExamples("Lp/n");
+    addToExamples("Lp/lp");
   }
 
   if (suggestions.length === 0) {
@@ -389,8 +371,8 @@ function parseHorseGenotype(genotypeText) {
     .trim();
 
   return {
-    Extension: findGenePair(text, ["E/E", "E/e", "e/e"], "e/e"),
-    Agouti: findGenePair(text, ["A/A", "A/a", "a/a"], "a/a"),
+    Extension: findGenePair(text, ["E/E", "E/e", "e/E", "e/e"], "e/e"),
+    Agouti: findGenePair(text, ["A/A", "A/a", "a/A", "a/a"], "a/a"),
     Cream: findGenePair(text, ["Cr/Cr", "Cr/n", "n/Cr", "n/n"], "n/n"),
 
     Dun: findGenePair(
@@ -398,13 +380,19 @@ function parseHorseGenotype(genotypeText) {
       [
         "D/D",
         "D/nd1",
+        "nd1/D",
         "D/nd2",
+        "nd2/D",
         "D/n",
+        "n/D",
         "nd1/nd1",
         "nd1/nd2",
+        "nd2/nd1",
         "nd1/n",
+        "n/nd1",
         "nd2/nd2",
         "nd2/n",
+        "n/nd2",
         "n/n"
       ],
       "n/n"
@@ -413,23 +401,37 @@ function parseHorseGenotype(genotypeText) {
     Champagne: findGenePair(text, ["Ch/Ch", "Ch/n", "n/Ch", "n/n"], "n/n"),
     Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
     Pearl: findGenePair(text, ["Prl/Prl", "Prl/n", "n/Prl", "n/n"], "n/n"),
-    Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "Mu/Mu", "n/n"], "n/n"),
+    Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "mu/Mu", "Mu/Mu", "n/n"], "n/n"),
 
-    Flaxen: findGenePair(text, ["F/F", "F/f", "f/f"], "F/F"),
+    Flaxen: findGenePair(text, ["F/F", "F/f", "f/F", "f/f"], "F/F"),
     Sooty: findGenePair(text, ["Sty/Sty", "Sty/n", "n/Sty", "n/n"], "n/n"),
     Pangare: findGenePair(text, ["P/P", "P/n", "n/P", "n/n"], "n/n"),
 
     Roan: findGenePair(text, ["Rn/Rn", "Rn/n", "n/Rn", "n/n"], "n/n"),
-    Grey: findGenePair(text, ["G/G", "G/g", "g/g"], "g/g"),
+    Grey: findGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
 
     Tobiano: findGenePair(text, ["To/To", "To/n", "n/To", "n/n"], "n/n"),
     Frame: findGenePair(text, ["OLW/OLW", "OLW/n", "n/OLW", "n/n"], "n/n"),
     Splash: findGenePair(text, ["Spl/Spl", "Spl/n", "n/Spl", "n/n"], "n/n"),
     Rabicano: findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
 
-    Appaloosa: findGenePair(text, ["Lp/Lp", "Lp/n", "n/Lp", "n/n"], "n/n"),
-    PATN1: findGenePair(text, ["PATN1/PATN1", "PATN1/n", "n/PATN1", "n/n"], "n/n"),
-    PATN2: findGenePair(text, ["PATN2/PATN2", "PATN2/n", "n/PATN2", "n/n"], "n/n")
+    Appaloosa: findGenePair(
+      text,
+      ["Lp/Lp", "Lp/lp", "lp/Lp", "lp/lp", "Lp/n", "n/Lp", "n/n"],
+      "lp/lp"
+    ),
+
+    PATN1: findGenePair(
+      text,
+      ["PATN1/PATN1", "PATN1/patn1", "patn1/PATN1", "patn1/patn1", "PATN1/n", "n/PATN1", "n/n"],
+      "patn1/patn1"
+    ),
+
+    PATN2: findGenePair(
+      text,
+      ["PATN2/PATN2", "PATN2/patn2", "patn2/PATN2", "patn2/patn2", "PATN2/n", "n/PATN2", "n/n"],
+      "patn2/patn2"
+    )
   };
 }
 
@@ -462,6 +464,14 @@ function findGenePair(text, options, fallback) {
         if (option.startsWith("n/")) {
           return option.split("/").reverse().join("/");
         }
+
+        if (option === "lp/Lp") return "Lp/lp";
+        if (option === "patn1/PATN1") return "PATN1/patn1";
+        if (option === "patn2/PATN2") return "PATN2/patn2";
+
+        if (option === "e/E") return "E/e";
+        if (option === "a/A") return "A/a";
+        if (option === "g/G") return "G/g";
 
         return option;
       }
@@ -591,6 +601,8 @@ function applyHorseChampagne(baseColour, parsed) {
 function applyHorseSilver(baseColour, parsed) {
   if (!hasDominantGene(parsed.Silver, "Z")) return baseColour;
 
+  if (baseColour === "Chestnut" || baseColour.includes("Chestnut")) return baseColour;
+
   if (baseColour === "Black") return "Silver Black";
   if (baseColour === "Bay") return "Silver Bay";
   if (baseColour === "Buckskin") return "Silver Buckskin";
@@ -690,10 +702,19 @@ function applyHorseAppaloosa(colour, parsed) {
   const patn1 = parsed.PATN1;
   const patn2 = parsed.PATN2;
 
-  const hasLp = hasDominantGene(lp, "Lp");
+  const hasLp =
+    lp === "Lp/Lp" ||
+    lp === "Lp/lp";
+
   const isLpLp = lp === "Lp/Lp";
-  const hasPatn1 = hasDominantGene(patn1, "PATN1");
-  const hasPatn2 = hasDominantGene(patn2, "PATN2");
+
+  const hasPatn1 =
+    patn1 === "PATN1/PATN1" ||
+    patn1 === "PATN1/patn1";
+
+  const hasPatn2 =
+    patn2 === "PATN2/PATN2" ||
+    patn2 === "PATN2/patn2";
 
   if (!hasLp) return colour;
 
@@ -749,6 +770,7 @@ function sortHorseGenePair(alleles) {
     })
     .join("/");
 }
+
 function horseOutcomeRow(label, sirePair, damPair) {
   const outcomes = calculateHorseGeneOutcomes(sirePair, damPair);
 
@@ -780,8 +802,12 @@ function calculateHorseGeneOutcomes(sirePair, damPair) {
     })
     .join("<br>");
 }
+
+/* =========================
+   EXPORTS
+========================= */
+
 window.runHorsePredictor = runHorsePredictor;
 window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
 window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
-window.runHorseGenetics = runHorseGenetics;
 window.runHorseGenetics = runHorseGenetics;
