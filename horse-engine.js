@@ -1,3 +1,5 @@
+/* HORSE ENGINE SABINO VERSION 6 */
+
 /* =========================
    EQUINE GENETICS ENGINE
 ========================= */
@@ -24,6 +26,10 @@ function runHorsePredictor(inputs) {
     horseOutcomeRow("Grey", sire.Grey, dam.Grey),
     horseOutcomeRow("Roan", sire.Roan, dam.Roan),
     horseOutcomeRow("Tobiano", sire.Tobiano, dam.Tobiano),
+    horseOutcomeRow("Frame", sire.Frame, dam.Frame),
+    horseOutcomeRow("Splash", sire.Splash, dam.Splash),
+    horseOutcomeRow("Sabino", sire.Sabino, dam.Sabino),
+    horseOutcomeRow("Rabicano", sire.Rabicano, dam.Rabicano),
     horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa),
     horseOutcomeRow("PATN1", sire.PATN1, dam.PATN1),
     horseOutcomeRow("PATN2", sire.PATN2, dam.PATN2)
@@ -303,6 +309,11 @@ function runHorseGenotypeBuilder(inputs) {
     addToExamples("Spl/n");
   }
 
+  if (phenotype.includes("sabino")) {
+    addSuggestion("Sabino: Sb/-");
+    addToExamples("Sb/n");
+  }
+
   if (phenotype.includes("rabicano")) {
     addSuggestion("Rabicano: Rb/-");
     addToExamples("Rb/n");
@@ -413,6 +424,7 @@ function parseHorseGenotype(genotypeText) {
     Tobiano: findGenePair(text, ["To/To", "To/n", "n/To", "n/n"], "n/n"),
     Frame: findGenePair(text, ["OLW/OLW", "OLW/n", "n/OLW", "n/n"], "n/n"),
     Splash: findGenePair(text, ["Spl/Spl", "Spl/n", "n/Spl", "n/n"], "n/n"),
+    Sabino: findGenePair(text, ["Sb/Sb", "Sb/n", "n/Sb", "n/n"], "n/n"),
     Rabicano: findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
 
     Appaloosa: findGenePair(
@@ -684,6 +696,10 @@ function applyHorsePatterns(colour, parsed) {
 
   if (hasDominantGene(parsed.Splash, "Spl")) {
     patterns.push("Splash");
+  }
+
+  if (hasDominantGene(parsed.Sabino, "Sb")) {
+    patterns.push("Sabino");
   }
 
   if (hasDominantGene(parsed.Rabicano, "Rb")) {
