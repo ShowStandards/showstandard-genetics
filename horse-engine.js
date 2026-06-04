@@ -411,7 +411,9 @@ function parseHorseGenotype(genotypeText) {
 
     Champagne: findGenePair(text, ["Ch/Ch", "Ch/n", "n/Ch", "n/n"], "n/n"),
     Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
-    Pearl: findGenePair(text, ["Prl/Prl", "Prl/n", "n/Prl", "n/n"], "n/n"),
+    Pearl: findGenePair(  text,["Prl/Prl", "Cr/Prl", "Prl/Cr", "Prl/n", "n/Prl", "n/n"],
+  "n/n"
+),,
     Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "mu/Mu", "Mu/Mu", "n/n"], "n/n"),
 
     Flaxen: findGenePair(text, ["F/F", "F/f", "f/F", "f/f"], "F/F"),
@@ -624,16 +626,39 @@ function applyHorseSilver(baseColour, parsed) {
 
   return "Silver " + baseColour;
 }
-
 function applyHorsePearl(baseColour, parsed) {
-  if (parsed.Pearl !== "Prl/Prl") return baseColour;
+  const pearl = parsed.Pearl;
 
-  if (baseColour === "Chestnut") return "Apricot";
-  if (baseColour === "Flaxen Chestnut") return "Flaxen Apricot";
-  if (baseColour === "Palomino") return "Pearl Palomino";
-  if (baseColour === "Buckskin") return "Pearl Buckskin";
+  if (
+    pearl !== "Prl/Prl" &&
+    pearl !== "Cr/Prl" &&
+    pearl !== "Prl/Cr"
+  ) {
+    return baseColour;
+  }
 
-  return baseColour + " Pearl";
+  if (pearl === "Prl/Prl") {
+    if (baseColour === "Chestnut") return "Apricot";
+    if (baseColour === "Flaxen Chestnut") return "Flaxen Apricot";
+    if (baseColour === "Bay") return "Bay Pearl";
+    if (baseColour === "Black") return "Black Pearl";
+
+    return baseColour + " Pearl";
+  }
+
+  if (
+    pearl === "Cr/Prl" ||
+    pearl === "Prl/Cr"
+  ) {
+    if (baseColour === "Chestnut") return "Cream Pearl";
+    if (baseColour === "Flaxen Chestnut") return "Flaxen Cream Pearl";
+    if (baseColour === "Bay") return "Buckskin Pearl";
+    if (baseColour === "Black") return "Smokey Black Pearl";
+
+    return baseColour + " Pearl";
+  }
+
+  return baseColour;
 }
 
 function applyHorseMushroom(baseColour, parsed) {
