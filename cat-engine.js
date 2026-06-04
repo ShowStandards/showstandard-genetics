@@ -501,20 +501,18 @@ function applyCatSilver(colour, parsed) {
     return colour;
   }
 
-  const isRedBased =
-    colour.includes("Red") ||
-    colour.includes("Cream");
+  const lower = colour.toLowerCase();
 
-  if (isRedBased) {
+  if (
+    lower.includes("red") ||
+    lower.includes("cream")
+  ) {
     return colour
-      .replace("Red", "Cameo")
-      .replace("Cream", "Cream Cameo");
+      .replace(/Red/g, "Cameo")
+      .replace(/Cream/g, "Cream Cameo");
   }
 
-  const isTabby =
-    colour.includes("Tabby");
-
-  if (isTabby) {
+  if (lower.includes("tabby")) {
     return "Silver " + colour;
   }
 
