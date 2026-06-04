@@ -1,3 +1,5 @@
+/* DOG ENGINE INTENSITY SABLE VERSION 14 */
+
 /* =========================
    CANINE GENETICS ENGINE
 ========================= */
@@ -197,6 +199,17 @@ function runDogGenotypeBuilder(inputs) {
     phenotype.includes("curly") ||
     phenotype.includes("curl");
 
+  const wantsShadedSable =
+    phenotype.includes("shaded sable");
+
+  const wantsSable =
+    phenotype.includes("sable") &&
+    !wantsShadedSable &&
+    !phenotype.includes("wolf sable");
+
+  const wantsDarkRed =
+    phenotype.includes("dark red");
+
   const isPlainGeneticWhite =
     cleanPhenotype === "white" ||
     cleanPhenotype === "recessive white" ||
@@ -308,19 +321,39 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
   }
 
-  if (!isPlainGeneticWhite && phenotype.includes("red")) {
+  if (!isPlainGeneticWhite && wantsDarkRed) {
     addSuggestion("Extension: e/e");
+    addSuggestion("Intensity: I/I");
 
     addBuiltExample({
       Extension: "e/e",
-      K: "K/ky"
+      K: "K/ky",
+      Intensity: "I/I"
+    });
+
+    addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
+  }
+
+  if (
+    !isPlainGeneticWhite &&
+    phenotype.includes("red") &&
+    !wantsDarkRed
+  ) {
+    addSuggestion("Extension: e/e");
+    addSuggestion("Intensity: I/i");
+
+    addBuiltExample({
+      Extension: "e/e",
+      K: "K/ky",
+      Intensity: "I/i"
     });
 
     addBuiltExample({
       Extension: "e/e",
       K: "ky/ky",
       Brown: "B/b",
-      Dilute: "D/d"
+      Dilute: "D/d",
+      Intensity: "I/i"
     });
 
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
@@ -686,24 +719,61 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
-  if (phenotype.includes("fawn")) {
+  if (wantsShadedSable) {
     addSuggestion("Agouti: Ay/-");
     addSuggestion("K locus: ky/ky or kbr/ky");
+    addSuggestion("Intensity: I/I");
 
     addBuiltExample({
       Extension: extensionBase("E/E"),
       K: "ky/ky",
-      Agouti: "Ay/a"
+      Agouti: "Ay/a",
+      Intensity: "I/I"
     });
 
     addBuiltExample({
       Extension: extensionBase("E/e"),
       K: "ky/ky",
-      Agouti: "Ay/at"
+      Agouti: "Ay/at",
+      Intensity: "I/I"
     });
   }
 
-  if (phenotype.includes("pale fawn")) {
+  if (wantsSable) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("K locus: ky/ky or kbr/ky");
+    addSuggestion("Intensity: I/i");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Intensity: "I/i"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "Ay/at",
+      Intensity: "I/i"
+    });
+  }
+
+  if (phenotype.includes("blue fawn")) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Intensity: i/i");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Dilute: "d/d",
+      Intensity: "i/i"
+    });
+  } else if (phenotype.includes("fawn")) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("K locus: ky/ky or kbr/ky");
     addSuggestion("Intensity: i/i");
 
     addBuiltExample({
@@ -712,17 +782,12 @@ function runDogGenotypeBuilder(inputs) {
       Agouti: "Ay/a",
       Intensity: "i/i"
     });
-  }
-
-  if (phenotype.includes("blue fawn")) {
-    addSuggestion("Dilute: d/d");
-    addSuggestion("Agouti: Ay/-");
 
     addBuiltExample({
-      Extension: extensionBase("E/E"),
+      Extension: extensionBase("E/e"),
       K: "ky/ky",
-      Agouti: "Ay/a",
-      Dilute: "d/d"
+      Agouti: "Ay/at",
+      Intensity: "i/i"
     });
   }
 
@@ -985,7 +1050,7 @@ function getDogBaseColour(parsed) {
     parsed.Agouti === "Ay/asa" ||
     parsed.Agouti === "Ay/a"
   ) {
-    return "Fawn";
+    return "Sable";
   }
 
   if (
@@ -1022,6 +1087,7 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Black") colour = "Chocolate";
     if (colour === "Tan Point") colour = "Chocolate Tan";
     if (colour === "Wolf Sable") colour = "Chocolate Wolf Sable";
+    if (colour === "Sable") colour = "Chocolate Sable";
     if (colour === "Saddle Tan") colour = "Chocolate Saddle Tan";
   }
 
@@ -1030,17 +1096,28 @@ function applyDogModifiers(colour, parsed) {
     if (colour === "Chocolate") colour = "Lilac";
     if (colour === "Tan Point") colour = "Blue Tan";
     if (colour === "Chocolate Tan") colour = "Lilac Tan";
-    if (colour === "Fawn") colour = "Blue Fawn";
+    if (colour === "Sable") colour = "Blue Sable";
+    if (colour === "Chocolate Sable") colour = "Lilac Sable";
     if (colour === "Wolf Sable") colour = "Blue Wolf Sable";
     if (colour === "Chocolate Wolf Sable") colour = "Lilac Wolf Sable";
     if (colour === "Saddle Tan") colour = "Blue Saddle Tan";
     if (colour === "Chocolate Saddle Tan") colour = "Lilac Saddle Tan";
   }
 
+  if (parsed.Intensity === "I/I") {
+    if (colour === "Red") colour = "Dark Red";
+    if (colour === "Sable") colour = "Shaded Sable";
+    if (colour === "Blue Sable") colour = "Shaded Blue Sable";
+    if (colour === "Chocolate Sable") colour = "Shaded Chocolate Sable";
+    if (colour === "Lilac Sable") colour = "Shaded Lilac Sable";
+  }
+
   if (parsed.Intensity === "i/i") {
     if (colour === "Red") colour = "Cream";
-    if (colour === "Fawn") colour = "Pale Fawn";
-    if (colour === "Blue Fawn") colour = "Pale Blue Fawn";
+    if (colour === "Sable") colour = "Fawn";
+    if (colour === "Blue Sable") colour = "Blue Fawn";
+    if (colour === "Chocolate Sable") colour = "Chocolate Fawn";
+    if (colour === "Lilac Sable") colour = "Lilac Fawn";
   }
 
   if (isSingleMerle) {
@@ -1074,6 +1151,7 @@ function applyDogModifiers(colour, parsed) {
   if (
     hasDogGene(parsed.Extension, "Em") &&
     colour !== "Red" &&
+    colour !== "Dark Red" &&
     colour !== "Cream"
   ) {
     colour = colour + " Mask";
@@ -1088,6 +1166,7 @@ function applyDogModifiers(colour, parsed) {
 
   if (
     colour !== "Red" &&
+    colour !== "Dark Red" &&
     colour !== "Cream" &&
     (
       parsed.K === "kbr/kbr" ||
@@ -1410,3 +1489,5 @@ window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
 window.runDogGenotypeBuilder = runDogGenotypeBuilder;
 window.runDogGenetics = runDogGenetics;
+window.parseDogGenotype = parseDogGenotype;
+window.getDogPhenotype = getDogPhenotype;
