@@ -1,4 +1,4 @@
-/* HORSE ENGINE SABINO PROPER VERSION 8 */
+/* HORSE ENGINE SABINO + PEARL PROPER VERSION 10 */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -384,7 +384,7 @@ function parseHorseGenotype(genotypeText) {
   return {
     Extension: findGenePair(text, ["E/E", "E/e", "e/E", "e/e"], "e/e"),
     Agouti: findGenePair(text, ["A/A", "A/a", "a/A", "a/a"], "a/a"),
-    Cream: findGenePair(text, ["Cr/Cr", "Cr/n", "n/Cr", "n/n"], "n/n"),
+    Cream: findHorseCreamGene(text),
 
     Dun: findGenePair(
       text,
@@ -411,9 +411,7 @@ function parseHorseGenotype(genotypeText) {
 
     Champagne: findGenePair(text, ["Ch/Ch", "Ch/n", "n/Ch", "n/n"], "n/n"),
     Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
-    Pearl: findGenePair(  text,["Prl/Prl", "Cr/Prl", "Prl/Cr", "Prl/n", "n/Prl", "n/n"],
-  "n/n"
-),,
+    Pearl: findHorsePearlGene(text),
     Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "mu/Mu", "Mu/Mu", "n/n"], "n/n"),
 
     Flaxen: findGenePair(text, ["F/F", "F/f", "f/F", "f/f"], "F/F"),
@@ -455,6 +453,60 @@ function parseHorsePhenotype(phenotypeText) {
     modifiers: [],
     patterns: []
   };
+}
+
+function findHorseCreamGene(text) {
+  const tokens = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ");
+
+  for (const token of tokens) {
+    if (token === "Cr/Cr") return "Cr/Cr";
+
+    if (
+      token === "Cr/n" ||
+      token === "n/Cr"
+    ) {
+      return "Cr/n";
+    }
+
+    if (
+      token === "Cr/Prl" ||
+      token === "Prl/Cr"
+    ) {
+      return "Cr/Prl";
+    }
+  }
+
+  return "n/n";
+}
+
+function findHorsePearlGene(text) {
+  const tokens = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ");
+
+  for (const token of tokens) {
+    if (token === "Prl/Prl") return "Prl/Prl";
+
+    if (
+      token === "Prl/n" ||
+      token === "n/Prl"
+    ) {
+      return "Prl/n";
+    }
+
+    if (
+      token === "Cr/Prl" ||
+      token === "Prl/Cr"
+    ) {
+      return "Cr/Prl";
+    }
+  }
+
+  return "n/n";
 }
 
 function findGenePair(text, options, fallback) {
@@ -629,31 +681,26 @@ function applyHorseSilver(baseColour, parsed) {
 function applyHorsePearl(baseColour, parsed) {
   const pearl = parsed.Pearl;
 
-  if (
-    pearl !== "Prl/Prl" &&
-    pearl !== "Cr/Prl" &&
-    pearl !== "Prl/Cr"
-  ) {
-    return baseColour;
-  }
-
   if (pearl === "Prl/Prl") {
     if (baseColour === "Chestnut") return "Apricot";
     if (baseColour === "Flaxen Chestnut") return "Flaxen Apricot";
     if (baseColour === "Bay") return "Bay Pearl";
     if (baseColour === "Black") return "Black Pearl";
+    if (baseColour === "Palomino") return "Palomino Pearl";
+    if (baseColour === "Buckskin") return "Buckskin Pearl";
+    if (baseColour === "Smokey Black") return "Smokey Black Pearl";
 
     return baseColour + " Pearl";
   }
 
-  if (
-    pearl === "Cr/Prl" ||
-    pearl === "Prl/Cr"
-  ) {
+  if (pearl === "Cr/Prl") {
     if (baseColour === "Chestnut") return "Cream Pearl";
     if (baseColour === "Flaxen Chestnut") return "Flaxen Cream Pearl";
     if (baseColour === "Bay") return "Buckskin Pearl";
     if (baseColour === "Black") return "Smokey Black Pearl";
+    if (baseColour === "Palomino") return "Cream Pearl";
+    if (baseColour === "Buckskin") return "Buckskin Pearl";
+    if (baseColour === "Smokey Black") return "Smokey Black Pearl";
 
     return baseColour + " Pearl";
   }
