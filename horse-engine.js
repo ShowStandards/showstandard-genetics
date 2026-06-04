@@ -1,4 +1,4 @@
-/* HORSE ENGINE SABINO + PEARL PROPER VERSION 10 */
+/* HORSE ENGINE SABINO + PEARL FIXED VERSION 12 */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -608,7 +608,10 @@ function applyHorseFlaxen(baseColour, parsed) {
 function applyHorseCream(baseColour, parsed) {
   const cream = parsed.Cream;
 
-  if (cream === "Cr/n") {
+  if (
+    cream === "Cr/n" ||
+    cream === "Cr/Prl"
+  ) {
     if (baseColour === "Chestnut") return "Palomino";
     if (baseColour === "Flaxen Chestnut") return "Flaxen Palomino";
     if (baseColour === "Bay") return "Buckskin";
