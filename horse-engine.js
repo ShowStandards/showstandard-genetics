@@ -1,4 +1,4 @@
-/* HORSE ENGINE SABINO VERSION 6 */
+/* HORSE ENGINE SABINO PROPER VERSION 8 */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -827,3 +827,6 @@ window.runHorsePredictor = runHorsePredictor;
 window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
 window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
 window.runHorseGenetics = runHorseGenetics;
+window.parseHorseGenotype = parseHorseGenotype;
+window.getHorsePhenotype = getHorsePhenotype;
+window.applyHorsePatterns = applyHorsePatterns;
