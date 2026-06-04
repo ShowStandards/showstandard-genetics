@@ -1,4 +1,4 @@
-/* DOG ENGINE INTENSITY SABLE VERSION 14 */
+/* DOG ENGINE FINAL INTENSITY + DOMINO VERSION 16 */
 
 /* =========================
    CANINE GENETICS ENGINE
@@ -199,16 +199,40 @@ function runDogGenotypeBuilder(inputs) {
     phenotype.includes("curly") ||
     phenotype.includes("curl");
 
-  const wantsShadedSable =
-    phenotype.includes("shaded sable");
+  const wantsSilverSable =
+    phenotype.includes("silver sable");
 
   const wantsSable =
     phenotype.includes("sable") &&
-    !wantsShadedSable &&
+    !wantsSilverSable &&
     !phenotype.includes("wolf sable");
 
-  const wantsDarkRed =
-    phenotype.includes("dark red");
+  const wantsSilver =
+    cleanPhenotype === "silver" ||
+    phenotype.includes("silver red");
+
+  const wantsBlackAndTan =
+    phenotype.includes("black & tan") ||
+    phenotype.includes("black and tan") ||
+    phenotype.includes("tan point");
+
+  const wantsSilverBlackAndTan =
+    phenotype.includes("silver black & tan") ||
+    phenotype.includes("silver black and tan");
+
+  const wantsCreamPoint =
+    phenotype.includes("cream point");
+
+  const wantsNorthernDomino =
+    phenotype.includes("northern domino");
+
+  const wantsDomino =
+    (
+      cleanPhenotype === "domino" ||
+      phenotype.includes("sighthound domino") ||
+      phenotype.includes("domino")
+    ) &&
+    !wantsNorthernDomino;
 
   const isPlainGeneticWhite =
     cleanPhenotype === "white" ||
@@ -310,6 +334,19 @@ function runDogGenotypeBuilder(inputs) {
 
   if (!isPlainGeneticWhite && phenotype.includes("cream")) {
     addSuggestion("Extension: e/e");
+    addSuggestion("Intensity: I/i");
+
+    addBuiltExample({
+      Extension: "e/e",
+      K: "K/ky",
+      Intensity: "I/i"
+    });
+
+    addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
+  }
+
+  if (!isPlainGeneticWhite && wantsSilver) {
+    addSuggestion("Extension: e/e");
     addSuggestion("Intensity: i/i");
 
     addBuiltExample({
@@ -321,7 +358,11 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
   }
 
-  if (!isPlainGeneticWhite && wantsDarkRed) {
+  if (
+    !isPlainGeneticWhite &&
+    phenotype.includes("red") &&
+    !wantsSilver
+  ) {
     addSuggestion("Extension: e/e");
     addSuggestion("Intensity: I/I");
 
@@ -331,29 +372,12 @@ function runDogGenotypeBuilder(inputs) {
       Intensity: "I/I"
     });
 
-    addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
-  }
-
-  if (
-    !isPlainGeneticWhite &&
-    phenotype.includes("red") &&
-    !wantsDarkRed
-  ) {
-    addSuggestion("Extension: e/e");
-    addSuggestion("Intensity: I/i");
-
-    addBuiltExample({
-      Extension: "e/e",
-      K: "K/ky",
-      Intensity: "I/i"
-    });
-
     addBuiltExample({
       Extension: "e/e",
       K: "ky/ky",
       Brown: "B/b",
       Dilute: "D/d",
-      Intensity: "I/i"
+      Intensity: "I/I"
     });
 
     addHidden("Agouti, K, Brown, and Dilute can be hidden by e/e.");
@@ -597,6 +621,46 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
+  if (wantsNorthernDomino) {
+    addSuggestion("Extension: Ea/-");
+    addSuggestion("Agouti: at/at, at/a, or aw/-");
+    addSuggestion("K locus: ky/ky");
+
+    addBuiltExample({
+      Extension: "Ea/E",
+      K: "ky/ky",
+      Agouti: "at/a",
+      Intensity: "I/I"
+    });
+
+    addBuiltExample({
+      Extension: "Ea/e",
+      K: "ky/ky",
+      Agouti: "aw/a",
+      Intensity: "I/I"
+    });
+  }
+
+  if (wantsDomino) {
+    addSuggestion("Extension: Eg/-");
+    addSuggestion("Agouti: at/at, at/a, or aw/-");
+    addSuggestion("K locus: ky/ky");
+
+    addBuiltExample({
+      Extension: "Eg/E",
+      K: "ky/ky",
+      Agouti: "at/a",
+      Intensity: "I/I"
+    });
+
+    addBuiltExample({
+      Extension: "Eg/e",
+      K: "ky/ky",
+      Agouti: "aw/a",
+      Intensity: "I/I"
+    });
+  }
+
   /* Non-merle bases */
 
   if (
@@ -719,7 +783,27 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
-  if (wantsShadedSable) {
+  if (wantsSilverSable) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("K locus: ky/ky or kbr/ky");
+    addSuggestion("Intensity: i/i");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Intensity: "i/i"
+    });
+
+    addBuiltExample({
+      Extension: extensionBase("E/e"),
+      K: "ky/ky",
+      Agouti: "Ay/at",
+      Intensity: "i/i"
+    });
+  }
+
+  if (wantsSable) {
     addSuggestion("Agouti: Ay/-");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addSuggestion("Intensity: I/I");
@@ -739,7 +823,19 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
-  if (wantsSable) {
+  if (phenotype.includes("blue fawn")) {
+    addSuggestion("Agouti: Ay/-");
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Intensity: I/i");
+
+    addBuiltExample({
+      Extension: extensionBase("E/E"),
+      K: "ky/ky",
+      Agouti: "Ay/a",
+      Dilute: "d/d",
+      Intensity: "I/i"
+    });
+  } else if (phenotype.includes("fawn")) {
     addSuggestion("Agouti: Ay/-");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addSuggestion("Intensity: I/i");
@@ -759,35 +855,36 @@ function runDogGenotypeBuilder(inputs) {
     });
   }
 
-  if (phenotype.includes("blue fawn")) {
-    addSuggestion("Agouti: Ay/-");
-    addSuggestion("Dilute: d/d");
-    addSuggestion("Intensity: i/i");
-
-    addBuiltExample({
-      Extension: extensionBase("E/E"),
-      K: "ky/ky",
-      Agouti: "Ay/a",
-      Dilute: "d/d",
-      Intensity: "i/i"
-    });
-  } else if (phenotype.includes("fawn")) {
-    addSuggestion("Agouti: Ay/-");
+  if (
+    (wantsBlackAndTan || wantsSilverBlackAndTan || wantsCreamPoint) &&
+    !wantsBlueMerle &&
+    !wantsSlateMerle &&
+    !wantsChocolateMerle &&
+    !wantsLilacMerle
+  ) {
+    addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
-    addSuggestion("Intensity: i/i");
+
+    if (wantsSilverBlackAndTan) {
+      addSuggestion("Intensity: i/i");
+    } else if (wantsCreamPoint) {
+      addSuggestion("Intensity: I/i");
+    } else {
+      addSuggestion("Intensity: I/I");
+    }
 
     addBuiltExample({
       Extension: extensionBase("E/E"),
       K: "ky/ky",
-      Agouti: "Ay/a",
-      Intensity: "i/i"
+      Agouti: "at/a",
+      Intensity: wantsSilverBlackAndTan ? "i/i" : wantsCreamPoint ? "I/i" : "I/I"
     });
 
     addBuiltExample({
       Extension: extensionBase("E/e"),
       K: "ky/ky",
-      Agouti: "Ay/at",
-      Intensity: "i/i"
+      Agouti: "at/at",
+      Intensity: wantsSilverBlackAndTan ? "i/i" : wantsCreamPoint ? "I/i" : "I/I"
     });
   }
 
@@ -805,13 +902,15 @@ function runDogGenotypeBuilder(inputs) {
     addBuiltExample({
       Extension: extensionBase("E/E"),
       K: "ky/ky",
-      Agouti: "at/a"
+      Agouti: "at/a",
+      Intensity: "I/I"
     });
 
     addBuiltExample({
       Extension: extensionBase("E/e"),
       K: "ky/ky",
-      Agouti: "at/at"
+      Agouti: "at/at",
+      Intensity: "I/I"
     });
   }
 
@@ -1037,10 +1136,33 @@ function getDogBaseColour(parsed) {
   }
 
   if (
-    hasDogGene(parsed.Extension, "Eg") &&
-    parsed.Agouti === "at/at"
+    hasDogGene(parsed.Extension, "Ea") &&
+    (
+      parsed.Agouti === "at/at" ||
+      parsed.Agouti === "at/a" ||
+      parsed.Agouti === "at/asa" ||
+      parsed.Agouti === "aw/aw" ||
+      parsed.Agouti === "aw/at" ||
+      parsed.Agouti === "aw/asa" ||
+      parsed.Agouti === "aw/a"
+    )
   ) {
-    return "Grizzle";
+    return "Northern Domino";
+  }
+
+  if (
+    hasDogGene(parsed.Extension, "Eg") &&
+    (
+      parsed.Agouti === "at/at" ||
+      parsed.Agouti === "at/a" ||
+      parsed.Agouti === "at/asa" ||
+      parsed.Agouti === "aw/aw" ||
+      parsed.Agouti === "aw/at" ||
+      parsed.Agouti === "aw/asa" ||
+      parsed.Agouti === "aw/a"
+    )
+  ) {
+    return "Domino";
   }
 
   if (
@@ -1067,7 +1189,7 @@ function getDogBaseColour(parsed) {
     parsed.Agouti === "at/asa" ||
     parsed.Agouti === "at/a"
   ) {
-    return "Tan Point";
+    return "Black & Tan";
   }
 
   return "Black";
@@ -1085,39 +1207,67 @@ function applyDogModifiers(colour, parsed) {
 
   if (isBrown) {
     if (colour === "Black") colour = "Chocolate";
-    if (colour === "Tan Point") colour = "Chocolate Tan";
+    if (colour === "Black & Tan") colour = "Chocolate & Tan";
     if (colour === "Wolf Sable") colour = "Chocolate Wolf Sable";
     if (colour === "Sable") colour = "Chocolate Sable";
     if (colour === "Saddle Tan") colour = "Chocolate Saddle Tan";
+    if (colour === "Domino") colour = "Chocolate Domino";
+    if (colour === "Northern Domino") colour = "Chocolate Northern Domino";
   }
 
   if (isDilute) {
     if (colour === "Black") colour = "Blue";
     if (colour === "Chocolate") colour = "Lilac";
-    if (colour === "Tan Point") colour = "Blue Tan";
-    if (colour === "Chocolate Tan") colour = "Lilac Tan";
+    if (colour === "Black & Tan") colour = "Blue & Tan";
+    if (colour === "Chocolate & Tan") colour = "Lilac & Tan";
     if (colour === "Sable") colour = "Blue Sable";
     if (colour === "Chocolate Sable") colour = "Lilac Sable";
     if (colour === "Wolf Sable") colour = "Blue Wolf Sable";
     if (colour === "Chocolate Wolf Sable") colour = "Lilac Wolf Sable";
     if (colour === "Saddle Tan") colour = "Blue Saddle Tan";
     if (colour === "Chocolate Saddle Tan") colour = "Lilac Saddle Tan";
+    if (colour === "Domino") colour = "Blue Domino";
+    if (colour === "Chocolate Domino") colour = "Lilac Domino";
+    if (colour === "Northern Domino") colour = "Blue Northern Domino";
+    if (colour === "Chocolate Northern Domino") colour = "Lilac Northern Domino";
   }
 
-  if (parsed.Intensity === "I/I") {
-    if (colour === "Red") colour = "Dark Red";
-    if (colour === "Sable") colour = "Shaded Sable";
-    if (colour === "Blue Sable") colour = "Shaded Blue Sable";
-    if (colour === "Chocolate Sable") colour = "Shaded Chocolate Sable";
-    if (colour === "Lilac Sable") colour = "Shaded Lilac Sable";
-  }
-
-  if (parsed.Intensity === "i/i") {
+  if (parsed.Intensity === "I/i") {
     if (colour === "Red") colour = "Cream";
+
     if (colour === "Sable") colour = "Fawn";
     if (colour === "Blue Sable") colour = "Blue Fawn";
     if (colour === "Chocolate Sable") colour = "Chocolate Fawn";
     if (colour === "Lilac Sable") colour = "Lilac Fawn";
+
+    if (colour === "Wolf Sable") colour = "Pale Wolf Sable";
+    if (colour === "Blue Wolf Sable") colour = "Pale Blue Wolf Sable";
+    if (colour === "Chocolate Wolf Sable") colour = "Pale Chocolate Wolf Sable";
+    if (colour === "Lilac Wolf Sable") colour = "Pale Lilac Wolf Sable";
+
+    if (colour === "Black & Tan") colour = "Cream Point";
+    if (colour === "Chocolate & Tan") colour = "Chocolate & Cream";
+    if (colour === "Blue & Tan") colour = "Blue & Cream";
+    if (colour === "Lilac & Tan") colour = "Lilac & Cream";
+  }
+
+  if (parsed.Intensity === "i/i") {
+    if (colour === "Red") colour = "Silver";
+
+    if (colour === "Sable") colour = "Silver Sable";
+    if (colour === "Blue Sable") colour = "Silver Blue Sable";
+    if (colour === "Chocolate Sable") colour = "Silver Chocolate Sable";
+    if (colour === "Lilac Sable") colour = "Silver Lilac Sable";
+
+    if (colour === "Wolf Sable") colour = "Silver Wolf Sable";
+    if (colour === "Blue Wolf Sable") colour = "Silver Blue Wolf Sable";
+    if (colour === "Chocolate Wolf Sable") colour = "Silver Chocolate Wolf Sable";
+    if (colour === "Lilac Wolf Sable") colour = "Silver Lilac Wolf Sable";
+
+    if (colour === "Black & Tan") colour = "Silver Black & Tan";
+    if (colour === "Chocolate & Tan") colour = "Silver Chocolate & Tan";
+    if (colour === "Blue & Tan") colour = "Silver Blue & Tan";
+    if (colour === "Lilac & Tan") colour = "Silver Lilac & Tan";
   }
 
   if (isSingleMerle) {
@@ -1151,8 +1301,8 @@ function applyDogModifiers(colour, parsed) {
   if (
     hasDogGene(parsed.Extension, "Em") &&
     colour !== "Red" &&
-    colour !== "Dark Red" &&
-    colour !== "Cream"
+    colour !== "Cream" &&
+    colour !== "Silver"
   ) {
     colour = colour + " Mask";
   }
@@ -1166,8 +1316,8 @@ function applyDogModifiers(colour, parsed) {
 
   if (
     colour !== "Red" &&
-    colour !== "Dark Red" &&
     colour !== "Cream" &&
+    colour !== "Silver" &&
     (
       parsed.K === "kbr/kbr" ||
       parsed.K === "kbr/ky"
@@ -1322,12 +1472,22 @@ function findDogExtensionGene(text) {
 
   for (const token of tokens) {
     if (token === "Em/Em") return "Em/Em";
+    if (token === "Em/Ea") return "Em/Ea";
+    if (token === "Ea/Em") return "Em/Ea";
     if (token === "Em/Eg") return "Em/Eg";
     if (token === "Eg/Em") return "Em/Eg";
     if (token === "Em/E") return "Em/E";
     if (token === "E/Em") return "Em/E";
     if (token === "Em/e") return "Em/e";
     if (token === "e/Em") return "Em/e";
+
+    if (token === "Ea/Ea") return "Ea/Ea";
+    if (token === "Ea/Eg") return "Ea/Eg";
+    if (token === "Eg/Ea") return "Ea/Eg";
+    if (token === "Ea/E") return "Ea/E";
+    if (token === "E/Ea") return "Ea/E";
+    if (token === "Ea/e") return "Ea/e";
+    if (token === "e/Ea") return "Ea/e";
 
     if (token === "Eg/Eg") return "Eg/Eg";
     if (token === "Eg/E") return "Eg/E";
@@ -1463,7 +1623,7 @@ function sortDogGenePair(alleles) {
   return alleles
     .sort((a, b) => {
       const order = [
-        "Em", "Eg", "E", "e",
+        "Em", "Ea", "Eg", "E", "e",
         "Ay", "aw", "at", "asa", "a",
         "K", "kbr", "ky",
         "B", "b",
