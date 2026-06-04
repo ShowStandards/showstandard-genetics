@@ -98,32 +98,38 @@ function runCatGenotypeBuilder(inputs) {
     if (!hidden.includes(item)) hidden.push(item);
   }
 
-  function buildExample(parts) {
-    const genes = [];
+ function buildExample(parts) {
+  const genes = [];
 
-    if (parts.Orange) genes.push(parts.Orange);
-    if (parts.Agouti) genes.push(parts.Agouti);
-    if (parts.Brown) genes.push(parts.Brown);
-    if (parts.Dilute) genes.push(parts.Dilute);
-    if (parts.White) genes.push(parts.White);
-    if (parts.WhiteSpotting) genes.push(parts.WhiteSpotting);
-    if (parts.Silver) genes.push(parts.Silver);
-    if (parts.Colourpoint) genes.push(parts.Colourpoint);
-    if (parts.Tabby) genes.push(parts.Tabby);
-    if (parts.Spotted) genes.push(parts.Spotted);
-    if (parts.Ticked) genes.push(parts.Ticked);
-    if (parts.Polydactyl) genes.push(parts.Polydactyl);
-    if (parts.Amber) genes.push(parts.Amber);
-    if (parts.Sunshine) genes.push(parts.Sunshine);
-    if (parts.ExtremeSunshine) genes.push(parts.ExtremeSunshine);
-    if (parts.Charcoal) genes.push(parts.Charcoal);
-    if (parts.Wideband) genes.push(parts.Wideband);
-    if (parts.Rufousing) genes.push(parts.Rufousing);
-    if (parts.Glitter) genes.push(parts.Glitter);
-    if (parts.Karpati) genes.push(parts.Karpati);
-
-    return genes.join(" ");
+  function add(gene, defaultValue) {
+    if (gene && gene !== defaultValue) {
+      genes.push(gene);
+    }
   }
+
+  add(parts.Orange, "o/o");
+  add(parts.Agouti, "a/a");
+  add(parts.Brown, "B/B");
+  add(parts.Dilute, "D/D");
+  add(parts.White, "w/w");
+  add(parts.WhiteSpotting, "s/s");
+  add(parts.Silver, "i/i");
+  add(parts.Colourpoint, "C/C");
+  add(parts.Tabby, "Mc/Mc");
+  add(parts.Spotted, "sp/sp");
+  add(parts.Ticked, "ta/ta");
+  add(parts.Polydactyl, "pd/pd");
+  add(parts.Amber, "n/n");
+  add(parts.Sunshine, "n/n");
+  add(parts.ExtremeSunshine, "n/n");
+  add(parts.Charcoal, "n/n");
+  add(parts.Wideband, "n/n");
+  add(parts.Rufousing, "n/n");
+  add(parts.Glitter, "n/n");
+  add(parts.Karpati, "n/n");
+
+  return genes.join(" ");
+}
 
   function renderBuilder() {
     if (suggestions.length === 0) {
