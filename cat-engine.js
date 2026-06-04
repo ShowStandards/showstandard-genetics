@@ -79,7 +79,8 @@ function runCatPhenotypeCalculator(inputs) {
 }
 
 function runCatGenotypeBuilder(inputs) {
-  const phenotype = String(inputs.phenotype || "").toLowerCase();
+  const phenotypeRaw = String(inputs.phenotype || "");
+  const phenotype = phenotypeRaw.toLowerCase();
 
   const suggestions = [];
   const examples = [];
@@ -97,234 +98,625 @@ function runCatGenotypeBuilder(inputs) {
     if (!hidden.includes(item)) hidden.push(item);
   }
 
-  function addToExamples(gene) {
-    if (examples.length === 0) {
-      examples.push(gene);
-      return;
+  function buildExample(parts) {
+    const genes = [];
+
+    if (parts.Orange) genes.push(parts.Orange);
+    if (parts.Agouti) genes.push(parts.Agouti);
+    if (parts.Brown) genes.push(parts.Brown);
+    if (parts.Dilute) genes.push(parts.Dilute);
+    if (parts.White) genes.push(parts.White);
+    if (parts.WhiteSpotting) genes.push(parts.WhiteSpotting);
+    if (parts.Silver) genes.push(parts.Silver);
+    if (parts.Colourpoint) genes.push(parts.Colourpoint);
+    if (parts.Tabby) genes.push(parts.Tabby);
+    if (parts.Spotted) genes.push(parts.Spotted);
+    if (parts.Ticked) genes.push(parts.Ticked);
+    if (parts.Polydactyl) genes.push(parts.Polydactyl);
+    if (parts.Amber) genes.push(parts.Amber);
+    if (parts.Sunshine) genes.push(parts.Sunshine);
+    if (parts.ExtremeSunshine) genes.push(parts.ExtremeSunshine);
+    if (parts.Charcoal) genes.push(parts.Charcoal);
+    if (parts.Wideband) genes.push(parts.Wideband);
+    if (parts.Rufousing) genes.push(parts.Rufousing);
+    if (parts.Glitter) genes.push(parts.Glitter);
+    if (parts.Karpati) genes.push(parts.Karpati);
+
+    return genes.join(" ");
+  }
+
+  function renderBuilder() {
+    if (suggestions.length === 0) {
+      suggestions.push("No simple genotype match found yet.");
     }
 
-    examples.forEach((example, index) => {
-      examples[index] += " " + gene;
-    });
+    return renderCatResults(
+      "Cat Genotype Builder",
+      `
+        <p><b>Phenotype:</b> ${inputs.phenotype}</p>
+
+        <p><b>Likely Required Genes:</b></p>
+        <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
+
+        <p><b>Possible Example Genotypes:</b></p>
+        <ul>${examples.length
+          ? examples.map(item => `<li>${item}</li>`).join("")
+          : "<li>No example genotypes generated yet.</li>"
+        }</ul>
+
+        <p><b>Possible Hidden Traits:</b></p>
+        <ul>${hidden.length
+          ? hidden.map(item => `<li>${item}</li>`).join("")
+          : "<li>No common hidden traits listed yet.</li>"
+        }</ul>
+
+        <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
+      `
+    );
   }
 
-  if (phenotype.includes("black")) {
+  const wantsBlueCream =
+    phenotype.includes("blue-cream") ||
+    phenotype.includes("blue cream");
+
+  const wantsCalico =
+    phenotype.includes("calico");
+
+  const wantsTortie =
+    phenotype.includes("tortie") ||
+    wantsBlueCream ||
+    wantsCalico;
+
+  const wantsCameo =
+    phenotype.includes("cameo");
+
+  const wantsSmoke =
+    phenotype.includes("smoke");
+
+  const wantsSilver =
+    phenotype.includes("silver");
+
+  const wantsInhibitor =
+    wantsCameo ||
+    wantsSmoke ||
+    wantsSilver ||
+    phenotype.includes("bimetallic");
+
+  const wantsBlue =
+    phenotype.includes("blue") &&
+    !wantsBlueCream &&
+    !phenotype.includes("blue-eyed");
+
+  const wantsCream =
+    phenotype.includes("cream") &&
+    !wantsBlueCream;
+
+  const wantsRed =
+    phenotype.includes("red") ||
+    wantsCameo;
+
+  const wantsBlack =
+    phenotype.includes("black") ||
+    wantsSmoke ||
+    wantsSilver;
+
+  const wantsChocolate =
+    phenotype.includes("chocolate");
+
+  const wantsLilac =
+    phenotype.includes("lilac");
+
+  const wantsCinnamon =
+    phenotype.includes("cinnamon");
+
+  const wantsFawn =
+    phenotype.includes("fawn");
+
+  const wantsTabby =
+    phenotype.includes("tabby") ||
+    phenotype.includes("classic") ||
+    phenotype.includes("mackerel") ||
+    phenotype.includes("spotted") ||
+    phenotype.includes("ticked") ||
+    wantsSilver;
+
+  const wantsClassic =
+    phenotype.includes("classic");
+
+  const wantsSpotted =
+    phenotype.includes("spotted");
+
+  const wantsTicked =
+    phenotype.includes("ticked");
+
+  const wantsBurmese =
+    phenotype.includes("burmese");
+
+  const wantsPoint =
+    phenotype.includes("siamese") ||
+    phenotype.includes("point");
+
+  const wantsMink =
+    phenotype.includes("mink");
+
+  const wantsBlueEyedAlbino =
+    phenotype.includes("blue-eyed albino");
+
+  const wantsRedEyedAlbino =
+    phenotype.includes("red-eyed albino");
+
+  const wantsWhite =
+    phenotype.includes("white") &&
+    !wantsBlueEyedAlbino &&
+    !wantsRedEyedAlbino;
+
+  const wantsPolydactyl =
+    phenotype.includes("polydactyl");
+
+  const wantsAmber =
+    phenotype.includes("amber");
+
+  const wantsSunshine =
+    phenotype.includes("sunshine") &&
+    !phenotype.includes("extreme sunshine");
+
+  const wantsExtremeSunshine =
+    phenotype.includes("extreme sunshine");
+
+  const wantsCharcoal =
+    phenotype.includes("charcoal");
+
+  const wantsShaded =
+    phenotype.includes("shaded");
+
+  const wantsRufoused =
+    phenotype.includes("rufoused");
+
+  const wantsGlitter =
+    phenotype.includes("glitter");
+
+  const wantsKarpati =
+    phenotype.includes("karpati");
+
+  const base = {
+    Orange: "o/o",
+    Agouti: "a/a",
+    Brown: "B/B",
+    Dilute: "D/D",
+    White: "w/w",
+    WhiteSpotting: "s/s",
+    Silver: "i/i",
+    Colourpoint: "C/C",
+    Tabby: "Mc/Mc",
+    Spotted: "sp/sp",
+    Ticked: "ta/ta",
+    Polydactyl: "pd/pd",
+    Amber: "n/n",
+    Sunshine: "n/n",
+    ExtremeSunshine: "n/n",
+    Charcoal: "n/n",
+    Wideband: "n/n",
+    Rufousing: "n/n",
+    Glitter: "n/n",
+    Karpati: "n/n"
+  };
+
+  function cloneBase() {
+    return Object.assign({}, base);
+  }
+
+  function addModifierGenes(parts) {
+    if (wantsInhibitor) {
+      parts.Silver = "I/i";
+      addSuggestion("Inhibitor/Silver: I/-");
+    }
+
+    if (wantsWhite || wantsCalico) {
+      parts.WhiteSpotting = "S/s";
+      addSuggestion("White Spotting: S/-");
+    }
+
+    if (wantsTabby) {
+      parts.Agouti = "A/a";
+      addSuggestion("Agouti: A/-");
+    }
+
+    if (wantsClassic) {
+      parts.Tabby = "mc/mc";
+      addSuggestion("Tabby Pattern: mc/mc");
+    }
+
+    if (wantsSpotted) {
+      parts.Spotted = "Sp/sp";
+      addSuggestion("Spotted: Sp/-");
+    }
+
+    if (wantsTicked) {
+      parts.Ticked = "Ta/ta";
+      addSuggestion("Ticked: Ta/-");
+    }
+
+    if (wantsBurmese) {
+      parts.Colourpoint = "cb/cb";
+      addSuggestion("Colourpoint: cb/cb");
+    }
+
+    if (wantsPoint) {
+      parts.Colourpoint = "cs/cs";
+      addSuggestion("Colourpoint: cs/cs");
+    }
+
+    if (wantsMink) {
+      parts.Colourpoint = "cb/cs";
+      addSuggestion("Colourpoint: cb/cs");
+    }
+
+    if (wantsBlueEyedAlbino) {
+      parts.Colourpoint = "ca/ca";
+      addSuggestion("Colourpoint: ca/ca");
+    }
+
+    if (wantsRedEyedAlbino) {
+      parts.Colourpoint = "c/c";
+      addSuggestion("Colourpoint: c/c");
+    }
+
+    if (wantsPolydactyl) {
+      parts.Polydactyl = "Pd/pd";
+      addSuggestion("Polydactyl: Pd/-");
+    }
+
+    if (wantsAmber) {
+      parts.Amber = "Amb/n";
+      addSuggestion("Amber: Amb/-");
+    }
+
+    if (wantsSunshine) {
+      parts.Sunshine = "Su/n";
+      addSuggestion("Sunshine: Su/-");
+    }
+
+    if (wantsExtremeSunshine) {
+      parts.ExtremeSunshine = "Es/n";
+      addSuggestion("Extreme Sunshine: Es/-");
+    }
+
+    if (wantsCharcoal) {
+      parts.Charcoal = "Ch/n";
+      addSuggestion("Charcoal: Ch/-");
+    }
+
+    if (wantsShaded) {
+      parts.Wideband = "Wb/n";
+      addSuggestion("Wideband/Shaded: Wb/-");
+    }
+
+    if (wantsRufoused) {
+      parts.Rufousing = "Rf/n";
+      addSuggestion("Rufousing: Rf/-");
+    }
+
+    if (wantsGlitter) {
+      parts.Glitter = "Gl/n";
+      addSuggestion("Glitter: Gl/-");
+    }
+
+    if (wantsKarpati) {
+      parts.Karpati = "Kp/n";
+      addSuggestion("Karpati: Kp/-");
+    }
+
+    return parts;
+  }
+
+  function addCompleteExample(parts) {
+    addExample(buildExample(addModifierGenes(parts)));
+  }
+
+  if (wantsBlueCream || (wantsTortie && wantsCream)) {
+    addSuggestion("Orange: O/o");
+    addSuggestion("Dilute: d/d");
+
+    if (wantsCameo) {
+      addSuggestion("Cameo: red/cream areas with Inhibitor I/-");
+    }
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/B",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/b",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/bl",
+      Dilute: "d/d"
+    }));
+
+    if (wantsCalico) {
+      addCompleteExample(Object.assign(cloneBase(), {
+        Orange: "O/o",
+        Brown: "B/B",
+        Dilute: "d/d",
+        WhiteSpotting: "S/S"
+      }));
+    }
+
+    addHidden("Blue-cream and calico are tortie-based, so examples should use O/o.");
+    return renderBuilder();
+  }
+
+  if (wantsTortie) {
+    addSuggestion("Orange: O/o");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/b",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/bl",
+      Dilute: "D/D"
+    }));
+
+    addHidden("Tortie can hide chocolate, cinnamon, and dilute.");
+    return renderBuilder();
+  }
+
+  if (wantsCream) {
+    addSuggestion("Orange: O/Y or O/O");
+    addSuggestion("Dilute: d/d");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/Y",
+      Brown: "B/B",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/O",
+      Brown: "B/B",
+      Dilute: "d/d"
+    }));
+
+    addHidden("Black-based genes can be hidden beneath cream.");
+    return renderBuilder();
+  }
+
+  if (wantsRed || wantsCameo) {
+    addSuggestion("Orange: O/Y or O/O");
+
+    if (wantsCameo) {
+      addSuggestion("Cameo: red cat with Inhibitor I/-");
+    }
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/Y",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/O",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addHidden("Black-based genes can be hidden beneath red/cameo.");
+    return renderBuilder();
+  }
+
+  if (wantsLilac) {
+    addSuggestion("Brown: b/b");
+    addSuggestion("Dilute: d/d");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "b/b",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "b/b",
+      Dilute: "d/d"
+    }));
+
+    return renderBuilder();
+  }
+
+  if (wantsFawn) {
+    addSuggestion("Brown: bl/bl");
+    addSuggestion("Dilute: d/d");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "bl/bl",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "bl/bl",
+      Dilute: "d/d"
+    }));
+
+    return renderBuilder();
+  }
+
+  if (wantsChocolate) {
+    addSuggestion("Brown: b/b or b/bl");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "b/b",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "b/b",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "b/bl",
+      Dilute: "D/D"
+    }));
+
+    addHidden("b/bl is chocolate carrying cinnamon.");
+    return renderBuilder();
+  }
+
+  if (wantsCinnamon) {
+    addSuggestion("Brown: bl/bl");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "bl/bl",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "bl/bl",
+      Dilute: "D/D"
+    }));
+
+    return renderBuilder();
+  }
+
+  if (wantsBlue) {
+    addSuggestion("Dilute: d/d");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "B/B",
+      Dilute: "d/d"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "B/B",
+      Dilute: "d/d"
+    }));
+
+    addHidden("Blue can carry chocolate or cinnamon.");
+    return renderBuilder();
+  }
+
+  if (wantsSmoke) {
+    addSuggestion("Inhibitor/Silver: I/-");
+    addSuggestion("Solid cat: a/a");
+    addSuggestion("Smoke is inhibitor on a solid black-series cat.");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Agouti: "a/a",
+      Brown: "B/B",
+      Dilute: "D/D",
+      Silver: "I/i"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Agouti: "a/a",
+      Brown: "B/b",
+      Dilute: "D/D",
+      Silver: "I/i"
+    }));
+
+    return renderBuilder();
+  }
+
+  if (wantsSilver || wantsTabby) {
+    if (wantsSilver) {
+      addSuggestion("Inhibitor/Silver: I/-");
+      addSuggestion("Silver uses I/- on a tabby/agouti cat.");
+    }
+
+    if (wantsTabby) {
+      addSuggestion("Agouti: A/-");
+    }
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Agouti: "A/a",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Agouti: "A/a",
+      Brown: "B/b",
+      Dilute: "D/D"
+    }));
+
+    return renderBuilder();
+  }
+
+  if (wantsBlack) {
     addSuggestion("Orange: o/Y or o/o");
     addSuggestion("Brown: B/-");
-    addExample("o/Y B/B D/D");
-    addExample("o/o B/B D/D");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "B/b",
+      Dilute: "D/D"
+    }));
+
     addHidden("Dilute can be carried: D/d");
+    return renderBuilder();
   }
 
-  if (phenotype.includes("blue")) {
-    addSuggestion("Dilute: d/d");
-    addExample("o/Y B/B d/d");
-    addExample("o/o B/B d/d");
-  }
-
-  if (phenotype.includes("chocolate")) {
-    addSuggestion("Brown: b/b");
-    addExample("o/Y b/b D/D");
-    addExample("o/o b/b D/D");
-  }
-
-  if (phenotype.includes("lilac")) {
-    addSuggestion("Brown: b/b");
-    addSuggestion("Dilute: d/d");
-    addExample("o/Y b/b d/d");
-    addExample("o/o b/b d/d");
-  }
-
-  if (phenotype.includes("cinnamon")) {
-    addSuggestion("Brown: bl/bl");
-    addExample("o/Y bl/bl D/D");
-    addExample("o/o bl/bl D/D");
-  }
-
-  if (phenotype.includes("fawn")) {
-    addSuggestion("Brown: bl/bl");
-    addSuggestion("Dilute: d/d");
-    addExample("o/Y bl/bl d/d");
-    addExample("o/o bl/bl d/d");
-  }
-
-  if (phenotype.includes("red")) {
-    addSuggestion("Orange: O/Y or O/O");
-    addExample("O/Y B/B D/D");
-    addExample("O/O B/B D/D");
-    addHidden("Black-based genes can be hidden beneath red.");
-  }
-
-  if (phenotype.includes("cream")) {
-    addSuggestion("Orange: O/Y or O/O");
-    addSuggestion("Dilute: d/d");
-    addExample("O/Y B/B d/d");
-    addExample("O/O B/B d/d");
-  }
-
-  if (phenotype.includes("tortie")) {
-    addSuggestion("Orange: O/o");
-    addExample("O/o B/B D/D");
-    addHidden("Can genetically be black, chocolate, or cinnamon based.");
-  }
-
-  if (phenotype.includes("blue tortie")) {
-    addSuggestion("Orange: O/o");
-    addSuggestion("Dilute: d/d");
-    addExample("O/o B/B d/d");
-  }
-
-  if (phenotype.includes("white")) {
+  if (wantsWhite) {
     addSuggestion("White: W/- OR White Spotting");
     addExample("W/w");
     addExample("S/S");
+    return renderBuilder();
   }
 
-  if (phenotype.includes("calico")) {
-    addSuggestion("Orange: O/o");
-    addSuggestion("White Spotting: S/-");
-    addExample("O/o B/B D/D S/s");
+  if (wantsBurmese || wantsPoint || wantsMink || wantsBlueEyedAlbino || wantsRedEyedAlbino) {
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "B/B",
+      Dilute: "D/D"
+    }));
+
+    return renderBuilder();
   }
 
-  if (phenotype.includes("burmese")) {
-    addSuggestion("Colourpoint: cb/cb");
-    addToExamples("cb/cb");
-  }
-
-  if (phenotype.includes("siamese") || phenotype.includes("point")) {
-    addSuggestion("Colourpoint: cs/cs");
-    addToExamples("cs/cs");
-  }
-
-  if (phenotype.includes("mink")) {
-    addSuggestion("Colourpoint: cb/cs");
-    addToExamples("cb/cs");
-  }
-
-  if (phenotype.includes("blue-eyed albino")) {
-    addSuggestion("Colourpoint: ca/ca");
-    addToExamples("ca/ca");
-  }
-
-  if (phenotype.includes("red-eyed albino")) {
-    addSuggestion("Colourpoint: c/c");
-    addToExamples("c/c");
-  }
-
-  if (phenotype.includes("silver")) {
-    addSuggestion("Silver: I/-");
-    addToExamples("I/i");
-  }
-
-  if (phenotype.includes("cameo")) {
-    addSuggestion("Orange: O/Y or O/O");
-    addSuggestion("Silver: I/-");
-    addSuggestion("Agouti: A/-");
-    addExample("O/Y I/i A/a");
-    addExample("O/O I/i A/a");
-    addHidden("Wideband may enhance cameo appearance.");
-  }
-
-  if (phenotype.includes("amber")) {
-    addSuggestion("Amber: Amb/-");
-    addToExamples("Amb/n");
-  }
-
-  if (phenotype.includes("sunshine")) {
-    addSuggestion("Sunshine: Su/-");
-    addToExamples("Su/n");
-  }
-
-  if (phenotype.includes("extreme sunshine")) {
-    addSuggestion("Extreme Sunshine: Es/-");
-    addToExamples("Es/n");
-  }
-
-  if (phenotype.includes("bimetallic")) {
-    addSuggestion("Silver: I/-");
-    addSuggestion("Sunshine or Extreme Sunshine");
-    addToExamples("I/i Su/n");
-  }
-
-  if (phenotype.includes("charcoal")) {
-    addSuggestion("Charcoal: Ch/-");
-    addToExamples("Ch/n");
-  }
-
-  if (phenotype.includes("shaded")) {
-    addSuggestion("Wideband: Wb/-");
-    addToExamples("Wb/n");
-  }
-
-  if (phenotype.includes("rufoused")) {
-    addSuggestion("Rufousing: Rf/-");
-    addToExamples("Rf/n");
-  }
-
-  if (phenotype.includes("glitter")) {
-    addSuggestion("Glitter: Gl/-");
-    addToExamples("Gl/n");
-  }
-
-  if (phenotype.includes("karpati")) {
-    addSuggestion("Karpati: Kp/-");
-    addToExamples("Kp/n");
-  }
-
-  if (phenotype.includes("tabby")) {
-    addSuggestion("Agouti: A/-");
-    addToExamples("A/a");
-  }
-
-  if (phenotype.includes("classic")) {
-    addSuggestion("Tabby: mc/mc");
-    addToExamples("mc/mc");
-  }
-
-  if (phenotype.includes("spotted")) {
-    addSuggestion("Spotted: Sp/-");
-    addToExamples("Sp/sp");
-  }
-
-  if (phenotype.includes("ticked")) {
-    addSuggestion("Ticked: Ta/-");
-    addToExamples("Ta/ta");
-  }
-
-  if (phenotype.includes("polydactyl")) {
-    addSuggestion("Polydactyl: Pd/-");
-    addToExamples("Pd/pd");
-  }
-
-  if (suggestions.length === 0) {
-    suggestions.push("No simple genotype match found yet.");
-  }
-
-  return renderCatResults(
-    "Cat Genotype Builder",
-    `
-      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
-
-      <p><b>Likely Required Genes:</b></p>
-      <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
-
-      <p><b>Possible Example Genotypes:</b></p>
-      <ul>${examples.length
-        ? examples.map(item => `<li>${item}</li>`).join("")
-        : "<li>No example genotypes generated yet.</li>"
-      }</ul>
-
-      <p><b>Possible Hidden Traits:</b></p>
-      <ul>${hidden.length
-        ? hidden.map(item => `<li>${item}</li>`).join("")
-        : "<li>No common hidden traits listed yet.</li>"
-      }</ul>
-
-      <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
-    `
-  );
+  suggestions.push("No simple genotype match found yet.");
+  return renderBuilder();
 }
-
 /* =========================
    PARSERS
 ========================= */
