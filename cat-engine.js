@@ -855,15 +855,42 @@ function getCatBaseColour(parsed) {
 function applyCatDilute(colour, parsed) {
   if (parsed.Dilute !== "d/d") return colour;
 
-  if (colour === "Black") return "Blue";
+  const isChocolate =
+    parsed.Brown === "b/b" ||
+    parsed.Brown === "b/bl";
+
+  const isCinnamon =
+    parsed.Brown === "bl/bl";
+
+  if (colour === "Black") {
+    return isChocolate
+      ? "Lilac"
+      : isCinnamon
+        ? "Fawn"
+        : "Blue";
+  }
+
   if (colour === "Chocolate") return "Lilac";
+
   if (colour === "Cinnamon") return "Fawn";
+
   if (colour === "Red") return "Cream";
-  if (colour === "Tortie") return "Blue Tortie";
+
+  if (colour === "Tortie") {
+
+    if (isChocolate) {
+      return "Lilac-Cream Tortie";
+    }
+
+    if (isCinnamon) {
+      return "Fawn-Cream Tortie";
+    }
+
+    return "Blue-Cream Tortie";
+  }
 
   return colour;
 }
-
 function applyCatPointModifier(colour, parsed) {
   if (!parsed || parsed.Colourpoint === "C/C") return colour;
 
