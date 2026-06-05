@@ -1050,14 +1050,10 @@ function applyCatTabby(colour, parsed) {
     return colour;
   }
 
-  const hasAgouti =
-    parsed.Agouti === "A/A" ||
-    parsed.Agouti === "A/a" ||
-    colour.includes("Red") ||
-    colour.includes("Cream") ||
-    colour.includes("Tortie");
-
-  if (!hasAgouti) {
+  if (
+    parsed.Agouti !== "A/A" &&
+    parsed.Agouti !== "A/a"
+  ) {
     return colour;
   }
 
