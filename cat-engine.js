@@ -22,6 +22,7 @@ function runCatPredictor(inputs) {
     catOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
     catOutcomeRow("Brown", sire.Brown, dam.Brown),
     catOutcomeRow("Dilute", sire.Dilute, dam.Dilute),
+    catOutcomeRow("Dilute Modifier", sire.DiluteModifier, dam.DiluteModifier),
     catOutcomeRow("White", sire.White, dam.White),
     catOutcomeRow("White Spotting", sire.WhiteSpotting, dam.WhiteSpotting),
     catOutcomeRow("Silver", sire.Silver, dam.Silver),
@@ -114,6 +115,7 @@ function runCatGenotypeBuilder(inputs) {
   add(parts.Agouti, "a/a");
   add(parts.Brown, "B/B");
   add(parts.Dilute, "D/D");
+  add(parts.DiluteModifier, "dm/dm");
   add(parts.White, "w/w");
   add(parts.WhiteSpotting, "s/s");
   add(parts.Silver, "i/i");
@@ -224,6 +226,22 @@ function runCatGenotypeBuilder(inputs) {
   const wantsFawn =
     phenotype.includes("fawn");
 
+  const wantsCaramel =
+    phenotype.includes("caramel") ||
+    phenotype.includes("taupe");
+
+  const wantsApricot =
+    phenotype.includes("apricot");
+
+  const wantsDiluteModifier =
+    wantsCaramel ||
+    wantsApricot;
+
+  const wantsCaramelApricotTortie =
+    phenotype.includes("caramel-apricot") ||
+    phenotype.includes("caramel apricot") ||
+    (wantsCaramel && wantsApricot && wantsTortie);
+
   const wantsTabby =
     phenotype.includes("tabby") ||
     phenotype.includes("classic") ||
@@ -314,6 +332,7 @@ function runCatGenotypeBuilder(inputs) {
     Agouti: "a/a",
     Brown: "B/B",
     Dilute: "D/D",
+    DiluteModifier: "dm/dm",
     White: "w/w",
     WhiteSpotting: "s/s",
     Silver: "i/i",
@@ -343,6 +362,11 @@ function runCatGenotypeBuilder(inputs) {
     if (wantsInhibitor) {
       parts.Silver = "I/i";
       addSuggestion("Inhibitor/Silver: I/-");
+    }
+
+    if (wantsDiluteModifier) {
+      parts.DiluteModifier = "Dm/dm";
+      addSuggestion("Dilute Modifier: Dm/-");
     }
 
     if (wantsWhite || wantsCalico) {
@@ -466,6 +490,109 @@ function runCatGenotypeBuilder(inputs) {
 
   function addCompleteExample(parts) {
     addExample(buildExample(addModifierGenes(parts)));
+  }
+
+
+  if (wantsCaramelApricotTortie) {
+    addSuggestion("Orange: O/o");
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Dilute Modifier: Dm/-");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/B",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/o",
+      Brown: "B/b",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addHidden("Caramel-apricot tortie is dilute tortie with dilute modifier.");
+    return renderBuilder();
+  }
+
+  if (wantsApricot) {
+    addSuggestion("Orange: O/Y or O/O");
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Dilute Modifier: Dm/-");
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/Y",
+      Brown: "B/B",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "O/O",
+      Brown: "B/B",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addHidden("Black-based genes can be hidden beneath apricot.");
+    return renderBuilder();
+  }
+
+  if (wantsCaramel) {
+    addSuggestion("Dilute: d/d");
+    addSuggestion("Dilute Modifier: Dm/-");
+
+    if (wantsLilac || phenotype.includes("lilac caramel") || phenotype.includes("taupe")) {
+      addSuggestion("Brown: b/b");
+      addCompleteExample(Object.assign(cloneBase(), {
+        Orange: "o/Y",
+        Brown: "b/b",
+        Dilute: "d/d",
+        DiluteModifier: "Dm/dm"
+      }));
+      addCompleteExample(Object.assign(cloneBase(), {
+        Orange: "o/o",
+        Brown: "b/b",
+        Dilute: "d/d",
+        DiluteModifier: "Dm/dm"
+      }));
+      return renderBuilder();
+    }
+
+    if (wantsFawn) {
+      addSuggestion("Brown: bl/bl");
+      addCompleteExample(Object.assign(cloneBase(), {
+        Orange: "o/Y",
+        Brown: "bl/bl",
+        Dilute: "d/d",
+        DiluteModifier: "Dm/dm"
+      }));
+      addCompleteExample(Object.assign(cloneBase(), {
+        Orange: "o/o",
+        Brown: "bl/bl",
+        Dilute: "d/d",
+        DiluteModifier: "Dm/dm"
+      }));
+      return renderBuilder();
+    }
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/Y",
+      Brown: "B/B",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addCompleteExample(Object.assign(cloneBase(), {
+      Orange: "o/o",
+      Brown: "B/B",
+      Dilute: "d/d",
+      DiluteModifier: "Dm/dm"
+    }));
+
+    addHidden("Caramel can carry chocolate or cinnamon.");
+    return renderBuilder();
   }
 
   if (wantsBlueCream || (wantsTortie && wantsCream)) {
@@ -790,6 +917,8 @@ function parseCatGenotype(genotypeText) {
 
     Dilute: findCatGenePair(text, ["D/D", "D/d", "d/d"], "D/D"),
 
+    DiluteModifier: findCatGenePair(text, ["Dm/Dm", "Dm/dm", "dm/Dm", "dm/dm"], "dm/dm"),
+
     White: findCatGenePair(text, ["W/W", "W/w", "w/w"], "w/w"),
 
     WhiteSpotting: findCatGenePair(text, ["S/S", "S/s", "s/s"], "s/s"),
@@ -845,6 +974,7 @@ function getCatPhenotype(parsed) {
   let colour = getCatBaseColour(parsed);
 
 colour = applyCatDilute(colour, parsed);
+colour = applyCatDiluteModifier(colour, parsed);
 colour = applyCatPointModifier(colour, parsed);
 colour = applyCatColourModifiers(colour, parsed);
 colour = applyCatTabby(colour, parsed);
@@ -943,6 +1073,33 @@ function applyCatDilute(colour, parsed) {
     }
 
     return "Blue-Cream Tortie";
+  }
+
+  return colour;
+}
+function applyCatDiluteModifier(colour, parsed) {
+  const hasDiluteModifier =
+    parsed.DiluteModifier === "Dm/Dm" ||
+    parsed.DiluteModifier === "Dm/dm" ||
+    parsed.DiluteModifier === "dm/Dm";
+
+  if (!hasDiluteModifier) return colour;
+
+  if (colour === "Blue") return "Caramel";
+  if (colour === "Lilac") return "Lilac Caramel";
+  if (colour === "Fawn") return "Fawn Caramel";
+  if (colour === "Cream") return "Apricot";
+
+  if (colour === "Blue-Cream Tortie") {
+    return "Caramel-Apricot Tortie";
+  }
+
+  if (colour === "Lilac-Cream Tortie") {
+    return "Lilac Caramel-Apricot Tortie";
+  }
+
+  if (colour === "Fawn-Cream Tortie") {
+    return "Fawn Caramel-Apricot Tortie";
   }
 
   return colour;
@@ -1387,6 +1544,7 @@ window.runCatPhenotypeCalculator = runCatPhenotypeCalculator;
 window.runCatGenotypeBuilder = runCatGenotypeBuilder;
 window.runCatGenetics = runCatGenetics;
 
+window.applyCatDiluteModifier = applyCatDiluteModifier;
 window.applyCatPointModifier = applyCatPointModifier;
 window.applyCatTabby = applyCatTabby;
 window.applyCatWhiteSpotting = applyCatWhiteSpotting;
