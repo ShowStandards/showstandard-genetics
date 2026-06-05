@@ -37,7 +37,10 @@ function runCatPredictor(inputs) {
     catOutcomeRow("Wideband", sire.Wideband, dam.Wideband),
     catOutcomeRow("Rufousing", sire.Rufousing, dam.Rufousing),
     catOutcomeRow("Glitter", sire.Glitter, dam.Glitter),
-    catOutcomeRow("Karpati", sire.Karpati, dam.Karpati)
+    catOutcomeRow("Karpati", sire.Karpati, dam.Karpati),
+    catOutcomeRow("Hair Length", sire.HairLength, dam.HairLength),
+    catOutcomeRow("Rex", sire.Rex, dam.Rex),
+    catOutcomeRow("Hairless", sire.Hairless, dam.Hairless)
   ].join("");
 
   return renderCatResults(
@@ -127,6 +130,9 @@ function runCatGenotypeBuilder(inputs) {
   add(parts.Rufousing, "n/n");
   add(parts.Glitter, "n/n");
   add(parts.Karpati, "n/n");
+  add(parts.HairLength, "L/L");
+  add(parts.Rex, "rx/rx");
+  add(parts.Hairless, "hr/hr");
 
   return genes.join(" ");
 }
@@ -284,6 +290,25 @@ function runCatGenotypeBuilder(inputs) {
   const wantsKarpati =
     phenotype.includes("karpati");
 
+  const wantsLonghair =
+    phenotype.includes("longhair") ||
+    phenotype.includes("long hair") ||
+    phenotype.includes("long-haired") ||
+    phenotype.includes("long haired");
+
+  const wantsShorthair =
+    phenotype.includes("shorthair") ||
+    phenotype.includes("short hair") ||
+    phenotype.includes("short-haired") ||
+    phenotype.includes("short haired");
+
+  const wantsRex =
+    phenotype.includes("rex");
+
+  const wantsHairless =
+    phenotype.includes("hairless") ||
+    phenotype.includes("sphynx");
+
   const base = {
     Orange: "o/o",
     Agouti: "a/a",
@@ -304,7 +329,10 @@ function runCatGenotypeBuilder(inputs) {
     Wideband: "n/n",
     Rufousing: "n/n",
     Glitter: "n/n",
-    Karpati: "n/n"
+    Karpati: "n/n",
+    HairLength: "L/L",
+    Rex: "rx/rx",
+    Hairless: "hr/hr"
   };
 
   function cloneBase() {
@@ -410,6 +438,27 @@ function runCatGenotypeBuilder(inputs) {
     if (wantsKarpati) {
       parts.Karpati = "Kp/n";
       addSuggestion("Karpati: Kp/-");
+    }
+
+    if (wantsLonghair) {
+      parts.HairLength = "l/l";
+      addSuggestion("Hair Length: l/l for longhair");
+    }
+
+    if (wantsShorthair) {
+      parts.HairLength = "L/l";
+      addSuggestion("Hair Length: L/- for shorthair");
+      addHidden("Shorthair can carry longhair: L/l.");
+    }
+
+    if (wantsRex) {
+      parts.Rex = "Rx/rx";
+      addSuggestion("Rex Coat: Rx/-");
+    }
+
+    if (wantsHairless) {
+      parts.Hairless = "Hr/hr";
+      addSuggestion("Hairless: Hr/-");
     }
 
     return parts;
@@ -771,7 +820,13 @@ function parseCatGenotype(genotypeText) {
 
     Glitter: findCatGenePair(text, ["Gl/Gl", "Gl/n", "n/Gl", "n/n"], "n/n"),
 
-    Karpati: findCatGenePair(text, ["Kp/Kp", "Kp/n", "n/Kp", "n/n"], "n/n")
+    Karpati: findCatGenePair(text, ["Kp/Kp", "Kp/n", "n/Kp", "n/n"], "n/n"),
+
+    HairLength: findCatGenePair(text, ["L/L", "L/l", "l/L", "l/l"], "L/L"),
+
+    Rex: findCatGenePair(text, ["Rx/Rx", "Rx/rx", "rx/Rx", "rx/rx"], "rx/rx"),
+
+    Hairless: findCatGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr")
   };
 }
 
@@ -796,6 +851,7 @@ colour = applyCatTabby(colour, parsed);
 colour = applyCatSilver(colour, parsed);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
+  colour = applyCatHairType(colour, parsed);
 
   return colour.trim();
 }
@@ -1120,6 +1176,30 @@ function applyCatPolydactyl(colour, parsed) {
   return colour;
 }
 
+function applyCatHairType(colour, parsed) {
+  if (
+    parsed.Hairless === "Hr/Hr" ||
+    parsed.Hairless === "Hr/hr" ||
+    parsed.Hairless === "hr/Hr"
+  ) {
+    return colour + " Hairless";
+  }
+
+  if (
+    parsed.Rex === "Rx/Rx" ||
+    parsed.Rex === "Rx/rx" ||
+    parsed.Rex === "rx/Rx"
+  ) {
+    return colour + " Rex";
+  }
+
+  if (parsed.HairLength === "l/l") {
+    return colour + " Longhair";
+  }
+
+  return colour + " Shorthair";
+}
+
 /* =========================
    OUTPUT HELPERS
 ========================= */
@@ -1311,3 +1391,4 @@ window.applyCatPointModifier = applyCatPointModifier;
 window.applyCatTabby = applyCatTabby;
 window.applyCatWhiteSpotting = applyCatWhiteSpotting;
 window.applyCatPolydactyl = applyCatPolydactyl;
+window.applyCatHairType = applyCatHairType;
