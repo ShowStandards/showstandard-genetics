@@ -1042,6 +1042,7 @@ function applyCatColourModifiers(colour, parsed) {
 }
 
 function applyCatTabby(colour, parsed) {
+
   if (
     colour === "Blue-Eyed Albino" ||
     colour === "Red-Eyed Albino" ||
@@ -1050,10 +1051,11 @@ function applyCatTabby(colour, parsed) {
     return colour;
   }
 
-  if (
-    parsed.Agouti !== "A/A" &&
-    parsed.Agouti !== "A/a"
-  ) {
+  const hasAgouti =
+    parsed.Agouti === "A/A" ||
+    parsed.Agouti === "A/a";
+
+  if (!hasAgouti) {
     return colour;
   }
 
@@ -1071,11 +1073,20 @@ function applyCatTabby(colour, parsed) {
     return "Spotted Tabby " + colour;
   }
 
-  if (parsed.Tabby === "mc/mc") {
+  if (
+    parsed.Tabby === "mc/mc"
+  ) {
     return "Classic Tabby " + colour;
   }
 
-  return "Mackerel Tabby " + colour;
+  if (
+    parsed.Tabby === "Mc/Mc" ||
+    parsed.Tabby === "Mc/mc"
+  ) {
+    return "Mackerel Tabby " + colour;
+  }
+
+  return colour;
 }
 
 function applyCatWhiteSpotting(colour, parsed) {
@@ -1246,7 +1257,7 @@ function findCatTabbyGene(text) {
     if (token === "mc/mc") return "mc/mc";
   }
 
-  return "Mc/Mc";
+  return "none";
 }
 
 function catOutcomeRow(label, sirePair, damPair) {
