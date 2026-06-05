@@ -1155,7 +1155,7 @@ function applyCatWhiteSpotting(colour, parsed) {
   }
 
   if (parsed.WhiteSpotting === "S/S") {
-    return colour + " and High White";
+    return colour + " Van";
   }
 
   if (parsed.WhiteSpotting === "S/s") {
