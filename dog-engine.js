@@ -1409,17 +1409,23 @@ function applyDogModifiers(colour, parsed) {
 
 function applyDogPatterns(colour, parsed) {
   const patterns = [];
-  const visibleWhite = getDogVisibleWhiteSpotting(parsed.WhiteSpotting);
 
-  if (visibleWhite === "sp") {
+  if (
+    parsed.WhiteSpotting === "sp/sp" ||
+    parsed.WhiteSpotting === "sp/si" ||
+    parsed.WhiteSpotting === "sp/sw"
+  ) {
     patterns.push("Piebald");
   }
 
-  if (visibleWhite === "si") {
+  if (
+    parsed.WhiteSpotting === "si/si" ||
+    parsed.WhiteSpotting === "si/sw"
+  ) {
     patterns.push("Irish White");
   }
 
-  if (visibleWhite === "sw") {
+  if (parsed.WhiteSpotting === "sw/sw") {
     patterns.push("Extreme White");
   }
 
@@ -1673,7 +1679,6 @@ function findDogWhiteSpotting(text) {
 
   return "S/S";
 }
-
 function dogOutcomeRow(label, sirePair, damPair) {
   const outcomes = calculateDogGeneOutcomes(sirePair, damPair);
 
