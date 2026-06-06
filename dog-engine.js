@@ -1,4 +1,4 @@
-/* DOG ENGINE FINAL INTENSITY + DOMINO + COCKER SABLE VERSION 17 */
+/* DOG ENGINE FINAL INTENSITY + DOMINO + COCKER SABLE + UPDATED WHITE SPOTTING VERSION 18 */
 
 /* =========================
    CANINE GENETICS ENGINE
@@ -26,6 +26,14 @@ function runDogGenetics(inputs) {
    Em/Eg will show Mask, not Domino.
    Em/Eh will show Mask, not Cocker Sable.
    K/Ky is accepted as K/ky.
+
+   White spotting hierarchy is now:
+   S > sp > si > sw
+
+   S/S, S/sp, S/si, S/sw = Solid
+   sp/sp, sp/si, sp/sw = Piebald
+   si/si, si/sw = Irish White
+   sw/sw = Extreme White
 */
 
 function runDogPredictor(inputs) {
@@ -291,8 +299,8 @@ function runDogGenotypeBuilder(inputs) {
   function whiteSpottingGene() {
     if (wantsExtremeWhite) return "sw/sw";
     if (wantsPiebald) return "sp/sp";
-    if (wantsIrish) return "S/sp";
-    if (wantsWhiteSpotting) return "S/sp";
+    if (wantsIrish) return "si/si";
+    if (wantsWhiteSpotting) return "si/si";
     return "";
   }
 
@@ -319,13 +327,13 @@ function runDogGenotypeBuilder(inputs) {
   function addGeneralPatternSuggestions() {
     if (wantsWhiteSpotting) {
       if (wantsExtremeWhite) {
-        addSuggestion("White Spotting: sw/sw, sp/sw, or S/sw");
+        addSuggestion("White Spotting: sw/sw");
       } else if (wantsPiebald) {
-        addSuggestion("White Spotting: sp/sp");
+        addSuggestion("White Spotting: sp/sp, sp/si, or sp/sw");
       } else if (wantsIrish) {
-        addSuggestion("White Spotting: S/sp");
+        addSuggestion("White Spotting: si/si or si/sw");
       } else {
-        addSuggestion("White Spotting: S/sp, sp/sp, or S/sw");
+        addSuggestion("White Spotting: si/si, sp/sp, or sw/sw depending on amount of white");
       }
     }
 
@@ -1401,20 +1409,17 @@ function applyDogModifiers(colour, parsed) {
 
 function applyDogPatterns(colour, parsed) {
   const patterns = [];
+  const visibleWhite = getDogVisibleWhiteSpotting(parsed.WhiteSpotting);
 
-  if (parsed.WhiteSpotting === "S/sp") {
-    patterns.push("Irish White");
-  }
-
-  if (parsed.WhiteSpotting === "sp/sp") {
+  if (visibleWhite === "sp") {
     patterns.push("Piebald");
   }
 
-  if (
-    parsed.WhiteSpotting === "sw/sw" ||
-    parsed.WhiteSpotting === "sp/sw" ||
-    parsed.WhiteSpotting === "S/sw"
-  ) {
+  if (visibleWhite === "si") {
+    patterns.push("Irish White");
+  }
+
+  if (visibleWhite === "sw") {
     patterns.push("Extreme White");
   }
 
@@ -1489,6 +1494,17 @@ function getDogVisibleExtension(pair) {
   }
 
   return "e";
+}
+
+function getDogVisibleWhiteSpotting(pair) {
+  const alleles = String(pair || "S/S").split("/");
+  const order = ["S", "sp", "si", "sw"];
+
+  for (const allele of order) {
+    if (alleles.includes(allele)) return allele;
+  }
+
+  return "S";
 }
 
 function randomDogFrom(array) {
@@ -1637,12 +1653,22 @@ function findDogWhiteSpotting(text) {
     if (token === "S/S") return "S/S";
     if (token === "S/sp") return "S/sp";
     if (token === "sp/S") return "S/sp";
-    if (token === "sp/sp") return "sp/sp";
-    if (token === "sw/sw") return "sw/sw";
-    if (token === "sp/sw") return "sp/sw";
-    if (token === "sw/sp") return "sp/sw";
+    if (token === "S/si") return "S/si";
+    if (token === "si/S") return "S/si";
     if (token === "S/sw") return "S/sw";
     if (token === "sw/S") return "S/sw";
+
+    if (token === "sp/sp") return "sp/sp";
+    if (token === "sp/si") return "sp/si";
+    if (token === "si/sp") return "sp/si";
+    if (token === "sp/sw") return "sp/sw";
+    if (token === "sw/sp") return "sp/sw";
+
+    if (token === "si/si") return "si/si";
+    if (token === "si/sw") return "si/sw";
+    if (token === "sw/si") return "si/sw";
+
+    if (token === "sw/sw") return "sw/sw";
   }
 
   return "S/S";
@@ -1690,7 +1716,7 @@ function sortDogGenePair(alleles) {
         "B", "b",
         "D", "d",
         "M", "m",
-        "S", "sp", "sw",
+        "S", "sp", "si", "sw",
         "T", "t",
         "R", "r",
         "H", "h",
@@ -1713,3 +1739,4 @@ window.runDogGenetics = runDogGenetics;
 window.parseDogGenotype = parseDogGenotype;
 window.getDogPhenotype = getDogPhenotype;
 window.getDogVisibleExtension = getDogVisibleExtension;
+window.getDogVisibleWhiteSpotting = getDogVisibleWhiteSpotting;
