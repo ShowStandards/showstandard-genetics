@@ -1529,7 +1529,6 @@ function applyCatTabby(colour, parsed) {
 
   return colour;
 }
-
 function applyCatWhiteSpotting(colour, parsed) {
   if (
     colour === "Blue-Eyed Albino" ||
