@@ -1,4 +1,4 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 14 - CHESTNUT SHADE NOTES */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 15 - BUILDER COMBO NAME FIXES */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -114,10 +114,16 @@ function runHorseGenotypeBuilder(inputs) {
     });
   }
 
+  function hasPhenotypePhrase(phrase) {
+    const normalizedPhenotype = phenotype.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+    const normalizedPhrase = String(phrase || "").toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+    return normalizedPhenotype.includes(normalizedPhrase);
+  }
+
   const isChestnutFamily =
-    phenotype.includes("chestnut") ||
-    phenotype.includes("sorrel") ||
-    phenotype.includes("red");
+    hasPhenotypePhrase("chestnut") ||
+    hasPhenotypePhrase("sorrel") ||
+    hasPhenotypePhrase("red");
 
   if (isChestnutFamily) {
     addSuggestion("Extension: e/e");
@@ -127,28 +133,28 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Agouti can be hidden on chestnut: A/A, A/a, or a/a");
     addHidden("Silver can be hidden on chestnut: Z/n or Z/Z");
 
-    if (phenotype.includes("sorrel")) {
+    if (hasPhenotypePhrase("sorrel")) {
       addNote("Sorrel is treated as part of the chestnut/red family and is genetically e/e.");
     }
 
-    if (phenotype.includes("red")) {
+    if (hasPhenotypePhrase("red")) {
       addNote("Red is treated as part of the chestnut/sorrel family and is genetically e/e.");
     }
 
-    if (phenotype.includes("liver")) {
-      addNote("Liver is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    if (hasPhenotypePhrase("liver")) {
+      addNote("Liver is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
     }
 
-    if (phenotype.includes("dark chestnut")) {
-      addNote("Dark chestnut is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    if (hasPhenotypePhrase("dark chestnut")) {
+      addNote("Dark Chestnut is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
     }
 
-    if (phenotype.includes("light chestnut")) {
-      addNote("Light chestnut is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    if (hasPhenotypePhrase("light chestnut")) {
+      addNote("Light Chestnut is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
     }
   }
 
-  if (phenotype.includes("black") && !phenotype.includes("silver black")) {
+  if (hasPhenotypePhrase("black") && !hasPhenotypePhrase("silver black")) {
     addSuggestion("Extension: E/-");
     addSuggestion("Agouti: a/a");
     addExample("E/E a/a");
@@ -156,7 +162,7 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Chestnut can be carried: E/e");
   }
 
-  if (phenotype.includes("bay")) {
+  if (hasPhenotypePhrase("bay")) {
     addSuggestion("Extension: E/-");
     addSuggestion("Agouti: A/-");
     addExample("E/E A/A");
@@ -165,7 +171,7 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Recessive black can be carried: A/a");
   }
 
-  if (phenotype.includes("palomino")) {
+  if (hasPhenotypePhrase("palomino")) {
     addSuggestion("Base: e/e");
     addSuggestion("Cream: Cr/n");
     addExample("e/e A/A Cr/n");
@@ -174,7 +180,7 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Agouti and Silver can be hidden on red-based horses.");
   }
 
-  if (phenotype.includes("buckskin")) {
+  if (hasPhenotypePhrase("buckskin")) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Cream: Cr/n");
     addExample("E/E A/A Cr/n");
@@ -183,7 +189,7 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Recessive black can be carried: A/a");
   }
 
-  if (phenotype.includes("smokey black")) {
+  if (hasPhenotypePhrase("smokey black")) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Cream: Cr/n");
     addExample("E/E a/a Cr/n");
@@ -191,7 +197,7 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Chestnut can be carried: E/e");
   }
 
-  if (phenotype.includes("cremello")) {
+  if (hasPhenotypePhrase("cremello")) {
     addSuggestion("Base: e/e");
     addSuggestion("Cream: Cr/Cr");
     addExample("e/e A/A Cr/Cr");
@@ -199,76 +205,142 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Agouti and Silver can be hidden on red-based horses.");
   }
 
-  if (phenotype.includes("perlino")) {
+  if (hasPhenotypePhrase("perlino")) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Cream: Cr/Cr");
     addExample("E/E A/A Cr/Cr");
     addExample("E/e A/a Cr/Cr");
   }
 
-  if (phenotype.includes("smokey cream")) {
+  if (hasPhenotypePhrase("smokey cream")) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Cream: Cr/Cr");
     addExample("E/E a/a Cr/Cr");
     addExample("E/e a/a Cr/Cr");
   }
 
-  if (phenotype.includes("dunalino")) {
+  const hasVisibleSilver = hasPhenotypePhrase("silver");
+
+  const isNamedDunCreamCombo =
+    hasPhenotypePhrase("dunalino") ||
+    hasPhenotypePhrase("dunskin") ||
+    hasPhenotypePhrase("dun skin") ||
+    hasPhenotypePhrase("smokey grullo") ||
+    hasPhenotypePhrase("smoky grullo") ||
+    hasPhenotypePhrase("silver grullo") ||
+    hasPhenotypePhrase("silver dunskin") ||
+    hasPhenotypePhrase("silver dun skin");
+
+  const isNamedDunChampagneCombo =
+    hasPhenotypePhrase("gold dun champagne") ||
+    hasPhenotypePhrase("amber dun champagne") ||
+    hasPhenotypePhrase("classic dun champagne") ||
+    hasPhenotypePhrase("silver amber dun champagne") ||
+    hasPhenotypePhrase("silver classic dun champagne");
+
+  if (hasPhenotypePhrase("dunalino") && !hasVisibleSilver) {
     addSuggestion("Base: e/e");
     addSuggestion("Cream: Cr/n");
     addSuggestion("Dun: D/-");
     addExample("e/e A/A Cr/n D/n");
     addExample("e/e A/a Cr/n D/n");
-  } else if (phenotype.includes("dunskin")) {
+    addHidden("Agouti and Silver can be hidden on red-based horses.");
+    addNote("Dunalino is palomino plus dun: genetically chestnut/red with one cream and dun.");
+  } else if ((hasPhenotypePhrase("dunskin") || hasPhenotypePhrase("dun skin")) && !hasVisibleSilver) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Cream: Cr/n");
     addSuggestion("Dun: D/-");
     addExample("E/E A/A Cr/n D/n");
     addExample("E/e A/a Cr/n D/n");
-  } else if (phenotype.includes("smokey grullo")) {
+    addHidden("Chestnut can be carried: E/e");
+    addHidden("Recessive black can be carried: A/a");
+    addNote("Dunskin is buckskin plus dun: genetically bay with one cream and dun.");
+  } else if ((hasPhenotypePhrase("smokey grullo") || hasPhenotypePhrase("smoky grullo")) && !hasVisibleSilver) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Cream: Cr/n");
     addSuggestion("Dun: D/-");
     addExample("E/E a/a Cr/n D/n");
     addExample("E/e a/a Cr/n D/n");
+    addHidden("Chestnut can be carried: E/e");
+    addNote("Smokey Grullo is smokey black plus dun: genetically black with one cream and dun.");
   }
 
-  if (phenotype.includes("red dun")) {
+  if (hasPhenotypePhrase("red dun")) {
     addSuggestion("Base: e/e");
     addSuggestion("Dun: D/-");
     addExample("e/e A/A D/n");
     addExample("e/e A/a D/n");
-  } else if (phenotype.includes("bay dun")) {
+  } else if (hasPhenotypePhrase("bay dun")) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Dun: D/-");
     addExample("E/E A/A D/n");
     addExample("E/e A/a D/n");
-  } else if (phenotype.includes("grullo") || phenotype.includes("grulla")) {
+  } else if ((hasPhenotypePhrase("grullo") || hasPhenotypePhrase("grulla")) && !isNamedDunCreamCombo) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Dun: D/-");
     addExample("E/E a/a D/n");
     addExample("E/e a/a D/n");
-  } else if (phenotype.includes("dun")) {
+  } else if (hasPhenotypePhrase("dun") && !isNamedDunCreamCombo && !isNamedDunChampagneCombo) {
     addSuggestion("Dun: D/-");
     addToExamples("D/n");
   }
 
-  if (phenotype.includes("gold champagne")) {
+  if (hasPhenotypePhrase("gold dun champagne")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Champagne: Ch/-");
+    addExample("e/e A/A D/n Ch/n");
+    addExample("e/e A/a D/n Ch/n");
+    addHidden("Agouti and Silver can be hidden on red-based horses.");
+  } else if (hasPhenotypePhrase("amber dun champagne")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E A/A D/n Ch/n");
+    addExample("E/e A/a D/n Ch/n");
+    addHidden("Chestnut can be carried: E/e");
+    addHidden("Recessive black can be carried: A/a");
+  } else if (hasPhenotypePhrase("classic dun champagne")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E a/a D/n Ch/n");
+    addExample("E/e a/a D/n Ch/n");
+    addHidden("Chestnut can be carried: E/e");
+  } else if (hasPhenotypePhrase("gold cream champagne")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Cream: Cr/n or Cr/Cr");
+    addSuggestion("Champagne: Ch/-");
+    addExample("e/e A/A Cr/n Ch/n");
+    addExample("e/e A/a Cr/n Ch/n");
+  } else if (hasPhenotypePhrase("amber cream champagne")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Cream: Cr/n or Cr/Cr");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E A/A Cr/n Ch/n");
+    addExample("E/e A/a Cr/n Ch/n");
+  } else if (hasPhenotypePhrase("classic cream champagne")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Cream: Cr/n or Cr/Cr");
+    addSuggestion("Champagne: Ch/-");
+    addExample("E/E a/a Cr/n Ch/n");
+    addExample("E/e a/a Cr/n Ch/n");
+  } else if (hasPhenotypePhrase("gold champagne")) {
     addSuggestion("Base: e/e");
     addSuggestion("Champagne: Ch/-");
     addExample("e/e A/A Ch/n");
     addExample("e/e A/a Ch/n");
-  } else if (phenotype.includes("amber champagne")) {
+  } else if (hasPhenotypePhrase("amber champagne")) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Champagne: Ch/-");
     addExample("E/E A/A Ch/n");
     addExample("E/e A/a Ch/n");
-  } else if (phenotype.includes("classic champagne")) {
+  } else if (hasPhenotypePhrase("classic champagne")) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Champagne: Ch/-");
     addExample("E/E a/a Ch/n");
     addExample("E/e a/a Ch/n");
-  } else if (phenotype.includes("champagne")) {
+  } else if (hasPhenotypePhrase("champagne")) {
     addSuggestion("Champagne: Ch/-");
     addExample("E/E A/A Ch/n");
     addExample("E/e A/a Ch/n");
@@ -279,17 +351,64 @@ function runHorseGenotypeBuilder(inputs) {
     addHidden("Champagne can occur on any base colour.");
   }
 
-  if (phenotype.includes("silver black")) {
+  if (hasPhenotypePhrase("silver dunskin") || hasPhenotypePhrase("silver dun skin")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Cream: Cr/n");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E A/A Cr/n D/n Z/n");
+    addExample("E/e A/a Cr/n D/n Z/n");
+    addHidden("Chestnut can be carried: E/e");
+  } else if (hasPhenotypePhrase("silver grullo")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E a/a D/n Z/n");
+    addExample("E/e a/a D/n Z/n");
+    addHidden("Chestnut can be carried: E/e");
+  } else if (hasPhenotypePhrase("silver bay dun")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E A/A D/n Z/n");
+    addExample("E/e A/a D/n Z/n");
+  } else if (hasPhenotypePhrase("silver amber dun champagne")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Champagne: Ch/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E A/A D/n Ch/n Z/n");
+    addExample("E/e A/a D/n Ch/n Z/n");
+  } else if (hasPhenotypePhrase("silver classic dun champagne")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Dun: D/-");
+    addSuggestion("Champagne: Ch/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E a/a D/n Ch/n Z/n");
+    addExample("E/e a/a D/n Ch/n Z/n");
+  } else if (hasPhenotypePhrase("silver amber champagne")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Champagne: Ch/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E A/A Ch/n Z/n");
+    addExample("E/e A/a Ch/n Z/n");
+  } else if (hasPhenotypePhrase("silver classic champagne")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Champagne: Ch/-");
+    addSuggestion("Silver: Z/-");
+    addExample("E/E a/a Ch/n Z/n");
+    addExample("E/e a/a Ch/n Z/n");
+  } else if (hasPhenotypePhrase("silver black")) {
     addSuggestion("Base: E/- a/a");
     addSuggestion("Silver: Z/-");
     addExample("E/E a/a Z/n");
     addExample("E/e a/a Z/n");
-  } else if (phenotype.includes("silver bay")) {
+  } else if (hasPhenotypePhrase("silver bay")) {
     addSuggestion("Base: E/- A/-");
     addSuggestion("Silver: Z/-");
     addExample("E/E A/A Z/n");
     addExample("E/e A/a Z/n");
-  } else if (phenotype.includes("silver")) {
+  } else if (hasPhenotypePhrase("silver")) {
     addSuggestion("Silver: Z/-");
     addToExamples("Z/n");
   }
