@@ -2,6 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
+console.log("CAT ENGINE VERSION: FULL REBUILD ORDER FIX 2026-06-08");
+
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
 
@@ -1280,17 +1282,28 @@ function applyCatSilver(colour, parsed) {
   const lower = colour.toLowerCase();
 
   if (lower.includes("tabby")) {
-    return colour.replace(/^(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby) (.+)$/,
+    // Supports both legacy prefix order and corrected base-first order.
+    colour = colour.replace(/^(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby) (.+)$/,
       function(match, pattern, base) {
         return base + " Silver " + pattern;
       }
     );
+
+    colour = colour.replace(/^(.+) (Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby)$/,
+      function(match, base, pattern) {
+        if (base.includes("Silver")) return match;
+        return base + " Silver " + pattern;
+      }
+    );
+
+    return colour;
   }
 
-  if (lower.includes("red") || lower.includes("cream")) {
+  if (lower.includes("red") || lower.includes("cream") || lower.includes("apricot")) {
     return colour
       .replace(/Red/g, "Red Cameo")
-      .replace(/Cream/g, "Cream Cameo");
+      .replace(/Cream/g, "Cream Cameo")
+      .replace(/Apricot/g, "Apricot Cameo");
   }
 
   return colour + " Smoke";
@@ -1491,27 +1504,27 @@ function applyCatTabby(colour, parsed) {
     parsed.Ticked === "Ta/Ta" ||
     parsed.Ticked === "Ta/ta"
   ) {
-    return "Ticked Tabby " + colour;
+    return colour + " Ticked Tabby";
   }
 
   if (
     parsed.Spotted === "Sp/Sp" ||
     parsed.Spotted === "Sp/sp"
   ) {
-    return "Spotted Tabby " + colour;
+    return colour + " Spotted Tabby";
   }
 
   if (
     parsed.Tabby === "mc/mc"
   ) {
-    return "Classic Tabby " + colour;
+    return colour + " Classic Tabby";
   }
 
   if (
     parsed.Tabby === "Mc/Mc" ||
     parsed.Tabby === "Mc/mc"
   ) {
-    return "Mackerel Tabby " + colour;
+    return colour + " Mackerel Tabby";
   }
 
   return colour;
