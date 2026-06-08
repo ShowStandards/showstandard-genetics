@@ -870,17 +870,20 @@ function getCatPhenotype(parsed, namingStyle) {
     parsed.White === "W/W" ||
     parsed.White === "W/w"
   ) {
-    return applyCatPolydactyl("White", parsed);
+    let whiteColour = "White";
+    whiteColour = applyCatPolydactyl(whiteColour, parsed);
+    whiteColour = applyCatHairType(whiteColour, parsed);
+    return whiteColour.trim();
   }
 
   let colour = getCatBaseColour(parsed);
 
-colour = applyCatDilute(colour, parsed);
-colour = applyCatDiluteModifier(colour, parsed);
-colour = applyCatPointModifier(colour, parsed);
-colour = applyCatColourModifiers(colour, parsed);
-colour = applyCatTabby(colour, parsed);
-colour = applyCatSilver(colour, parsed);
+  colour = applyCatDilute(colour, parsed);
+  colour = applyCatDiluteModifier(colour, parsed);
+  colour = applyCatPointModifier(colour, parsed);
+  colour = applyCatColourModifiers(colour, parsed);
+  colour = applyCatTabby(colour, parsed);
+  colour = applyCatSilver(colour, parsed);
   colour = applyCatBreedSpecificNaming(colour, parsed, namingStyle);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
@@ -1043,11 +1046,7 @@ function applyCatSilver(colour, parsed) {
   const lower = colour.toLowerCase();
 
   if (lower.includes("tabby")) {
-    return colour.replace(/^(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby) (.+)$/,
-      function(match, pattern, base) {
-        return base + " Silver " + pattern;
-      }
-    );
+    return colour.replace(/\b(Ticked|Spotted|Classic|Mackerel) Tabby\b/g, "Silver $1 Tabby");
   }
 
   if (lower.includes("red") || lower.includes("cream")) {
@@ -1075,20 +1074,34 @@ function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
     .replace(/^Burmese /, "")
     .replace(/^Mink /, "");
 
-  function renamePoint(base) {
+  function renameBasePrefix(base) {
     return base
-      .replace(/^Black$/, "Seal Point")
-      .replace(/^Blue$/, "Blue Point")
-      .replace(/^Chocolate$/, "Chocolate Point")
-      .replace(/^Lilac$/, "Lilac Point")
-      .replace(/^Cinnamon$/, "Cinnamon Point")
-      .replace(/^Fawn$/, "Fawn Point")
-      .replace(/^Red$/, "Flame Point")
-      .replace(/^Cream$/, "Cream Point")
-      .replace(/^Tortie$/, "Tortie Point")
-      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Point")
-      .replace(/^(.*) Tabby (.*)$/, "$2 Lynx Point")
-      .replace(/^(.*) Silver (.*) Tabby$/, "$1 Silver Lynx Point");
+      .replace(/^Black\b/, "Seal")
+      .replace(/^Blue\b/, "Blue")
+      .replace(/^Chocolate\b/, "Chocolate")
+      .replace(/^Lilac\b/, "Lilac")
+      .replace(/^Cinnamon\b/, "Cinnamon")
+      .replace(/^Fawn\b/, "Fawn")
+      .replace(/^Red\b/, "Flame")
+      .replace(/^Cream\b/, "Cream");
+  }
+
+  function renamePoint(base) {
+    let renamed = renameBasePrefix(base);
+
+    if (/\bTabby\b/.test(renamed)) {
+      renamed = renamed
+        .replace(/\b(Ticked|Spotted|Classic|Mackerel) Tabby\b/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      return renamed + " Lynx Point";
+    }
+
+    if (renamed === "Tortie") return "Tortie Point";
+    if (renamed === "Blue-Cream Tortie") return "Blue-Cream Point";
+
+    return renamed + " Point";
   }
 
   function renameBurmese(base) {
@@ -1118,8 +1131,7 @@ function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
   }
 
   if (isPointed || hasStyle(["siamese", "point", "colourpoint", "colorpoint", "ragdoll", "birman", "himalayan", "balinese"])) {
-    const renamed = renamePoint(clean);
-    return renamed === clean ? clean + " Point" : renamed;
+    return renamePoint(clean);
   }
 
   if (isBurmese || hasStyle(["burmese"])) {
@@ -1254,27 +1266,27 @@ function applyCatTabby(colour, parsed) {
     parsed.Ticked === "Ta/Ta" ||
     parsed.Ticked === "Ta/ta"
   ) {
-    return "Ticked Tabby " + colour;
+    return colour + " Ticked Tabby";
   }
 
   if (
     parsed.Spotted === "Sp/Sp" ||
     parsed.Spotted === "Sp/sp"
   ) {
-    return "Spotted Tabby " + colour;
+    return colour + " Spotted Tabby";
   }
 
   if (
     parsed.Tabby === "mc/mc"
   ) {
-    return "Classic Tabby " + colour;
+    return colour + " Classic Tabby";
   }
 
   if (
     parsed.Tabby === "Mc/Mc" ||
     parsed.Tabby === "Mc/mc"
   ) {
-    return "Mackerel Tabby " + colour;
+    return colour + " Mackerel Tabby";
   }
 
   return colour;
