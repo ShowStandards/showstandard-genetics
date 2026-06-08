@@ -138,7 +138,11 @@ function runHorseGenotypeBuilder(inputs) {
     const normalizedPhrase = String(phrase || "").toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
     return normalizedPhenotype.includes(normalizedPhrase);
   }
-
+if (hasPhenotypePhrase("overo")) {
+  addNote(
+    "Overo is a descriptive term and may refer to Frame Overo, Splash, Sabino, or combinations of those patterns. Genetic testing is required to determine the specific pattern."
+  );
+}
   const isChestnutFamily =
     hasPhenotypePhrase("chestnut") ||
     hasPhenotypePhrase("sorrel") ||
