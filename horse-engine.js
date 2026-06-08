@@ -1,4 +1,4 @@
-/* HORSE ENGINE SABINO + PEARL FIXED VERSION 12 */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 14 - CHESTNUT SHADE NOTES */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -21,8 +21,15 @@ function runHorsePredictor(inputs) {
   const rows = [
     horseOutcomeRow("Extension", sire.Extension, dam.Extension),
     horseOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
-    horseOutcomeRow("Cream", sire.Cream, dam.Cream),
+    horseOutcomeRow("Cream / Cream-Pearl", sire.Cream, dam.Cream),
+    horseOutcomeRow("Pearl", sire.Pearl, dam.Pearl),
     horseOutcomeRow("Dun", sire.Dun, dam.Dun),
+    horseOutcomeRow("Champagne", sire.Champagne, dam.Champagne),
+    horseOutcomeRow("Silver", sire.Silver, dam.Silver),
+    horseOutcomeRow("Mushroom", sire.Mushroom, dam.Mushroom),
+    horseOutcomeRow("Flaxen", sire.Flaxen, dam.Flaxen),
+    horseOutcomeRow("Sooty", sire.Sooty, dam.Sooty),
+    horseOutcomeRow("Pangare", sire.Pangare, dam.Pangare),
     horseOutcomeRow("Grey", sire.Grey, dam.Grey),
     horseOutcomeRow("Roan", sire.Roan, dam.Roan),
     horseOutcomeRow("Tobiano", sire.Tobiano, dam.Tobiano),
@@ -64,20 +71,10 @@ function runHorsePhenotypeCalculator(inputs) {
   const parsed = parseHorseGenotype(genotypeText);
   const phenotype = getHorsePhenotype(parsed);
 
-  let greyNote = "";
-
-  if (hasDominantGene(parsed.Grey, "G")) {
-    greyNote = `
-      <p><b>Hidden Base:</b> ${getHorseVisibleColourWithoutGrey(parsed)}</p>
-      <p><b>Note:</b> Grey is visually overriding the base colour.</p>
-    `;
-  }
-
   return renderHorseResults(
     "Phenotype Calculator",
     `
       <p><b>Phenotype:</b> ${phenotype}</p>
-      ${greyNote}
       <p><b>Genotype:</b> ${genotypeText}</p>
     `
   );
@@ -88,6 +85,7 @@ function runHorseGenotypeBuilder(inputs) {
   const suggestions = [];
   const examples = [];
   const hidden = [];
+  const notes = [];
 
   function addSuggestion(item) {
     if (!suggestions.includes(item)) suggestions.push(item);
@@ -101,6 +99,10 @@ function runHorseGenotypeBuilder(inputs) {
     if (!hidden.includes(item)) hidden.push(item);
   }
 
+  function addNote(item) {
+    if (!notes.includes(item)) notes.push(item);
+  }
+
   function addToExamples(gene) {
     if (examples.length === 0) {
       examples.push(gene);
@@ -112,13 +114,38 @@ function runHorseGenotypeBuilder(inputs) {
     });
   }
 
-  if (phenotype.includes("chestnut") || phenotype.includes("red")) {
+  const isChestnutFamily =
+    phenotype.includes("chestnut") ||
+    phenotype.includes("sorrel") ||
+    phenotype.includes("red");
+
+  if (isChestnutFamily) {
     addSuggestion("Extension: e/e");
     addExample("e/e A/A");
     addExample("e/e A/a");
     addExample("e/e a/a");
     addHidden("Agouti can be hidden on chestnut: A/A, A/a, or a/a");
     addHidden("Silver can be hidden on chestnut: Z/n or Z/Z");
+
+    if (phenotype.includes("sorrel")) {
+      addNote("Sorrel is treated as part of the chestnut/red family and is genetically e/e.");
+    }
+
+    if (phenotype.includes("red")) {
+      addNote("Red is treated as part of the chestnut/sorrel family and is genetically e/e.");
+    }
+
+    if (phenotype.includes("liver")) {
+      addNote("Liver is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    }
+
+    if (phenotype.includes("dark chestnut")) {
+      addNote("Dark chestnut is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    }
+
+    if (phenotype.includes("light chestnut")) {
+      addNote("Light chestnut is a shade of chestnut and is not genetically distinct from chestnut in this calculator. You can add the shade name on the horse profile if you wish.");
+    }
   }
 
   if (phenotype.includes("black") && !phenotype.includes("silver black")) {
@@ -184,6 +211,26 @@ function runHorseGenotypeBuilder(inputs) {
     addSuggestion("Cream: Cr/Cr");
     addExample("E/E a/a Cr/Cr");
     addExample("E/e a/a Cr/Cr");
+  }
+
+  if (phenotype.includes("dunalino")) {
+    addSuggestion("Base: e/e");
+    addSuggestion("Cream: Cr/n");
+    addSuggestion("Dun: D/-");
+    addExample("e/e A/A Cr/n D/n");
+    addExample("e/e A/a Cr/n D/n");
+  } else if (phenotype.includes("dunskin")) {
+    addSuggestion("Base: E/- A/-");
+    addSuggestion("Cream: Cr/n");
+    addSuggestion("Dun: D/-");
+    addExample("E/E A/A Cr/n D/n");
+    addExample("E/e A/a Cr/n D/n");
+  } else if (phenotype.includes("smokey grullo")) {
+    addSuggestion("Base: E/- a/a");
+    addSuggestion("Cream: Cr/n");
+    addSuggestion("Dun: D/-");
+    addExample("E/E a/a Cr/n D/n");
+    addExample("E/e a/a Cr/n D/n");
   }
 
   if (phenotype.includes("red dun")) {
@@ -366,6 +413,8 @@ function runHorseGenotypeBuilder(inputs) {
 
       <p><b>Possible Hidden Traits:</b></p>
       <ul>${hidden.length ? hidden.map(item => `<li>${item}</li>`).join("") : "<li>No common hidden traits listed yet.</li>"}</ul>
+
+      ${notes.length ? `<p><b>Colour Notes:</b></p><ul>${notes.map(item => `<li>${item}</li>`).join("")}</ul>` : ""}
 
       <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
     `
@@ -558,6 +607,10 @@ function getHorseBaseColour(parsed) {
 }
 
 function getHorsePhenotype(parsed) {
+  if (parsed.Frame === "OLW/OLW") {
+    return "⚠ Homozygous Frame Overo (OLW/OLW) - Lethal White Syndrome / non-viable genotype";
+  }
+
   if (hasDominantGene(parsed.Grey, "G")) {
     return "Grey";
   }
@@ -642,6 +695,16 @@ function applyHorseDun(baseColour, parsed) {
     if (baseColour === "Bay") return "Bay Dun";
     if (baseColour === "Black") return "Grullo";
 
+    if (baseColour === "Palomino") return "Dunalino";
+    if (baseColour === "Flaxen Palomino") return "Flaxen Dunalino";
+    if (baseColour === "Buckskin") return "Dunskin";
+    if (baseColour === "Smokey Black") return "Smokey Grullo";
+
+    if (baseColour === "Cremello") return "Cremello Dun";
+    if (baseColour === "Flaxen Cremello") return "Flaxen Cremello Dun";
+    if (baseColour === "Perlino") return "Perlino Dun";
+    if (baseColour === "Smokey Cream") return "Smokey Cream Dun";
+
     return baseColour + " Dun";
   }
 
@@ -664,6 +727,21 @@ function applyHorseChampagne(baseColour, parsed) {
   if (baseColour === "Bay") return "Amber Champagne";
   if (baseColour === "Black") return "Classic Champagne";
 
+  if (baseColour === "Red Dun") return "Gold Dun Champagne";
+  if (baseColour === "Flaxen Red Dun") return "Flaxen Gold Dun Champagne";
+  if (baseColour === "Bay Dun") return "Amber Dun Champagne";
+  if (baseColour === "Grullo") return "Classic Dun Champagne";
+
+  if (baseColour === "Palomino") return "Gold Cream Champagne";
+  if (baseColour === "Flaxen Palomino") return "Flaxen Gold Cream Champagne";
+  if (baseColour === "Buckskin") return "Amber Cream Champagne";
+  if (baseColour === "Smokey Black") return "Classic Cream Champagne";
+
+  if (baseColour === "Dunalino") return "Gold Dun Champagne";
+  if (baseColour === "Flaxen Dunalino") return "Flaxen Gold Dun Champagne";
+  if (baseColour === "Dunskin") return "Amber Dun Champagne";
+  if (baseColour === "Smokey Grullo") return "Classic Dun Champagne";
+
   return baseColour + " Champagne";
 }
 
@@ -671,6 +749,7 @@ function applyHorseSilver(baseColour, parsed) {
   if (!hasDominantGene(parsed.Silver, "Z")) return baseColour;
 
   if (baseColour === "Chestnut" || baseColour.includes("Chestnut")) return baseColour;
+  if (baseColour.includes("Gold")) return baseColour;
 
   if (baseColour === "Black") return "Silver Black";
   if (baseColour === "Bay") return "Silver Bay";
@@ -679,8 +758,20 @@ function applyHorseSilver(baseColour, parsed) {
   if (baseColour === "Smokey Black") return "Silver Smokey Black";
   if (baseColour === "Smokey Cream") return "Silver Smokey Cream";
 
+  if (baseColour === "Grullo" || baseColour === "Smokey Grullo") return "Silver Grullo";
+  if (baseColour === "Bay Dun") return "Silver Bay Dun";
+  if (baseColour === "Dunskin") return "Silver Dunskin";
+
+  if (baseColour === "Amber Champagne") return "Silver Amber Champagne";
+  if (baseColour === "Classic Champagne") return "Silver Classic Champagne";
+  if (baseColour === "Amber Dun Champagne") return "Silver Amber Dun Champagne";
+  if (baseColour === "Classic Dun Champagne") return "Silver Classic Dun Champagne";
+  if (baseColour === "Amber Cream Champagne") return "Silver Amber Cream Champagne";
+  if (baseColour === "Classic Cream Champagne") return "Silver Classic Cream Champagne";
+
   return "Silver " + baseColour;
 }
+
 function applyHorsePearl(baseColour, parsed) {
   const pearl = parsed.Pearl;
 
@@ -757,7 +848,12 @@ function applyHorseRoan(baseColour, parsed) {
 ========================= */
 
 function applyHorsePatterns(colour, parsed) {
+  if (parsed.Frame === "OLW/OLW") {
+    return "⚠ Homozygous Frame Overo (OLW/OLW) - Lethal White Syndrome / non-viable genotype";
+  }
+
   const patterns = [];
+  const score = calculateHorseWhiteScore(parsed);
 
   const hasTobiano = hasDominantGene(parsed.Tobiano, "To");
   const hasFrame = hasDominantGene(parsed.Frame, "OLW");
@@ -782,10 +878,37 @@ function applyHorsePatterns(colour, parsed) {
   }
 
   if (patterns.length > 0) {
-    return colour + " " + patterns.join(" ");
+    return colour + " " + getHorseWhiteExpression(score) + " " + patterns.join(" ");
   }
 
   return colour;
+}
+
+function calculateHorseWhiteScore(parsed) {
+  let score = 0;
+
+  if (parsed.Tobiano === "To/To") score += 3;
+  else if (parsed.Tobiano === "To/n") score += 2;
+
+  if (parsed.Frame === "OLW/n") score += 1;
+
+  if (parsed.Splash === "Spl/Spl") score += 2;
+  else if (parsed.Splash === "Spl/n") score += 1;
+
+  if (parsed.Sabino === "Sb/Sb") score += 2;
+  else if (parsed.Sabino === "Sb/n") score += 1;
+
+  if (parsed.Rabicano === "Rb/Rb") score += 1;
+  else if (parsed.Rabicano === "Rb/n") score += 0.5;
+
+  return score;
+}
+
+function getHorseWhiteExpression(score) {
+  if (score <= 1) return "Minimal White";
+  if (score <= 3) return "Moderate White";
+  if (score <= 5) return "High White";
+  return "Maximum White";
 }
 
 function applyHorseAppaloosa(colour, parsed) {
@@ -809,13 +932,21 @@ function applyHorseAppaloosa(colour, parsed) {
 
   if (!hasLp) return colour;
 
-  if (hasPatn1 && isLpLp) return colour + " Few Spot";
-  if (hasPatn1) return colour + " Leopard";
+  const appaloosaPatterns = [];
 
-  if (hasPatn2 && isLpLp) return colour + " Snow Cap";
-  if (hasPatn2) return colour + " Blanket";
+  if (hasPatn1) {
+    appaloosaPatterns.push(isLpLp ? "Few Spot" : "Leopard");
+  }
 
-  return colour + " Varnish Roan";
+  if (hasPatn2) {
+    appaloosaPatterns.push(isLpLp ? "Snow Cap" : "Blanket");
+  }
+
+  if (appaloosaPatterns.length === 0) {
+    appaloosaPatterns.push("Varnish Roan");
+  }
+
+  return colour + " " + appaloosaPatterns.join(" ");
 }
 
 /* =========================
@@ -893,6 +1024,39 @@ function calculateHorseGeneOutcomes(sirePair, damPair) {
     })
     .join("<br>");
 }
+
+
+/* =========================
+   HORSE GENE SUMMARY TABLE
+========================= */
+
+/*
+| Gene / Locus | Code | What It Does |
+|---|---|---|
+| Extension | E/e | Controls black pigment. E/- allows black pigment; e/e creates red/chestnut base. |
+| Agouti | A/a | Controls black pigment placement. A/- makes bay on E/- horses; a/a makes black. Hidden on chestnut. |
+| Cream | Cr | Incomplete dominant dilution. Cr/n makes palomino, buckskin, or smokey black. Cr/Cr makes cremello, perlino, or smokey cream. |
+| Pearl | Prl | Recessive dilution. Prl/Prl creates pearl/apricot colours; Cr/Prl creates cream-pearl colours. |
+| Dun | D, nd1, nd2 | D/- creates dun dilution and primitive markings. nd1 can show primitive markings without full dun dilution. |
+| Champagne | Ch | Dominant dilution. Creates gold, amber, classic, cream champagne, and dun champagne colours. |
+| Silver | Z | Dilutes black pigment only. Affects black/bay-based horses; hidden on chestnut. |
+| Mushroom | mu | Recessive red-based dilution. Creates mushroom and mushmello. |
+| Flaxen | f | Recessive modifier that lightens mane/tail on chestnut-based horses. |
+| Sooty | Sty | Darkening modifier. Adds sooty shading to the visible colour. |
+| Pangare | P | Light-point modifier. Adds pangare/mealy shading. |
+| Grey | G | Dominant progressive greying. In this engine, G/- displays simply as Grey. |
+| Roan | Rn | Dominant roaning. Creates red roan, bay roan, blue roan, etc. |
+| Tobiano | To | Dominant white pattern. Adds to white-expression score; To/To scores higher than To/n. |
+| Frame Overo | OLW | Dominant frame pattern. OLW/n displays Frame Overo; OLW/OLW returns lethal white warning. |
+| Splash | Spl | Dominant white pattern. Spl/Spl scores higher than Spl/n. |
+| Sabino | Sb | Dominant white pattern. Sb/Sb scores higher than Sb/n. |
+| Rabicano | Rb | Roaning/white pattern modifier. Adds a smaller amount to white-expression score. |
+| Appaloosa / Leopard Complex | Lp | Required for Appaloosa patterning. Lp with no PATN displays Varnish Roan. |
+| PATN1 | PATN1 | Appaloosa modifier. With Lp/lp gives Leopard; with Lp/Lp gives Few Spot. |
+| PATN2 | PATN2 | Appaloosa modifier. With Lp/lp gives Blanket; with Lp/Lp gives Snow Cap. |
+|
+| White Expression Score | — | Tobiano, Frame, Splash, Sabino, and Rabicano are scored together as Minimal, Moderate, High, or Maximum White while keeping pattern names visible. |
+*/
 
 /* =========================
    EXPORTS
