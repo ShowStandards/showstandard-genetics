@@ -1,4 +1,4 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 16 - QUAD DUN FIX */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 17 - OVERO NOTE FIX */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -133,17 +133,18 @@ function runHorseGenotypeBuilder(inputs) {
     });
   }
 
-function hasPhenotypePhrase(phrase) {
-const normalizedPhenotype = phenotype.replace(/[-*]+/g, " ").replace(/\s+/g, " ").trim();
-const normalizedPhrase = String(phrase || "").toLowerCase().replace(/[-*]+/g, " ").replace(/\s+/g, " ").trim();
-return normalizedPhenotype.includes(normalizedPhrase);
-}
+  function hasPhenotypePhrase(phrase) {
+    const normalizedPhenotype = phenotype.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+    const normalizedPhrase = String(phrase || "").toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+    return normalizedPhenotype.includes(normalizedPhrase);
+  }
 
-if (hasPhenotypePhrase("overo")) {
-addNote(
-"Overo is a descriptive term and may refer to Frame Overo, Splash, Sabino, or combinations of those patterns. Genetic testing is required to determine the specific pattern."
-);
-}
+
+  if (hasPhenotypePhrase("overo")) {
+    addNote(
+      "Overo is a descriptive term and may refer to Frame Overo, Splash, Sabino, or combinations of those patterns. Genetic testing is required to determine the specific pattern."
+    );
+  }
 
   const isChestnutFamily =
     hasPhenotypePhrase("chestnut") ||
