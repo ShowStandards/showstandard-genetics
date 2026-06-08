@@ -71,7 +71,7 @@ function runCatRoll(inputs) {
 function runCatPhenotypeCalculator(inputs) {
   const genotypeText = inputs.singleGenotype;
   const parsed = parseCatGenotype(genotypeText);
-  const phenotype = getCatPhenotype(parsed);
+  const phenotype = getCatPhenotype(parsed, inputs.breed || inputs.namingStyle || "");
 
   return renderCatResults(
     "Cat Phenotype Calculator",
@@ -865,7 +865,7 @@ function parseCatGenotype(genotypeText) {
    PHENOTYPE PIPELINE
 ========================= */
 
-function getCatPhenotype(parsed) {
+function getCatPhenotype(parsed, namingStyle) {
   if (
     parsed.White === "W/W" ||
     parsed.White === "W/w"
@@ -881,6 +881,7 @@ colour = applyCatPointModifier(colour, parsed);
 colour = applyCatColourModifiers(colour, parsed);
 colour = applyCatTabby(colour, parsed);
 colour = applyCatSilver(colour, parsed);
+  colour = applyCatBreedSpecificNaming(colour, parsed, namingStyle);
   colour = applyCatWhiteSpotting(colour, parsed);
   colour = applyCatPolydactyl(colour, parsed);
   colour = applyCatHairType(colour, parsed);
@@ -986,6 +987,7 @@ function applyCatDiluteModifier(colour, parsed) {
     parsed.DiluteModifier === "dm/Dm";
 
   if (!hasDiluteModifier) return colour;
+  if (parsed.Dilute !== "d/d") return colour;
 
   return colour
     .replace(/Blue-Cream Tortie/g, "Caramel-Apricot Tortie")
@@ -1028,26 +1030,109 @@ function applyCatSilver(colour, parsed) {
     parsed.Silver === "I/I" ||
     parsed.Silver === "I/i";
 
-  if (!hasSilver) {
+  if (!hasSilver) return colour;
+
+  if (
+    colour === "Blue-Eyed Albino" ||
+    colour === "Red-Eyed Albino" ||
+    colour === "White"
+  ) {
     return colour;
   }
 
   const lower = colour.toLowerCase();
 
-  if (
-    lower.includes("red") ||
-    lower.includes("cream")
-  ) {
+  if (lower.includes("tabby")) {
+    return colour.replace(/^(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby) (.+)$/,
+      function(match, pattern, base) {
+        return base + " Silver " + pattern;
+      }
+    );
+  }
+
+  if (lower.includes("red") || lower.includes("cream")) {
     return colour
-      .replace(/Red/g, "Cameo")
+      .replace(/Red/g, "Red Cameo")
       .replace(/Cream/g, "Cream Cameo");
   }
 
-  if (lower.includes("tabby")) {
-    return "Silver " + colour;
+  return colour + " Smoke";
+}
+
+function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
+  const style = String(namingStyle || "").toLowerCase();
+
+  function hasStyle(words) {
+    return words.some(word => style.includes(word));
   }
 
-  return "Smoke " + colour;
+  const isPointed = parsed.Colourpoint === "cs/cs" || colour.startsWith("Pointed ");
+  const isBurmese = parsed.Colourpoint === "cb/cb" || colour.startsWith("Burmese ");
+  const isMink = parsed.Colourpoint === "cb/cs" || colour.startsWith("Mink ");
+
+  let clean = colour
+    .replace(/^Pointed /, "")
+    .replace(/^Burmese /, "")
+    .replace(/^Mink /, "");
+
+  function renamePoint(base) {
+    return base
+      .replace(/^Black$/, "Seal Point")
+      .replace(/^Blue$/, "Blue Point")
+      .replace(/^Chocolate$/, "Chocolate Point")
+      .replace(/^Lilac$/, "Lilac Point")
+      .replace(/^Cinnamon$/, "Cinnamon Point")
+      .replace(/^Fawn$/, "Fawn Point")
+      .replace(/^Red$/, "Flame Point")
+      .replace(/^Cream$/, "Cream Point")
+      .replace(/^Tortie$/, "Tortie Point")
+      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Point")
+      .replace(/^(.*) Tabby (.*)$/, "$2 Lynx Point")
+      .replace(/^(.*) Silver (.*) Tabby$/, "$1 Silver Lynx Point");
+  }
+
+  function renameBurmese(base) {
+    return base
+      .replace(/^Black$/, "Sable")
+      .replace(/^Chocolate$/, "Champagne")
+      .replace(/^Blue$/, "Blue Burmese")
+      .replace(/^Lilac$/, "Platinum")
+      .replace(/^Red$/, "Red Burmese")
+      .replace(/^Cream$/, "Cream Burmese")
+      .replace(/^Tortie$/, "Tortoiseshell Burmese")
+      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Burmese");
+  }
+
+  function renameMink(base) {
+    return base
+      .replace(/^Black$/, "Natural Mink")
+      .replace(/^Chocolate$/, "Champagne Mink")
+      .replace(/^Blue$/, "Blue Mink")
+      .replace(/^Lilac$/, "Platinum Mink")
+      .replace(/^Cinnamon$/, "Cinnamon Mink")
+      .replace(/^Fawn$/, "Fawn Mink")
+      .replace(/^Red$/, "Red Mink")
+      .replace(/^Cream$/, "Cream Mink")
+      .replace(/^Tortie$/, "Tortie Mink")
+      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Mink");
+  }
+
+  if (isPointed || hasStyle(["siamese", "point", "colourpoint", "colorpoint", "ragdoll", "birman", "himalayan", "balinese"])) {
+    const renamed = renamePoint(clean);
+    return renamed === clean ? clean + " Point" : renamed;
+  }
+
+  if (isBurmese || hasStyle(["burmese"])) {
+    const renamed = renameBurmese(clean);
+    return renamed === clean ? clean + " Burmese" : renamed;
+  }
+
+  if (isMink || hasStyle(["tonkinese", "mink"])) {
+    const renamed = renameMink(clean);
+    return renamed === clean ? clean + " Mink" : renamed;
+  }
+
+  return colour;
 }
 
 function applyCatColourModifiers(colour, parsed) {
@@ -1125,7 +1210,7 @@ function applyCatColourModifiers(colour, parsed) {
       parsed.Silver === "I/i"
     )
   ) {
-    return "Bimetallic";
+    return "Bimetallic " + colour;
   }
 
   if (modifiers.includes("Extreme Sunshine")) {
@@ -1205,11 +1290,11 @@ function applyCatWhiteSpotting(colour, parsed) {
   }
 
   if (parsed.WhiteSpotting === "S/S") {
-    return colour + " Van";
+    return colour + " High White";
   }
 
   if (parsed.WhiteSpotting === "S/s") {
-    return colour + " and White";
+    return colour + " Bicolour";
   }
 
   return colour;
@@ -1387,7 +1472,7 @@ function findCatTabbyGene(text) {
     if (token === "mc/mc") return "mc/mc";
   }
 
-  return "none";
+  return "Mc/Mc";
 }
 
 function catOutcomeRow(label, sirePair, damPair) {
@@ -1424,7 +1509,64 @@ function calculateCatGeneOutcomes(sirePair, damPair) {
 }
 
 function sortCatGenePair(alleles) {
-  return alleles.sort().join("/");
+  const priority = {
+    "O": 1,
+    "o": 2,
+    "Y": 3,
+    "W": 1,
+    "w": 2,
+    "S": 1,
+    "s": 2,
+    "I": 1,
+    "i": 2,
+    "D": 1,
+    "d": 2,
+    "Dm": 1,
+    "dm": 2,
+    "B": 1,
+    "b": 2,
+    "bl": 3,
+    "C": 1,
+    "cb": 2,
+    "cs": 3,
+    "ca": 4,
+    "c": 5,
+    "A": 1,
+    "a": 2,
+    "Mc": 1,
+    "mc": 2,
+    "Sp": 1,
+    "sp": 2,
+    "Ta": 1,
+    "ta": 2,
+    "Pd": 1,
+    "pd": 2,
+    "L": 1,
+    "l": 2,
+    "Rx": 1,
+    "rx": 2,
+    "Hr": 1,
+    "hr": 2,
+    "Amb": 1,
+    "Su": 1,
+    "Es": 1,
+    "Ch": 1,
+    "Wb": 1,
+    "Rf": 1,
+    "Gl": 1,
+    "Kp": 1,
+    "n": 2
+  };
+
+  return alleles
+    .slice()
+    .sort((a, b) => {
+      const pa = priority[a] || 50;
+      const pb = priority[b] || 50;
+      if (pa !== pb) return pa - pb;
+      return String(a).localeCompare(String(b));
+    })
+    .join("/");
 }
 
 /* =========================
@@ -1443,3 +1585,4 @@ window.applyCatTabby = applyCatTabby;
 window.applyCatWhiteSpotting = applyCatWhiteSpotting;
 window.applyCatPolydactyl = applyCatPolydactyl;
 window.applyCatHairType = applyCatHairType;
+window.applyCatBreedSpecificNaming = applyCatBreedSpecificNaming;
