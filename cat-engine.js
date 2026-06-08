@@ -2,7 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: FULL REBUILD ORDER FIX 2026-06-08");
+console.log("CAT ENGINE VERSION: FINAL CAT ORDER NORMALIZER 2026-06-08");
+window.__CAT_ENGINE_VERSION = "FINAL CAT ORDER NORMALIZER 2026-06-08";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -869,7 +870,7 @@ function parseCatGenotype(genotypeText) {
 
 function getCatPhenotype(parsed, namingStyle) {
   const name = buildCatPhenotypeName(parsed, namingStyle);
-  return name.trim().replace(/\s+/g, " ");
+  return normalizeCatColourOrder(name).trim().replace(/\s+/g, " ");
 }
 
 function buildCatPhenotypeName(parsed, namingStyle) {
@@ -1126,6 +1127,69 @@ function addCatHairTypeName(colour, parsed) {
   }
 
   return colour + " Shorthair";
+}
+
+
+function normalizeCatColourOrder(name) {
+  let colour = String(name || "").trim().replace(/\s+/g, " ");
+
+  const hairWords = ["Shorthair", "Longhair", "Rex", "Hairless"];
+  let hair = "";
+
+  for (const word of hairWords) {
+    const suffix = " " + word;
+    if (colour.endsWith(suffix)) {
+      hair = word;
+      colour = colour.slice(0, -suffix.length).trim();
+      break;
+    }
+  }
+
+  const tailWords = ["Polydactyl", "High White", "Bicolour"];
+  const tails = [];
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+
+    for (const word of tailWords) {
+      const suffix = " " + word;
+      if (colour.endsWith(suffix)) {
+        tails.unshift(word);
+        colour = colour.slice(0, -suffix.length).trim();
+        changed = true;
+        break;
+      }
+    }
+  }
+
+  const patternRegex = /^(Silver\s+)?(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby)\s+(.+)$/;
+  let match = colour.match(patternRegex);
+
+  if (match) {
+    const silver = match[1] ? "Silver" : "";
+    const pattern = match[2];
+    const base = match[3];
+    colour = [base, silver, pattern].filter(Boolean).join(" ");
+  }
+
+  const silverPatternRegex = /^Silver\s+(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby)\s+(.+)$/;
+  match = colour.match(silverPatternRegex);
+
+  if (match) {
+    const pattern = match[1];
+    const base = match[2];
+    colour = [base, "Silver", pattern].join(" ");
+  }
+
+  const smokeRegex = /^Smoke\s+(.+)$/;
+  match = colour.match(smokeRegex);
+
+  if (match) {
+    colour = match[1] + " Smoke";
+  }
+
+  return [colour].concat(tails).concat(hair ? [hair] : []).filter(Boolean).join(" ");
 }
 
 /* =========================
