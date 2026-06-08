@@ -1,4 +1,4 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 15 - BUILDER COMBO NAME FIXES */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 16 - QUAD DUN FIX */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -91,8 +91,25 @@ function runHorseGenotypeBuilder(inputs) {
     if (!suggestions.includes(item)) suggestions.push(item);
   }
 
+  function cleanExampleGenotype(item) {
+    const tokens = String(item || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .split(" ")
+      .filter(Boolean);
+
+    const cleaned = [];
+
+    tokens.forEach(token => {
+      if (!cleaned.includes(token)) cleaned.push(token);
+    });
+
+    return cleaned.join(" ");
+  }
+
   function addExample(item) {
-    if (!examples.includes(item)) examples.push(item);
+    const cleaned = cleanExampleGenotype(item);
+    if (cleaned && !examples.includes(cleaned)) examples.push(cleaned);
   }
 
   function addHidden(item) {
@@ -104,13 +121,15 @@ function runHorseGenotypeBuilder(inputs) {
   }
 
   function addToExamples(gene) {
+    const cleanedGene = cleanExampleGenotype(gene);
+
     if (examples.length === 0) {
-      examples.push(gene);
+      addExample(cleanedGene);
       return;
     }
 
     examples.forEach((example, index) => {
-      examples[index] = example + " " + gene;
+      examples[index] = cleanExampleGenotype(example + " " + cleanedGene);
     });
   }
 
