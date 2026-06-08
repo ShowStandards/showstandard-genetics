@@ -866,27 +866,264 @@ function parseCatGenotype(genotypeText) {
 ========================= */
 
 function getCatPhenotype(parsed, namingStyle) {
-  if (
-    parsed.White === "W/W" ||
-    parsed.White === "W/w"
-  ) {
-    return applyCatPolydactyl("White", parsed);
+  const name = buildCatPhenotypeName(parsed, namingStyle);
+  return name.trim().replace(/\s+/g, " ");
+}
+
+function buildCatPhenotypeName(parsed, namingStyle) {
+  const isAlbino =
+    parsed.Colourpoint === "ca/ca" ||
+    parsed.Colourpoint === "c/c";
+
+  let mainName = "";
+
+  if (parsed.White === "W/W" || parsed.White === "W/w") {
+    mainName = "White";
+  } else if (parsed.Colourpoint === "ca/ca") {
+    mainName = "Blue-Eyed Albino";
+  } else if (parsed.Colourpoint === "c/c") {
+    mainName = "Red-Eyed Albino";
+  } else {
+    const parts = getCatPhenotypeParts(parsed);
+    mainName = assembleCatColourName(parts, parsed, namingStyle);
   }
 
-  let colour = getCatBaseColour(parsed);
+  mainName = addCatWhiteSpottingName(mainName, parsed, isAlbino);
+  mainName = addCatPolydactylName(mainName, parsed);
+  mainName = addCatHairTypeName(mainName, parsed);
 
-colour = applyCatDilute(colour, parsed);
-colour = applyCatDiluteModifier(colour, parsed);
-colour = applyCatPointModifier(colour, parsed);
-colour = applyCatColourModifiers(colour, parsed);
-colour = applyCatTabby(colour, parsed);
-colour = applyCatSilver(colour, parsed);
-  colour = applyCatBreedSpecificNaming(colour, parsed, namingStyle);
-  colour = applyCatWhiteSpotting(colour, parsed);
-  colour = applyCatPolydactyl(colour, parsed);
-  colour = applyCatHairType(colour, parsed);
+  return mainName;
+}
 
-  return colour.trim();
+function getCatPhenotypeParts(parsed) {
+  let base = getCatBaseColour(parsed);
+  base = applyCatDilute(base, parsed);
+  base = applyCatDiluteModifier(base, parsed);
+
+  const hasAgouti = parsed.Agouti === "A/A" || parsed.Agouti === "A/a";
+  const hasSilver = parsed.Silver === "I/I" || parsed.Silver === "I/i";
+
+  let pattern = "";
+
+  if (hasAgouti) {
+    if (parsed.Ticked === "Ta/Ta" || parsed.Ticked === "Ta/ta") {
+      pattern = "Ticked Tabby";
+    } else if (parsed.Spotted === "Sp/Sp" || parsed.Spotted === "Sp/sp") {
+      pattern = "Spotted Tabby";
+    } else if (parsed.Tabby === "mc/mc") {
+      pattern = "Classic Tabby";
+    } else if (parsed.Tabby === "Mc/Mc" || parsed.Tabby === "Mc/mc") {
+      pattern = "Mackerel Tabby";
+    }
+  }
+
+  const extraModifiers = getCatExtraModifierWords(parsed);
+
+  return {
+    base,
+    pattern,
+    hasSilver,
+    extraModifiers
+  };
+}
+
+function assembleCatColourName(parts, parsed, namingStyle) {
+  let base = parts.base;
+  let pattern = parts.pattern;
+  let silverWord = "";
+  let smokeWord = "";
+  let extras = parts.extraModifiers.slice();
+
+  if (parts.hasSilver) {
+    if (extras.includes("Sunshine") || extras.includes("Extreme Sunshine")) {
+      extras = extras.filter(item => item !== "Sunshine" && item !== "Extreme Sunshine");
+      extras.unshift("Bimetallic");
+    }
+
+    if (pattern) {
+      silverWord = "Silver";
+    } else if (base.includes("Red") || base.includes("Cream") || base.includes("Apricot")) {
+      base = base
+        .replace(/Red/g, "Red Cameo")
+        .replace(/Cream/g, "Cream Cameo")
+        .replace(/Apricot/g, "Apricot Cameo");
+    } else {
+      smokeWord = "Smoke";
+    }
+  }
+
+  let core = [base, silverWord, pattern, smokeWord]
+    .filter(Boolean)
+    .join(" ");
+
+  core = applyCatPointNamingFromParts(core, base, silverWord, pattern, parsed, namingStyle);
+  core = applyCatBurmeseMinkNamingFromParts(core, base, parsed, namingStyle);
+
+  if (extras.length > 0) {
+    core = extras.join(" ") + " " + core;
+  }
+
+  return core;
+}
+
+function getCatExtraModifierWords(parsed) {
+  const modifiers = [];
+
+  if (parsed.Amber === "Amb/Amb" || parsed.Amber === "Amb/n") {
+    modifiers.push("Amber");
+  }
+
+  if (parsed.ExtremeSunshine === "Es/Es" || parsed.ExtremeSunshine === "Es/n") {
+    modifiers.push("Extreme Sunshine");
+  } else if (parsed.Sunshine === "Su/Su" || parsed.Sunshine === "Su/n") {
+    modifiers.push("Sunshine");
+  }
+
+  if (parsed.Charcoal === "Ch/Ch" || parsed.Charcoal === "Ch/n") {
+    modifiers.push("Charcoal");
+  }
+
+  if (parsed.Wideband === "Wb/Wb" || parsed.Wideband === "Wb/n") {
+    modifiers.push("Shaded");
+  }
+
+  if (parsed.Rufousing === "Rf/Rf" || parsed.Rufousing === "Rf/n") {
+    modifiers.push("Rufoused");
+  }
+
+  if (parsed.Glitter === "Gl/Gl" || parsed.Glitter === "Gl/n") {
+    modifiers.push("Glitter");
+  }
+
+  if (parsed.Karpati === "Kp/Kp" || parsed.Karpati === "Kp/n") {
+    modifiers.push("Karpati");
+  }
+
+  return modifiers;
+}
+
+function applyCatPointNamingFromParts(core, base, silverWord, pattern, parsed, namingStyle) {
+  const style = String(namingStyle || "").toLowerCase();
+  const styleWantsPoint =
+    style.includes("siamese") ||
+    style.includes("point") ||
+    style.includes("colourpoint") ||
+    style.includes("colorpoint") ||
+    style.includes("ragdoll") ||
+    style.includes("birman") ||
+    style.includes("himalayan") ||
+    style.includes("balinese");
+
+  if (parsed.Colourpoint !== "cs/cs" && !styleWantsPoint) return core;
+
+  const pointBaseMap = {
+    "Black": "Seal",
+    "Blue": "Blue",
+    "Chocolate": "Chocolate",
+    "Lilac": "Lilac",
+    "Cinnamon": "Cinnamon",
+    "Fawn": "Fawn",
+    "Red": "Flame",
+    "Cream": "Cream",
+    "Caramel": "Caramel",
+    "Apricot": "Apricot",
+    "Tortie": "Tortie",
+    "Blue-Cream Tortie": "Blue-Cream",
+    "Caramel-Apricot Tortie": "Caramel-Apricot"
+  };
+
+  const pointBase = pointBaseMap[base] || base;
+
+  if (pattern) {
+    const patternName = pattern.replace(" Tabby", "");
+    return [pointBase, silverWord, patternName, "Lynx Point"]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return pointBase + " Point";
+}
+
+function applyCatBurmeseMinkNamingFromParts(core, base, parsed, namingStyle) {
+  const style = String(namingStyle || "").toLowerCase();
+  const wantsBurmese = parsed.Colourpoint === "cb/cb" || style.includes("burmese");
+  const wantsMink = parsed.Colourpoint === "cb/cs" || style.includes("tonkinese") || style.includes("mink");
+
+  if (!wantsBurmese && !wantsMink) return core;
+
+  const burmeseMap = {
+    "Black": "Sable",
+    "Chocolate": "Champagne",
+    "Blue": "Blue Burmese",
+    "Lilac": "Platinum",
+    "Red": "Red Burmese",
+    "Cream": "Cream Burmese",
+    "Tortie": "Tortoiseshell Burmese",
+    "Blue-Cream Tortie": "Blue-Cream Burmese"
+  };
+
+  const minkMap = {
+    "Black": "Natural Mink",
+    "Chocolate": "Champagne Mink",
+    "Blue": "Blue Mink",
+    "Lilac": "Platinum Mink",
+    "Cinnamon": "Cinnamon Mink",
+    "Fawn": "Fawn Mink",
+    "Red": "Red Mink",
+    "Cream": "Cream Mink",
+    "Tortie": "Tortie Mink",
+    "Blue-Cream Tortie": "Blue-Cream Mink"
+  };
+
+  if (wantsBurmese) return burmeseMap[base] || (core + " Burmese");
+  if (wantsMink) return minkMap[base] || (core + " Mink");
+
+  return core;
+}
+
+function addCatWhiteSpottingName(colour, parsed, isAlbino) {
+  if (
+    isAlbino ||
+    colour === "White" ||
+    colour === "Blue-Eyed Albino" ||
+    colour === "Red-Eyed Albino"
+  ) {
+    return colour;
+  }
+
+  if (parsed.WhiteSpotting === "S/S") {
+    return colour + " High White";
+  }
+
+  if (parsed.WhiteSpotting === "S/s") {
+    return colour + " Bicolour";
+  }
+
+  return colour;
+}
+
+function addCatPolydactylName(colour, parsed) {
+  if (parsed.Polydactyl === "Pd/Pd" || parsed.Polydactyl === "Pd/pd") {
+    return colour + " Polydactyl";
+  }
+
+  return colour;
+}
+
+function addCatHairTypeName(colour, parsed) {
+  if (parsed.Hairless === "Hr/Hr" || parsed.Hairless === "Hr/hr" || parsed.Hairless === "hr/Hr") {
+    return colour + " Hairless";
+  }
+
+  if (parsed.Rex === "Rx/Rx" || parsed.Rex === "Rx/rx" || parsed.Rex === "rx/Rx") {
+    return colour + " Rex";
+  }
+
+  if (parsed.HairLength === "l/l") {
+    return colour + " Longhair";
+  }
+
+  return colour + " Shorthair";
 }
 
 /* =========================
@@ -1043,13 +1280,11 @@ function applyCatSilver(colour, parsed) {
   const lower = colour.toLowerCase();
 
   if (lower.includes("tabby")) {
-    return colour
-      .replace(/ Silver /g, " ")
-      .replace(/^(.*?) (Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby)$/,
-        function(match, base, pattern) {
-          return base + " Silver " + pattern;
-        }
-      );
+    return colour.replace(/^(Ticked Tabby|Spotted Tabby|Classic Tabby|Mackerel Tabby) (.+)$/,
+      function(match, pattern, base) {
+        return base + " Silver " + pattern;
+      }
+    );
   }
 
   if (lower.includes("red") || lower.includes("cream")) {
@@ -1089,8 +1324,8 @@ function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
       .replace(/^Cream$/, "Cream Point")
       .replace(/^Tortie$/, "Tortie Point")
       .replace(/^Blue-Cream Tortie$/, "Blue-Cream Point")
-      .replace(/^(.*?) Silver (Ticked|Spotted|Classic|Mackerel) Tabby$/, "$1 Silver Lynx Point")
-      .replace(/^(.*?) (Ticked|Spotted|Classic|Mackerel) Tabby$/, "$1 Lynx Point");
+      .replace(/^(.*) Tabby (.*)$/, "$2 Lynx Point")
+      .replace(/^(.*) Silver (.*) Tabby$/, "$1 Silver Lynx Point");
   }
 
   function renameBurmese(base) {
@@ -1256,27 +1491,27 @@ function applyCatTabby(colour, parsed) {
     parsed.Ticked === "Ta/Ta" ||
     parsed.Ticked === "Ta/ta"
   ) {
-    return colour + " Ticked Tabby";
+    return "Ticked Tabby " + colour;
   }
 
   if (
     parsed.Spotted === "Sp/Sp" ||
     parsed.Spotted === "Sp/sp"
   ) {
-    return colour + " Spotted Tabby";
+    return "Spotted Tabby " + colour;
   }
 
   if (
     parsed.Tabby === "mc/mc"
   ) {
-    return colour + " Classic Tabby";
+    return "Classic Tabby " + colour;
   }
 
   if (
     parsed.Tabby === "Mc/Mc" ||
     parsed.Tabby === "Mc/mc"
   ) {
-    return colour + " Mackerel Tabby";
+    return "Mackerel Tabby " + colour;
   }
 
   return colour;
