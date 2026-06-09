@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 19.3 - RED MERLE CACHE CHECK */
 /* DOG ENGINE VERSION 19.1 - E LOCUS REBUILD + MERLE RENAMES + SHADE NOTES + WHITE SPOTTING + COAT CLEANUP */
 
 /* =========================
@@ -1269,6 +1270,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
+window.DOG_GENETICS_ENGINE_VERSION = "19.3-red-merle-fix";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
