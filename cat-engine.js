@@ -376,6 +376,8 @@ function runCatGenotypeBuilder(inputs) {
       addSuggestion("Agouti: A/-");
 
       if (wantsLynx) {
+        parts.Tabby = "Mc/mc";
+        addSuggestion("Tabby Pattern: Mc/- shown in examples for lynx point.");
         addSuggestion("Lynx Point: requires tabby/agouti expression with colourpoint.");
         addHidden("Lynx Point is not a separate colourpoint allele; it is tabby showing through a pointed coat.");
       }
