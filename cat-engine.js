@@ -2,8 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: FINAL CAT ORDER NORMALIZER 2026-06-08");
-window.__CAT_ENGINE_VERSION = "FINAL CAT ORDER NORMALIZER 2026-06-08";
+console.log("CAT ENGINE VERSION: FINAL CAT ORDER NORMALIZER + LYNX BUILDER FIX 2026-06-09");
+window.__CAT_ENGINE_VERSION = "FINAL CAT ORDER NORMALIZER + LYNX BUILDER FIX 2026-06-09";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -240,12 +240,16 @@ function runCatGenotypeBuilder(inputs) {
     wantsCaramel ||
     wantsApricot;
 
+  const wantsLynx =
+    phenotype.includes("lynx");
+
   const wantsTabby =
     phenotype.includes("tabby") ||
     phenotype.includes("classic") ||
     phenotype.includes("mackerel") ||
     phenotype.includes("spotted") ||
     phenotype.includes("ticked") ||
+    wantsLynx ||
     wantsSilver;
 
   const wantsClassic =
@@ -370,6 +374,11 @@ function runCatGenotypeBuilder(inputs) {
     if (wantsTabby) {
       parts.Agouti = "A/a";
       addSuggestion("Agouti: A/-");
+
+      if (wantsLynx) {
+        addSuggestion("Lynx Point: requires tabby/agouti expression with colourpoint.");
+        addHidden("Lynx Point is not a separate colourpoint allele; it is tabby showing through a pointed coat.");
+      }
     }
 
     if (wantsClassic) {
