@@ -1055,6 +1055,16 @@ function replaceDogBasePrefix(colour, map) {
 function cleanupDogColourName(colour) {
   return String(colour || "")
     .replace(/\s+/g, " ")
+
+    /* Final merle-name safety net.
+       This catches any older branch or layered modifier that still says
+       Chocolate Merle and forces Show Standard naming. */
+    .replace(/Double Chocolate Merle/g, "Double Red Merle")
+    .replace(/Chocolate Merle/g, "Red Merle")
+    .replace(/Double Blue Merle/g, "Double Blue Merle")
+    .replace(/Double Slate Merle/g, "Double Slate Merle")
+    .replace(/Double Lilac Merle/g, "Double Lilac Merle")
+
     .replace(/& Cream/g, "Cream")
     .replace(/Chocolate Cream/g, "Chocolate Cream")
     .replace(/Blue Cream/g, "Blue Cream")
