@@ -376,13 +376,20 @@ function runDogGenotypeBuilder(inputs) {
 
   if (wantsDomino) {
     addSuggestion("Extension: Eg/e or Eg/Eg");
-    addSuggestion("Agouti: at/at, at/a, or aw/-");
     addSuggestion("K locus: ky/ky");
-    addBuiltExample({ Extension: "Eg/e", K: "ky/ky", Agouti: "at/a", Intensity: "I/I" });
-    addBuiltExample({ Extension: "Eg/Eg", K: "ky/ky", Agouti: "aw/a", Intensity: "I/I" });
+
+    if (wantsBlackAndTan || wantsTanPoint) {
+      addSuggestion("Agouti: at/at or at/a");
+      addBuiltExample({ Extension: "Eg/e", K: "ky/ky", Agouti: "at/a", Intensity: "I/I" });
+      addBuiltExample({ Extension: "Eg/Eg", K: "ky/ky", Agouti: "at/at", Intensity: "I/I" });
+    } else {
+      addSuggestion("Agouti: at/at, at/a, or aw/-");
+      addBuiltExample({ Extension: "Eg/e", K: "ky/ky", Agouti: "at/a", Intensity: "I/I" });
+      addBuiltExample({ Extension: "Eg/Eg", K: "ky/ky", Agouti: "aw/a", Intensity: "I/I" });
+    }
   }
 
-  if (phenotype.includes("black") && !phenotype.includes("silver black") && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle && !wantsGenericMerle) {
+  if (phenotype.includes("black") && !phenotype.includes("silver black") && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle && !wantsGenericMerle && !wantsDomino && !wantsNorthernDomino && !wantsCockerSable) {
     addSuggestion("Extension: E/-");
     addSuggestion("Black: K/- OR ky/ky with a/a");
     addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a" });
@@ -443,14 +450,14 @@ function runDogGenotypeBuilder(inputs) {
     addBuiltExample({ Extension: extensionBase("E/E"), K: "ky/ky", Agouti: "Ay/a", Intensity: "I/i" });
   }
 
-  if ((wantsBlackAndTan || wantsSilverBlackAndTan || wantsCreamPoint) && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle) {
+  if ((wantsBlackAndTan || wantsSilverBlackAndTan || wantsCreamPoint) && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle && !wantsDomino && !wantsNorthernDomino && !wantsCockerSable) {
     addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addSuggestion(wantsSilverBlackAndTan ? "Intensity: i/i" : wantsCreamPoint ? "Intensity: I/i" : "Intensity: I/I");
     addBuiltExample({ Extension: extensionBase("E/E"), K: "ky/ky", Agouti: "at/a", Intensity: wantsSilverBlackAndTan ? "i/i" : wantsCreamPoint ? "I/i" : "I/I" });
   }
 
-  if (wantsTanPoint && !wantsBrownBase && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle) {
+  if (wantsTanPoint && !wantsBrownBase && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle && !wantsDomino && !wantsNorthernDomino && !wantsCockerSable) {
     addSuggestion("Agouti: at/at or at/a");
     addSuggestion("K locus: ky/ky or kbr/ky");
     addBuiltExample({ Extension: extensionBase("E/E"), K: "ky/ky", Agouti: "at/a", Intensity: "I/I" });
@@ -1270,7 +1277,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "19.3-red-merle-fix";
+window.DOG_GENETICS_ENGINE_VERSION = "19.4-builder-domino-cleanup";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
