@@ -1,798 +1,667 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 19 - AUTO ANIMAL GENOTYPE LOCUS CLEANUP */
+<div class="animal-form">
 
-/* =========================
-   EQUINE GENETICS ENGINE
-========================= */
+  <h2>Add Animal</h2>
 
-function runHorseGenetics(inputs) {
-  const mode = inputs.mode;
+  <div class="genetics-helper-box">
+    <b>Genetics Lab</b><br>
+    Leave genotype blank to auto-roll a genotype from the listed colour, or open the Genetics Lab manually.
+    <a href="https://showstandard.jcink.net/index.php?act=Pages&pid=42" target="_blank" rel="noopener">Open Genetics Lab</a>
+  </div>
 
-  if (mode === "predictor") return runHorsePredictor(inputs);
-  if (mode === "phenotypeFromGenotype") return runHorsePhenotypeCalculator(inputs);
+  <div class="form-grid">
 
-  /*
-    The Genetics Lab uses genotypeFromPhenotype to display the full educational
-    report. Add Animal can request genotype-only output by passing
-    returnType: "genotypeOnly" without changing the Genetics Lab page.
-  */
-  if (mode === "genotypeFromPhenotype" && inputs.returnType === "genotypeOnly") {
-    return buildAutoHorseGenotype(inputs.phenotype);
-  }
+    <div class="form-section">
+      <label>Name *</label>
+      <input id="name" placeholder="Name">
+    </div>
 
-  if (mode === "genotypeFromPhenotype") return runHorseGenotypeBuilder(inputs);
-  if (mode === "autoAnimalGenotype") return buildAutoHorseGenotype(inputs.phenotype);
+    <input type="hidden" id="normalized_name">
 
-  return "Invalid horse genetics mode.";
+    <div class="form-section">
+      <label>Species *</label>
+      <select id="species">
+        <option value="">Species</option>
+        <option value="dog">Dog</option>
+        <option value="horse">Horse</option>
+        <option value="cat">Cat</option>
+      </select>
+    </div>
+
+    <div class="form-section">
+      <label>Gender *</label>
+      <select id="gender">
+        <option value="">Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Altered Male">Altered Male</option>
+        <option value="Altered Female">Altered Female</option>
+      </select>
+    </div>
+
+    <div class="form-section">
+      <label>Breed *</label>
+      <input id="breed" placeholder="Breed">
+    </div>
+
+    <div class="form-section">
+      <label>Colour *</label>
+      <input id="colour" placeholder="Colour">
+    </div>
+
+    <div class="form-section">
+      <label>Birth Year</label>
+      <input id="birthyear" type="number" placeholder="e.g. 2022">
+    </div>
+
+    <div class="form-section full">
+      <label>Origins *</label>
+
+      <select id="originType">
+        <option value="">Select Origin</option>
+        <option value="Created">Created</option>
+        <option value="Bred">Bred</option>
+      </select>
+
+      <input id="originDetails" placeholder="Optional details">
+    </div>
+
+    <div class="form-section full">
+      <label>Genotype</label>
+      <input id="genotype" placeholder="Leave blank to auto-roll from colour">
+      <div class="genotype-note">
+        If blank, the system will try to generate a genotype from Species + Colour when the animal is added.
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label>Owner *</label>
+      <input id="owner" placeholder="Owner">
+    </div>
+
+    <div class="form-section">
+      <label>Breeder *</label>
+      <input id="breeder" placeholder="Breeder">
+    </div>
+
+    <div class="form-section">
+      <label>Sire</label>
+      <input id="sire" placeholder="Parent UUID from profile page">
+    </div>
+
+    <div class="form-section">
+      <label>Dam</label>
+      <input id="dam" placeholder="Parent UUID from profile page">
+    </div>
+
+    <div class="form-section full">
+      <label>Bio</label>
+      <textarea id="bio" placeholder="Bio"></textarea>
+    </div>
+
+  </div>
+
+  <button type="button" id="addAnimalBtn">Add Animal</button>
+
+</div>
+
+<script src="https://raw.githack.com/ShowStandards/showstandard-genetics/main/horse-engine.js?add-animal-engine-only-v20"></script>
+<script src="https://raw.githack.com/ShowStandards/showstandard-genetics/main/dog-engine.js?add-animal-engine-only-v20"></script>
+<script src="https://raw.githack.com/ShowStandards/showstandard-genetics/main/cat-engine.js?add-animal-engine-only-v20"></script>
+
+<style>
+.animal-form {
+  max-width: 700px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
 }
 
-function runHorsePredictor(inputs) {
-  const sire = parseHorseGenotype(inputs.sireGenotype);
-  const dam = parseHorseGenotype(inputs.damGenotype);
-
-  const rows = [
-    horseOutcomeRow("Extension", sire.Extension, dam.Extension),
-    horseOutcomeRow("Agouti", sire.Agouti, dam.Agouti),
-    horseOutcomeRow("Cream / Cream-Pearl", sire.Cream, dam.Cream),
-    horseOutcomeRow("Pearl", sire.Pearl, dam.Pearl),
-    horseOutcomeRow("Dun", sire.Dun, dam.Dun),
-    horseOutcomeRow("Champagne", sire.Champagne, dam.Champagne),
-    horseOutcomeRow("Silver", sire.Silver, dam.Silver),
-    horseOutcomeRow("Mushroom", sire.Mushroom, dam.Mushroom),
-    horseOutcomeRow("Flaxen", sire.Flaxen, dam.Flaxen),
-    horseOutcomeRow("Sooty", sire.Sooty, dam.Sooty),
-    horseOutcomeRow("Pangare", sire.Pangare, dam.Pangare),
-    horseOutcomeRow("Grey", sire.Grey, dam.Grey),
-    horseOutcomeRow("Roan", sire.Roan, dam.Roan),
-    horseOutcomeRow("Tobiano", sire.Tobiano, dam.Tobiano),
-    horseOutcomeRow("Frame", sire.Frame, dam.Frame),
-    horseOutcomeRow("Splash", sire.Splash, dam.Splash),
-    horseOutcomeRow("Sabino", sire.Sabino, dam.Sabino),
-    horseOutcomeRow("Rabicano", sire.Rabicano, dam.Rabicano),
-    horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa),
-    horseOutcomeRow("PATN1", sire.PATN1, dam.PATN1),
-    horseOutcomeRow("PATN2", sire.PATN2, dam.PATN2)
-  ].join("");
-
-  return renderHorseResults(
-    "Horse Predictor",
-    `
-      <p><b>Sire:</b> ${inputs.sireGenotype}</p>
-      <p><b>Dam:</b> ${inputs.damGenotype}</p>
-
-      <table class="breed-table">
-        <tr>
-          <th>Gene</th>
-          <th>Possible Outcomes</th>
-        </tr>
-        ${rows}
-      </table>
-    `
-  );
+.genetics-helper-box {
+  background: #eef4f4;
+  border: 1px solid #cfdede;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  color: #555;
 }
 
-function runHorseRoll(inputs) {
-  return `
-    <h4>Horse Roll</h4>
-    <p>Horse foal roller coming next.</p>
-  `;
+.genetics-helper-box b {
+  color: #2f6f6f;
 }
 
-function runHorsePhenotypeCalculator(inputs) {
-  const genotypeText = inputs.singleGenotype;
-  const parsed = parseHorseGenotype(genotypeText);
-  const phenotype = getHorsePhenotype(parsed);
-
-  return renderHorseResults(
-    "Phenotype Calculator",
-    `
-      <p><b>Phenotype:</b> ${phenotype}</p>
-      <p><b>Genotype:</b> ${genotypeText}</p>
-    `
-  );
+.genetics-helper-box a {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #2f6f6f;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
 }
 
-function runHorseGenotypeBuilder(inputs) {
-  const phenotype = String(inputs.phenotype || "").toLowerCase();
-  const suggestions = [];
-  const examples = [];
-  const hidden = [];
-  const notes = [];
-
-  function addSuggestion(item) {
-    if (!suggestions.includes(item)) suggestions.push(item);
-  }
-
-  function cleanExampleGenotype(item) {
-    const tokens = String(item || "")
-      .replace(/\s+/g, " ")
-      .trim()
-      .split(" ")
-      .filter(Boolean);
-
-    const cleaned = [];
-
-    tokens.forEach(token => {
-      if (!cleaned.includes(token)) cleaned.push(token);
-    });
-
-    return cleaned.join(" ");
-  }
-
-  function addExample(item) {
-    const cleaned = cleanExampleGenotype(item);
-    if (cleaned && !examples.includes(cleaned)) examples.push(cleaned);
-  }
-
-  function addHidden(item) {
-    if (!hidden.includes(item)) hidden.push(item);
-  }
-
-  function addNote(item) {
-    if (!notes.includes(item)) notes.push(item);
-  }
-
-  function addToExamples(gene) {
-    const cleanedGene = cleanExampleGenotype(gene);
-
-    if (examples.length === 0) {
-      addExample(cleanedGene);
-      return;
-    }
-
-    examples.forEach((example, index) => {
-      examples[index] = cleanExampleGenotype(example + " " + cleanedGene);
-    });
-  }
-
-  function hasPhenotypePhrase(phrase) {
-    const normalizedPhenotype = phenotype.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-    const normalizedPhrase = String(phrase || "").toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-    return normalizedPhenotype.includes(normalizedPhrase);
-  }
-
-
-  if (hasPhenotypePhrase("overo")) {
-    addNote(
-      "Overo is a descriptive term and may refer to Frame Overo, Splash, Sabino, or combinations of those patterns. Genetic testing is required to determine the specific pattern."
-    );
-  }
-
-  const isChestnutFamily =
-    hasPhenotypePhrase("chestnut") ||
-    hasPhenotypePhrase("sorrel") ||
-    hasPhenotypePhrase("red");
-
-  if (isChestnutFamily) {
-    addSuggestion("Extension: e/e");
-    addExample("e/e A/A");
-    addExample("e/e A/a");
-    addExample("e/e a/a");
-    addHidden("Agouti can be hidden on chestnut: A/A, A/a, or a/a");
-    addHidden("Silver can be hidden on chestnut: Z/n or Z/Z");
-
-    if (hasPhenotypePhrase("sorrel")) {
-      addNote("Sorrel is treated as part of the chestnut/red family and is genetically e/e.");
-    }
-
-    if (hasPhenotypePhrase("red")) {
-      addNote("Red is treated as part of the chestnut/sorrel family and is genetically e/e.");
-    }
-
-    if (hasPhenotypePhrase("liver")) {
-      addNote("Liver is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
-    }
-
-    if (hasPhenotypePhrase("dark chestnut")) {
-      addNote("Dark Chestnut is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
-    }
-
-    if (hasPhenotypePhrase("light chestnut")) {
-      addNote("Light Chestnut is a shade of Chestnut and is not genetically distinct from Chestnut in this calculator. This can be added on your horse profile if you wish.");
-    }
-  }
-
-  if (hasPhenotypePhrase("black") && !hasPhenotypePhrase("silver black")) {
-    addSuggestion("Extension: E/-");
-    addSuggestion("Agouti: a/a");
-    addExample("E/E a/a");
-    addExample("E/e a/a");
-    addHidden("Chestnut can be carried: E/e");
-  }
-
-  if (hasPhenotypePhrase("bay")) {
-    addSuggestion("Extension: E/-");
-    addSuggestion("Agouti: A/-");
-    addExample("E/E A/A");
-    addExample("E/e A/a");
-    addHidden("Chestnut can be carried: E/e");
-    addHidden("Recessive black can be carried: A/a");
-  }
-
-  if (hasPhenotypePhrase("palomino")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Cream: Cr/n");
-    addExample("e/e A/A Cr/n");
-    addExample("e/e A/a Cr/n");
-    addExample("e/e a/a Cr/n");
-    addHidden("Agouti and Silver can be hidden on red-based horses.");
-  }
-
-  if (hasPhenotypePhrase("buckskin")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Cream: Cr/n");
-    addExample("E/E A/A Cr/n");
-    addExample("E/e A/a Cr/n");
-    addHidden("Chestnut can be carried: E/e");
-    addHidden("Recessive black can be carried: A/a");
-  }
-
-  if (hasPhenotypePhrase("smokey black")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Cream: Cr/n");
-    addExample("E/E a/a Cr/n");
-    addExample("E/e a/a Cr/n");
-    addHidden("Chestnut can be carried: E/e");
-  }
-
-  if (hasPhenotypePhrase("cremello")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Cream: Cr/Cr");
-    addExample("e/e A/A Cr/Cr");
-    addExample("e/e A/a Cr/Cr");
-    addHidden("Agouti and Silver can be hidden on red-based horses.");
-  }
-
-  if (hasPhenotypePhrase("perlino")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Cream: Cr/Cr");
-    addExample("E/E A/A Cr/Cr");
-    addExample("E/e A/a Cr/Cr");
-  }
-
-  if (hasPhenotypePhrase("smokey cream")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Cream: Cr/Cr");
-    addExample("E/E a/a Cr/Cr");
-    addExample("E/e a/a Cr/Cr");
-  }
-
-  const hasVisibleSilver = hasPhenotypePhrase("silver");
-
-  const isNamedDunCreamCombo =
-    hasPhenotypePhrase("dunalino") ||
-    hasPhenotypePhrase("dunskin") ||
-    hasPhenotypePhrase("dun skin") ||
-    hasPhenotypePhrase("smokey grullo") ||
-    hasPhenotypePhrase("smoky grullo") ||
-    hasPhenotypePhrase("silver grullo") ||
-    hasPhenotypePhrase("silver dunskin") ||
-    hasPhenotypePhrase("silver dun skin");
-
-  const isNamedDunChampagneCombo =
-    hasPhenotypePhrase("gold dun champagne") ||
-    hasPhenotypePhrase("amber dun champagne") ||
-    hasPhenotypePhrase("classic dun champagne") ||
-    hasPhenotypePhrase("silver amber dun champagne") ||
-    hasPhenotypePhrase("silver classic dun champagne");
-
-  if (hasPhenotypePhrase("dunalino") && !hasVisibleSilver) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Cream: Cr/n");
-    addSuggestion("Dun: D/-");
-    addExample("e/e A/A Cr/n D/n");
-    addExample("e/e A/a Cr/n D/n");
-    addHidden("Agouti and Silver can be hidden on red-based horses.");
-    addNote("Dunalino is palomino plus dun: genetically chestnut/red with one cream and dun.");
-  } else if ((hasPhenotypePhrase("dunskin") || hasPhenotypePhrase("dun skin")) && !hasVisibleSilver) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Cream: Cr/n");
-    addSuggestion("Dun: D/-");
-    addExample("E/E A/A Cr/n D/n");
-    addExample("E/e A/a Cr/n D/n");
-    addHidden("Chestnut can be carried: E/e");
-    addHidden("Recessive black can be carried: A/a");
-    addNote("Dunskin is buckskin plus dun: genetically bay with one cream and dun.");
-  } else if ((hasPhenotypePhrase("smokey grullo") || hasPhenotypePhrase("smoky grullo")) && !hasVisibleSilver) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Cream: Cr/n");
-    addSuggestion("Dun: D/-");
-    addExample("E/E a/a Cr/n D/n");
-    addExample("E/e a/a Cr/n D/n");
-    addHidden("Chestnut can be carried: E/e");
-    addNote("Smokey Grullo is smokey black plus dun: genetically black with one cream and dun.");
-  }
-
-  if (hasPhenotypePhrase("red dun")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Dun: D/-");
-    addExample("e/e A/A D/n");
-    addExample("e/e A/a D/n");
-  } else if (hasPhenotypePhrase("bay dun")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Dun: D/-");
-    addExample("E/E A/A D/n");
-    addExample("E/e A/a D/n");
-  } else if ((hasPhenotypePhrase("grullo") || hasPhenotypePhrase("grulla")) && !isNamedDunCreamCombo) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Dun: D/-");
-    addExample("E/E a/a D/n");
-    addExample("E/e a/a D/n");
-  } else if (hasPhenotypePhrase("dun") && !isNamedDunCreamCombo && !isNamedDunChampagneCombo) {
-    addSuggestion("Dun: D/-");
-    addToExamples("D/n");
-  }
-
-  if (hasPhenotypePhrase("gold dun champagne")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Champagne: Ch/-");
-    addExample("e/e A/A D/n Ch/n");
-    addExample("e/e A/a D/n Ch/n");
-    addHidden("Agouti and Silver can be hidden on red-based horses.");
-  } else if (hasPhenotypePhrase("amber dun champagne")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E A/A D/n Ch/n");
-    addExample("E/e A/a D/n Ch/n");
-    addHidden("Chestnut can be carried: E/e");
-    addHidden("Recessive black can be carried: A/a");
-  } else if (hasPhenotypePhrase("classic dun champagne")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E a/a D/n Ch/n");
-    addExample("E/e a/a D/n Ch/n");
-    addHidden("Chestnut can be carried: E/e");
-  } else if (hasPhenotypePhrase("gold cream champagne")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Cream: Cr/n or Cr/Cr");
-    addSuggestion("Champagne: Ch/-");
-    addExample("e/e A/A Cr/n Ch/n");
-    addExample("e/e A/a Cr/n Ch/n");
-  } else if (hasPhenotypePhrase("amber cream champagne")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Cream: Cr/n or Cr/Cr");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E A/A Cr/n Ch/n");
-    addExample("E/e A/a Cr/n Ch/n");
-  } else if (hasPhenotypePhrase("classic cream champagne")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Cream: Cr/n or Cr/Cr");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E a/a Cr/n Ch/n");
-    addExample("E/e a/a Cr/n Ch/n");
-  } else if (hasPhenotypePhrase("gold champagne")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Champagne: Ch/-");
-    addExample("e/e A/A Ch/n");
-    addExample("e/e A/a Ch/n");
-  } else if (hasPhenotypePhrase("amber champagne")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E A/A Ch/n");
-    addExample("E/e A/a Ch/n");
-  } else if (hasPhenotypePhrase("classic champagne")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E a/a Ch/n");
-    addExample("E/e a/a Ch/n");
-  } else if (hasPhenotypePhrase("champagne")) {
-    addSuggestion("Champagne: Ch/-");
-    addExample("E/E A/A Ch/n");
-    addExample("E/e A/a Ch/n");
-    addExample("E/E a/a Ch/n");
-    addExample("E/e a/a Ch/n");
-    addExample("e/e A/A Ch/n");
-    addExample("e/e A/a Ch/n");
-    addHidden("Champagne can occur on any base colour.");
-  }
-
-  if (hasPhenotypePhrase("silver dunskin") || hasPhenotypePhrase("silver dun skin")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Cream: Cr/n");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E A/A Cr/n D/n Z/n");
-    addExample("E/e A/a Cr/n D/n Z/n");
-    addHidden("Chestnut can be carried: E/e");
-  } else if (hasPhenotypePhrase("silver grullo")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E a/a D/n Z/n");
-    addExample("E/e a/a D/n Z/n");
-    addHidden("Chestnut can be carried: E/e");
-  } else if (hasPhenotypePhrase("silver bay dun")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E A/A D/n Z/n");
-    addExample("E/e A/a D/n Z/n");
-  } else if (hasPhenotypePhrase("silver amber dun champagne")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Champagne: Ch/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E A/A D/n Ch/n Z/n");
-    addExample("E/e A/a D/n Ch/n Z/n");
-  } else if (hasPhenotypePhrase("silver classic dun champagne")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Dun: D/-");
-    addSuggestion("Champagne: Ch/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E a/a D/n Ch/n Z/n");
-    addExample("E/e a/a D/n Ch/n Z/n");
-  } else if (hasPhenotypePhrase("silver amber champagne")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Champagne: Ch/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E A/A Ch/n Z/n");
-    addExample("E/e A/a Ch/n Z/n");
-  } else if (hasPhenotypePhrase("silver classic champagne")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Champagne: Ch/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E a/a Ch/n Z/n");
-    addExample("E/e a/a Ch/n Z/n");
-  } else if (hasPhenotypePhrase("silver black")) {
-    addSuggestion("Base: E/- a/a");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E a/a Z/n");
-    addExample("E/e a/a Z/n");
-  } else if (hasPhenotypePhrase("silver bay")) {
-    addSuggestion("Base: E/- A/-");
-    addSuggestion("Silver: Z/-");
-    addExample("E/E A/A Z/n");
-    addExample("E/e A/a Z/n");
-  } else if (hasPhenotypePhrase("silver")) {
-    addSuggestion("Silver: Z/-");
-    addToExamples("Z/n");
-  }
-
-  if (phenotype.includes("apricot")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Pearl: Prl/Prl");
-    addExample("e/e A/A Prl/Prl");
-    addExample("e/e A/a Prl/Prl");
-  } else if (phenotype.includes("pearl")) {
-    addSuggestion("Pearl: Prl/Prl or Cr/n + Prl/n depending on phenotype");
-    addToExamples("Prl/n");
-  }
-
-  if (phenotype.includes("mushmello")) {
-    addSuggestion("Base: e/e with Cream");
-    addSuggestion("Mushroom: mu/mu");
-    addExample("e/e A/A Cr/n mu/mu");
-  } else if (phenotype.includes("mushroom")) {
-    addSuggestion("Base: e/e");
-    addSuggestion("Mushroom: mu/mu");
-    addExample("e/e A/A mu/mu");
-    addExample("e/e A/a mu/mu");
-  }
-
-  if (phenotype.includes("flaxen")) {
-    addSuggestion("Flaxen: f/f");
-    addToExamples("f/f");
-  }
-
-  if (phenotype.includes("sooty")) {
-    addSuggestion("Sooty: Sty/-");
-    addToExamples("Sty/n");
-  }
-
-  if (phenotype.includes("pangare")) {
-    addSuggestion("Pangare: P/-");
-    addToExamples("P/n");
-  }
-
-  if (phenotype.includes("grey") || phenotype.includes("gray")) {
-    addSuggestion("Grey: G/-");
-    addToExamples("G/g");
-    addHidden("Grey visually overrides the base colour, so the base may be genetically hidden.");
-  }
-
-  if (phenotype.includes("roan")) {
-    addSuggestion("Roan: Rn/-");
-    addToExamples("Rn/n");
-  }
-
-  if (phenotype.includes("tobiano")) {
-    addSuggestion("Tobiano: To/-");
-    addToExamples("To/n");
-  }
-
-  if (phenotype.includes("frame")) {
-    addSuggestion("Frame Overo: OLW/-");
-    addToExamples("OLW/n");
-  }
-
-  if (phenotype.includes("splash")) {
-    addSuggestion("Splash: Spl/-");
-    addToExamples("Spl/n");
-  }
-
-  if (phenotype.includes("sabino")) {
-    addSuggestion("Sabino: Sb/-");
-    addToExamples("Sb/n");
-  }
-
-  if (phenotype.includes("rabicano")) {
-    addSuggestion("Rabicano: Rb/-");
-    addToExamples("Rb/n");
-  }
-
-  if (phenotype.includes("tovero")) {
-    addSuggestion("Tobiano: To/-");
-    addSuggestion("Frame Overo: OLW/-");
-    addToExamples("To/n OLW/n");
-  }
-
-  if (phenotype.includes("few spot")) {
-    addSuggestion("Appaloosa: Lp/Lp");
-    addSuggestion("PATN1: PATN1/-");
-    addToExamples("Lp/Lp PATN1/patn1");
-  } else if (phenotype.includes("leopard")) {
-    addSuggestion("Appaloosa: Lp/-");
-    addSuggestion("PATN1: PATN1/-");
-    addToExamples("Lp/lp PATN1/patn1");
-  } else if (phenotype.includes("snow cap")) {
-    addSuggestion("Appaloosa: Lp/Lp");
-    addSuggestion("PATN2: PATN2/-");
-    addToExamples("Lp/Lp PATN2/patn2");
-  } else if (phenotype.includes("blanket")) {
-    addSuggestion("Appaloosa: Lp/-");
-    addSuggestion("PATN2: PATN2/-");
-    addToExamples("Lp/lp PATN2/patn2");
-  } else if (
-    phenotype.includes("appaloosa") ||
-    phenotype.includes("varnish")
-  ) {
-    addSuggestion("Appaloosa: Lp/-");
-    addToExamples("Lp/lp");
-  }
-
-  if (suggestions.length === 0) {
-    suggestions.push("No simple genotype match found yet.");
-  }
-
-  return renderHorseResults(
-    "Genotype Builder",
-    `
-      <p><b>Phenotype:</b> ${inputs.phenotype}</p>
-
-      <p><b>Likely Required Genes:</b></p>
-      <ul>${suggestions.map(item => `<li>${item}</li>`).join("")}</ul>
-
-      <p><b>Possible Example Genotypes:</b></p>
-      <ul>${examples.length ? examples.map(item => `<li>${item}</li>`).join("") : "<li>No example genotypes generated yet.</li>"}</ul>
-
-      <p><b>Possible Hidden Traits:</b></p>
-      <ul>${hidden.length ? hidden.map(item => `<li>${item}</li>`).join("") : "<li>No common hidden traits listed yet.</li>"}</ul>
-
-      ${notes.length ? `<p><b>Colour Notes:</b></p><ul>${notes.map(item => `<li>${item}</li>`).join("")}</ul>` : ""}
-
-      <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
-    `
-  );
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
+.form-section {
+  display: flex;
+  flex-direction: column;
+}
 
-function buildAutoHorseGenotype(phenotypeInput) {
-  const phenotype = String(phenotypeInput || "")
+.form-section.full {
+  grid-column: span 2;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #2f6f6f;
+}
+
+input, select, textarea {
+  padding: 10px;
+  border: 1px solid #cfdede;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2f6f6f;
+  box-shadow: 0 0 0 3px rgba(47,111,111,0.12);
+}
+
+textarea {
+  min-height: 100px;
+}
+
+.genotype-note {
+  font-size: 12px;
+  color: #666;
+  padding-top: 4px;
+}
+
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  background: #2f6f6f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #245555;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+</style>
+
+<script>
+console.log("Add Animal loaded");
+
+const TITLE_WORDS = [
+  "natch","intch","gch","ghgch","ghch","mbis","mbiss","bis","biss",
+  "tdch","ao","toth1","toth2","toth3","toth4","toth5","toth6",
+  "toth7","toth8","toth9","toth10","toth11","toth12","toth13",
+  "tah","tth","enj","enn","eno","wer","wdi","gdi","gdt","gdm",
+  "ngh","epi","dintro","dtr","s1","s2","wtp3","wtp4","cd1l",
+  "cd2l","cdm","cbdm","cbd2l","cihdm","ihdm","ihd2l","ntd",
+  "e","e**","e***"
+];
+
+function normalizeName(name) {
+  if (!name) return "";
+
+  let cleaned = name.toLowerCase();
+  cleaned = cleaned.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  cleaned = cleaned.replace(/[^a-z0-9\s']/g, " ");
+
+  let words = cleaned.split(/\s+/);
+  words = words.filter(w => w && !TITLE_WORDS.includes(w));
+
+  return words.join(" ").trim().replace(/\s+/g, " ");
+}
+
+function getValue(id) {
+  return document.getElementById(id).value.trim();
+}
+
+function setValue(id, value) {
+  document.getElementById(id).value = value || "";
+}
+
+document.getElementById("name").addEventListener("input", () => {
+  document.getElementById("normalized_name").value =
+    normalizeName(document.getElementById("name").value);
+});
+
+function validateRequiredFields() {
+  const required = [
+    ["name", "Name"],
+    ["species", "Species"],
+    ["gender", "Gender"],
+    ["breed", "Breed"],
+    ["colour", "Colour"],
+    ["originType", "Origins"],
+    ["owner", "Owner"],
+    ["breeder", "Breeder"]
+  ];
+
+  const missing = required
+    .filter(([id]) => !getValue(id))
+    .map(([, label]) => label);
+
+  if (missing.length) {
+    alert("Please fill out required fields:\n\n" + missing.join("\n"));
+    return false;
+  }
+
+  return true;
+}
+
+function isUUID(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function plainTextFromHTML(value) {
+  const div = document.createElement("div");
+  div.innerHTML = String(value || "");
+  return (div.textContent || div.innerText || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isGenotypeToken(token) {
+  const t = String(token || "")
+    .replace(/[,.]+$/g, "")
+    .trim();
+
+  if (!t) return false;
+  if (!t.includes("/")) return false;
+
+  return /^[A-Za-z0-9*+\-]+\/[A-Za-z0-9*+\-]+$/.test(t);
+}
+
+function looksLikeGenotype(text) {
+  const value = String(text || "").trim();
+  if (!value) return false;
+
+  const tokens = value.split(/\s+/).filter(Boolean);
+  const genotypeTokens = tokens.filter(isGenotypeToken);
+
+  return genotypeTokens.length >= 2;
+}
+
+function cleanGenotypeCandidate(line) {
+  return String(line || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/^(example|possible|genotype|result|option|one option|sample)\s*(genotype|genotypes)?\s*[:\-]\s*/i, "")
+    .replace(/^\d+[\.)]\s*/, "")
+    .replace(/^[•\-]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function firstGenotypeSequence(text) {
+  const tokens = String(text || "")
+    .replace(/[;,]/g, " ")
+    .split(/\s+/)
+    .map(token => token.replace(/[,.]+$/g, "").trim())
+    .filter(Boolean);
+
+  const collected = [];
+
+  for (const token of tokens) {
+    if (isGenotypeToken(token)) {
+      collected.push(token);
+      continue;
+    }
+
+    if (collected.length >= 2) break;
+    collected.length = 0;
+  }
+
+  return collected.length >= 2 ? collected.join(" ") : "";
+}
+
+function extractGenotypeFromEngineOutput(output) {
+  const text = plainTextFromHTML(output);
+  if (!text) return "";
+
+  /* Preferred: grab the first actual genotype sequence after the engine's
+     example-genotype label. This prevents the whole explanation from being
+     saved into animals.genotype. */
+  const exampleBlock = text.match(/(?:possible\s+example\s+genotypes?|possible\s+genotypes?|example\s+genotypes?|example\s+genotype)\s*[:\-]\s*([\s\S]*?)(?:possible\s+hidden\s+traits?|hidden\s+traits?|note\s*:|$)/i);
+
+  if (exampleBlock) {
+    const candidate = firstGenotypeSequence(exampleBlock[1]);
+    if (candidate) return candidate;
+  }
+
+  /* Fallback: some engines may say simply "Genotype: e/e A/a Cr/n". */
+  const directLabel = text.match(/(?:^|\s)genotype\s*[:\-]\s*((?:[A-Za-z0-9*+\-]+\/[A-Za-z0-9*+\-]+\s*){2,})/i);
+
+  if (directLabel) {
+    const candidate = firstGenotypeSequence(directLabel[1]);
+    if (candidate) return candidate;
+  }
+
+  /* Last fallback: find the first two-or-more token genotype-looking sequence
+     anywhere in the engine output. */
+  const anySequence = firstGenotypeSequence(text);
+  if (anySequence) return anySequence;
+
+  return "";
+}
+
+function normaliseColourKey(colour) {
+  return String(colour || "")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[–—]/g, " ")
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/[–—]/g, "-")
+    .replace(/[^a-z0-9\s\-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-
-  if (!phenotype) return "";
-
-  function has(phrase) {
-    return phenotype.includes(String(phrase || "").toLowerCase());
-  }
-
-  const parts = [];
-
-  function add(gene) {
-    if (gene && !parts.includes(gene)) parts.push(gene);
-  }
-
-  /* Named cream / double-cream colours must be checked before base colours. */
-  if (has("cremello")) {
-    add("e/e"); add("A/A"); add("Cr/Cr");
-  } else if (has("perlino")) {
-    add("E/E"); add("A/A"); add("Cr/Cr");
-  } else if (has("smokey cream") || has("smoky cream")) {
-    add("E/E"); add("a/a"); add("Cr/Cr");
-  } else if (has("dunalino")) {
-    add("e/e"); add("A/A"); add("Cr/n"); add("D/n");
-  } else if (has("dunskin") || has("dun skin")) {
-    add("E/E"); add("A/A"); add("Cr/n"); add("D/n");
-  } else if (has("smokey grullo") || has("smoky grullo")) {
-    add("E/E"); add("a/a"); add("Cr/n"); add("D/n");
-  } else if (has("palomino")) {
-    add("e/e"); add("A/A"); add("Cr/n");
-  } else if (has("buckskin")) {
-    add("E/E"); add("A/A"); add("Cr/n");
-  } else if (has("smokey black") || has("smoky black")) {
-    add("E/E"); add("a/a"); add("Cr/n");
-  } else if (has("red dun")) {
-    add("e/e"); add("A/A"); add("D/n");
-  } else if (has("bay dun")) {
-    add("E/E"); add("A/A"); add("D/n");
-  } else if (has("grullo") || has("grulla")) {
-    add("E/E"); add("a/a"); add("D/n");
-  } else if (has("silver black")) {
-    add("E/E"); add("a/a"); add("Z/n");
-  } else if (has("silver bay")) {
-    add("E/E"); add("A/A"); add("Z/n");
-  } else if (has("classic champagne")) {
-    add("E/E"); add("a/a"); add("Ch/n");
-  } else if (has("amber champagne")) {
-    add("E/E"); add("A/A"); add("Ch/n");
-  } else if (has("gold champagne")) {
-    add("e/e"); add("A/A"); add("Ch/n");
-  } else if (has("apricot")) {
-    add("e/e"); add("A/A"); add("Prl/Prl");
-  } else if (has("mushmello")) {
-    add("e/e"); add("A/A"); add("Cr/n"); add("mu/mu");
-  } else if (has("mushroom")) {
-    add("e/e"); add("A/A"); add("mu/mu");
-  } else if (has("chestnut") || has("sorrel") || has("red")) {
-    add("e/e"); add("A/A");
-  } else if (has("bay") || has("brown")) {
-    add("E/E"); add("A/A");
-  } else if (has("black")) {
-    add("E/E"); add("a/a");
-  }
-
-  if (!parts.length) return "";
-
-  /* Add extra modifiers/patterns if they appear in the colour name and are not already present. */
-  if (has("cream") && !parts.some(g => g.includes("Cr/"))) add("Cr/n");
-  if (has("champagne") && !parts.some(g => g.includes("Ch/"))) add("Ch/n");
-  if ((has("dun") || has("grullo") || has("grulla")) && !parts.some(g => g.includes("D/"))) add("D/n");
-  if (has("silver") && !parts.some(g => g.includes("Z/"))) add("Z/n");
-  if ((has("grey") || has("gray")) && !parts.some(g => g.includes("G/"))) add("G/g");
-  if (has("roan") && !parts.some(g => g.includes("Rn/"))) add("Rn/n");
-  if (has("tobiano") && !parts.some(g => g.includes("To/"))) add("To/n");
-  if ((has("frame") || has("overo")) && !parts.some(g => g.includes("OLW/"))) add("OLW/n");
-  if (has("splash") && !parts.some(g => g.includes("Spl/"))) add("Spl/n");
-  if (has("sabino") && !parts.some(g => g.includes("Sb/"))) add("Sb/n");
-  if (has("rabicano") && !parts.some(g => g.includes("Rb/"))) add("Rb/n");
-
-  if (has("few spot")) {
-    add("Lp/Lp"); add("PATN1/patn1");
-  } else if (has("leopard")) {
-    add("Lp/lp"); add("PATN1/patn1");
-  } else if (has("snow cap")) {
-    add("Lp/Lp"); add("PATN2/patn2");
-  } else if (has("blanket")) {
-    add("Lp/lp"); add("PATN2/patn2");
-  } else if (has("varnish") || has("appaloosa")) {
-    add("Lp/lp");
-  }
-
-  return cleanAutoHorseGenotype(parts.join(" "));
 }
 
-function cleanAutoHorseGenotype(genotypeText) {
+function sexTokenForCat(gender, redBased) {
+  const g = String(gender || "").toLowerCase();
+  const male = g.includes("male") && !g.includes("female");
+
+  if (redBased) return male ? "O/Y" : "O/O";
+  return male ? "o/Y" : "o/o";
+}
+
+function fallbackGenotypeFromColour(species, colour, gender) {
+  const key = normaliseColourKey(colour);
+  if (!key) return "";
+
+  if (species === "horse") {
+    const has = word => new RegExp("(^|\\s|-)" + word + "(\\s|-|$)", "i").test(key);
+    const tokens = [];
+
+    if (key.includes("cremello")) {
+      tokens.push("e/e", "A/A", "Cr/Cr");
+    } else if (key.includes("perlino")) {
+      tokens.push("E/E", "A/A", "Cr/Cr");
+    } else if (key.includes("smokey cream") || key.includes("smoky cream")) {
+      tokens.push("E/E", "a/a", "Cr/Cr");
+    } else if (key.includes("palomino")) {
+      tokens.push("e/e", "A/A", "Cr/n");
+    } else if (key.includes("buckskin")) {
+      tokens.push("E/E", "A/A", "Cr/n");
+    } else if (key.includes("smokey black") || key.includes("smoky black")) {
+      tokens.push("E/E", "a/a", "Cr/n");
+    } else if (key.includes("chestnut") || key.includes("sorrel") || key.includes("flaxen")) {
+      tokens.push("e/e", "A/A");
+    } else if (key.includes("bay") || key.includes("brown")) {
+      tokens.push("E/E", "A/A");
+    } else if (key.includes("black")) {
+      tokens.push("E/E", "a/a");
+    } else {
+      return "";
+    }
+
+    if (key.includes("champagne")) tokens.push("Ch/n");
+    if (key.includes("dun") || key.includes("grullo") || key.includes("grulla")) tokens.push("D/n");
+    if (key.includes("silver")) tokens.push("Z/n");
+    if (key.includes("grey") || key.includes("gray")) tokens.push("G/g");
+    if (key.includes("roan")) tokens.push("Rn/n");
+    if (key.includes("tobiano")) tokens.push("To/n");
+    if (key.includes("sabino")) tokens.push("Sb/n");
+    if (key.includes("frame") || key.includes("overo")) tokens.push("O/n");
+    if (key.includes("splash")) tokens.push("SW1/n");
+    if (key.includes("pearl")) tokens.push("prl/n");
+
+    return [...new Set(tokens)].join(" ");
+  }
+
+  if (species === "cat") {
+    const tokens = [];
+    const isRed = key.includes("red") || key.includes("orange") || key.includes("cream") || key.includes("tortie") || key.includes("torbie") || key.includes("calico");
+    const isTortie = key.includes("tortie") || key.includes("torbie") || key.includes("calico");
+
+    if (isTortie) {
+      tokens.push("O/o");
+    } else {
+      tokens.push(sexTokenForCat(gender, key.includes("red") || key.includes("orange") || key.includes("cream")));
+    }
+
+    if (key.includes("cinnamon") || key.includes("fawn")) {
+      tokens.push("bl/bl");
+    } else if (key.includes("chocolate") || key.includes("lilac")) {
+      tokens.push("b/b");
+    } else {
+      tokens.push("B/-");
+    }
+
+    if (key.includes("blue") || key.includes("lilac") || key.includes("fawn") || key.includes("cream")) {
+      tokens.push("d/d");
+    } else {
+      tokens.push("D/-");
+    }
+
+    if (key.includes("tabby") || key.includes("lynx") || key.includes("torbie")) {
+      tokens.push("A/-");
+    } else {
+      tokens.push("a/a");
+    }
+
+    if (key.includes("point") || key.includes("lynx point")) tokens.push("cs/cs");
+    if (key.includes("mink")) tokens.push("cb/cs");
+    if (key.includes("sepia")) tokens.push("cb/cb");
+    if (key.includes("silver") || key.includes("smoke")) tokens.push("I/-");
+    if (key.includes("white") || key.includes("bicolour") || key.includes("bicolor") || key.includes("calico")) tokens.push("S/-");
+
+    return [...new Set(tokens)].join(" ");
+  }
+
+  if (species === "dog") {
+    const tokens = [];
+
+    if (key.includes("red") || key.includes("yellow") || key.includes("cream") || key.includes("gold")) {
+      tokens.push("e/e");
+    } else {
+      tokens.push("E/E");
+    }
+
+    if (key.includes("chocolate") || key.includes("liver") || key.includes("brown") || key.includes("lilac") || key.includes("isabella")) {
+      tokens.push("b/b");
+    } else {
+      tokens.push("B/B");
+    }
+
+    if (key.includes("blue") || key.includes("lilac") || key.includes("isabella")) {
+      tokens.push("d/d");
+    } else {
+      tokens.push("D/D");
+    }
+
+    if (key.includes("black") || key.includes("chocolate") || key.includes("blue") || key.includes("lilac")) {
+      tokens.push("K/K");
+    }
+
+    if (key.includes("tan") || key.includes("points") || key.includes("black and tan") || key.includes("tricolor")) {
+      tokens.push("ky/ky", "at/at");
+    }
+
+    if (key.includes("sable")) tokens.push("ky/ky", "Ay/-");
+    if (key.includes("brindle")) tokens.push("kbr/ky");
+    if (key.includes("merle")) tokens.push("M/m");
+    if (key.includes("harlequin")) tokens.push("H/h", "M/m");
+    if (key.includes("domino")) tokens.push("Eg/-");
+    if (key.includes("white") || key.includes("piebald")) tokens.push("sp/sp");
+
+    return [...new Set(tokens)].join(" ");
+  }
+
+  return "";
+}
+
+async function generateGenotypeFromColour(species, colour, gender) {
+  let output = "";
+
+  if (species === "horse") {
+    if (typeof window.runHorseGenetics !== "function") {
+      throw new Error("Horse genetics engine is not loaded yet.");
+    }
+
+    // Horse engine v18+ / v19+ supports a clean genotype-only mode.
+    // This avoids scraping the educational Genetics Lab report, which was
+    // causing duplicated genes like A/A A/a.
+    output = window.runHorseGenetics({
+      mode: "autoAnimalGenotype",
+      phenotype: colour,
+      returnType: "genotypeOnly",
+      singleGenotype: "",
+      sireGenotype: "",
+      damGenotype: ""
+    });
+  } else if (species === "dog") {
+    if (typeof window.runDogGenetics !== "function") {
+      throw new Error("Dog genetics engine is not loaded yet.");
+    }
+
+    output = window.runDogGenetics({
+      mode: "genotypeFromPhenotype",
+      phenotype: colour,
+      returnType: "genotypeOnly",
+      gender: gender || "",
+      singleGenotype: "",
+      sireGenotype: "",
+      damGenotype: ""
+    });
+  } else if (species === "cat") {
+    if (typeof window.runCatGenetics !== "function") {
+      throw new Error("Cat genetics engine is not loaded yet.");
+    }
+
+    output = window.runCatGenetics({
+      mode: "genotypeFromPhenotype",
+      phenotype: colour,
+      returnType: "genotypeOnly",
+      gender: gender || "",
+      singleGenotype: "",
+      sireGenotype: "",
+      damGenotype: ""
+    });
+  } else {
+    throw new Error("Choose a valid species before auto-generating genotype.");
+  }
+
+  let genotype = String(output || "").trim();
+
+  // If dog/cat engines have not been given genotypeOnly mode yet, this keeps
+  // them working by extracting from their existing report output.
+  if (!looksLikeGenotype(genotype)) {
+    genotype = extractGenotypeFromEngineOutput(output);
+  }
+
+  genotype = cleanOneGenePerLocus(genotype, species);
+
+  if (!genotype) {
+    console.warn("Could not extract genotype from genetics output:", output);
+    throw new Error("A genotype could not be auto-generated from that colour. Please enter one manually or use the Genetics Lab.");
+  }
+
+  return genotype;
+}
+
+function cleanOneGenePerLocus(genotypeText, species) {
   const tokens = String(genotypeText || "")
+    .replace(/<[^>]*>/g, " ")
     .replace(/[,;]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .split(" ")
     .filter(Boolean);
 
-  const locusOrder = [
-    "Extension",
-    "Agouti",
-    "Cream",
-    "Pearl",
-    "Dun",
-    "Champagne",
-    "Silver",
-    "Mushroom",
-    "Flaxen",
-    "Sooty",
-    "Pangare",
-    "Grey",
-    "Roan",
-    "Tobiano",
-    "Frame",
-    "Splash",
-    "Sabino",
-    "Rabicano",
-    "Appaloosa",
-    "PATN1",
-    "PATN2"
+  if (!tokens.length) return "";
+
+  if (species !== "horse") {
+    // Dog/cat engines may intentionally use multiple loci with similar-looking
+    // symbols. For now, only simple exact duplicate cleanup is safe here.
+    return tokens.filter((token, index, arr) => arr.indexOf(token) === index).join(" ");
+  }
+
+  const order = [
+    "Extension", "Agouti", "Cream", "Pearl", "Dun", "Champagne", "Silver",
+    "Mushroom", "Flaxen", "Sooty", "Pangare", "Grey", "Roan", "Tobiano",
+    "Frame", "Splash", "Sabino", "Rabicano", "Appaloosa", "PATN1", "PATN2"
   ];
 
   const byLocus = {};
   const unknown = [];
 
-  function locusForGene(token) {
-    const clean = String(token || "").trim();
+  function normalize(token) {
+    const t = String(token || "").trim();
+    const flips = {
+      "e/E": "E/e", "a/A": "A/a", "g/G": "G/g",
+      "n/Cr": "Cr/n", "n/Prl": "Prl/n", "Prl/Cr": "Cr/Prl",
+      "n/D": "D/n", "n/Ch": "Ch/n", "n/Z": "Z/n",
+      "n/Rn": "Rn/n", "n/To": "To/n", "n/OLW": "OLW/n",
+      "n/Spl": "Spl/n", "n/Sb": "Sb/n", "n/Rb": "Rb/n",
+      "lp/Lp": "Lp/lp", "n/Lp": "Lp/n",
+      "patn1/PATN1": "PATN1/patn1", "n/PATN1": "PATN1/n",
+      "patn2/PATN2": "PATN2/patn2", "n/PATN2": "PATN2/n"
+    };
+    return flips[t] || t;
+  }
 
-    if (/^(E\/E|E\/e|e\/E|e\/e)$/.test(clean)) return "Extension";
-    if (/^(A\/A|A\/a|a\/A|a\/a)$/.test(clean)) return "Agouti";
-    if (/^(Cr\/Cr|Cr\/n|n\/Cr|Cr\/Prl|Prl\/Cr)$/.test(clean)) return "Cream";
-    if (/^(Prl\/Prl|Prl\/n|n\/Prl)$/.test(clean)) return "Pearl";
-    if (/^(D\/D|D\/nd1|nd1\/D|D\/nd2|nd2\/D|D\/n|n\/D|nd1\/nd1|nd1\/nd2|nd2\/nd1|nd1\/n|n\/nd1|nd2\/nd2|nd2\/n|n\/nd2)$/.test(clean)) return "Dun";
-    if (/^(Ch\/Ch|Ch\/n|n\/Ch)$/.test(clean)) return "Champagne";
-    if (/^(Z\/Z|Z\/n|n\/Z)$/.test(clean)) return "Silver";
-    if (/^(mu\/mu|Mu\/mu|mu\/Mu|Mu\/Mu)$/.test(clean)) return "Mushroom";
-    if (/^(F\/F|F\/f|f\/F|f\/f)$/.test(clean)) return "Flaxen";
-    if (/^(Sty\/Sty|Sty\/n|n\/Sty)$/.test(clean)) return "Sooty";
-    if (/^(P\/P|P\/n|n\/P)$/.test(clean)) return "Pangare";
-    if (/^(G\/G|G\/g|g\/G)$/.test(clean)) return "Grey";
-    if (/^(Rn\/Rn|Rn\/n|n\/Rn)$/.test(clean)) return "Roan";
-    if (/^(To\/To|To\/n|n\/To)$/.test(clean)) return "Tobiano";
-    if (/^(OLW\/OLW|OLW\/n|n\/OLW)$/.test(clean)) return "Frame";
-    if (/^(Spl\/Spl|Spl\/n|n\/Spl)$/.test(clean)) return "Splash";
-    if (/^(Sb\/Sb|Sb\/n|n\/Sb)$/.test(clean)) return "Sabino";
-    if (/^(Rb\/Rb|Rb\/n|n\/Rb)$/.test(clean)) return "Rabicano";
-    if (/^(Lp\/Lp|Lp\/lp|lp\/Lp|Lp\/n|n\/Lp)$/.test(clean)) return "Appaloosa";
-    if (/^(PATN1\/PATN1|PATN1\/patn1|patn1\/PATN1|PATN1\/n|n\/PATN1)$/.test(clean)) return "PATN1";
-    if (/^(PATN2\/PATN2|PATN2\/patn2|patn2\/PATN2|PATN2\/n|n\/PATN2)$/.test(clean)) return "PATN2";
-
+  function locus(token) {
+    if (/^(E\/E|E\/e|e\/e)$/.test(token)) return "Extension";
+    if (/^(A\/A|A\/a|a\/a)$/.test(token)) return "Agouti";
+    if (/^(Cr\/Cr|Cr\/n|Cr\/Prl)$/.test(token)) return "Cream";
+    if (/^(Prl\/Prl|Prl\/n)$/.test(token)) return "Pearl";
+    if (/^(D\/D|D\/nd1|D\/nd2|D\/n|nd1\/nd1|nd1\/nd2|nd2\/nd1|nd1\/n|nd2\/nd2|nd2\/n)$/.test(token)) return "Dun";
+    if (/^(Ch\/Ch|Ch\/n)$/.test(token)) return "Champagne";
+    if (/^(Z\/Z|Z\/n)$/.test(token)) return "Silver";
+    if (/^(mu\/mu|Mu\/mu|Mu\/Mu)$/.test(token)) return "Mushroom";
+    if (/^(F\/F|F\/f|f\/f)$/.test(token)) return "Flaxen";
+    if (/^(Sty\/Sty|Sty\/n)$/.test(token)) return "Sooty";
+    if (/^(P\/P|P\/n)$/.test(token)) return "Pangare";
+    if (/^(G\/G|G\/g|g\/g)$/.test(token)) return "Grey";
+    if (/^(Rn\/Rn|Rn\/n)$/.test(token)) return "Roan";
+    if (/^(To\/To|To\/n)$/.test(token)) return "Tobiano";
+    if (/^(OLW\/OLW|OLW\/n)$/.test(token)) return "Frame";
+    if (/^(Spl\/Spl|Spl\/n)$/.test(token)) return "Splash";
+    if (/^(Sb\/Sb|Sb\/n)$/.test(token)) return "Sabino";
+    if (/^(Rb\/Rb|Rb\/n)$/.test(token)) return "Rabicano";
+    if (/^(Lp\/Lp|Lp\/lp|Lp\/n)$/.test(token)) return "Appaloosa";
+    if (/^(PATN1\/PATN1|PATN1\/patn1|PATN1\/n)$/.test(token)) return "PATN1";
+    if (/^(PATN2\/PATN2|PATN2\/patn2|PATN2\/n)$/.test(token)) return "PATN2";
     return "";
   }
 
-  function normalizeGeneToken(token) {
-    if (token === "e/E") return "E/e";
-    if (token === "a/A") return "A/a";
-    if (token === "g/G") return "G/g";
-    if (token === "n/Cr") return "Cr/n";
-    if (token === "n/Prl") return "Prl/n";
-    if (token === "Prl/Cr") return "Cr/Prl";
-    if (token === "n/D") return "D/n";
-    if (token === "n/Ch") return "Ch/n";
-    if (token === "n/Z") return "Z/n";
-    if (token === "mu/Mu") return "Mu/mu";
-    if (token === "f/F") return "F/f";
-    if (token === "n/Sty") return "Sty/n";
-    if (token === "n/P") return "P/n";
-    if (token === "n/Rn") return "Rn/n";
-    if (token === "n/To") return "To/n";
-    if (token === "n/OLW") return "OLW/n";
-    if (token === "n/Spl") return "Spl/n";
-    if (token === "n/Sb") return "Sb/n";
-    if (token === "n/Rb") return "Rb/n";
-    if (token === "lp/Lp") return "Lp/lp";
-    if (token === "n/Lp") return "Lp/n";
-    if (token === "patn1/PATN1") return "PATN1/patn1";
-    if (token === "n/PATN1") return "PATN1/n";
-    if (token === "patn2/PATN2") return "PATN2/patn2";
-    if (token === "n/PATN2") return "PATN2/n";
-    return token;
-  }
-
-  tokens.forEach(token => {
-    const normalized = normalizeGeneToken(token);
-    const locus = locusForGene(normalized);
-
-    if (!locus) {
-      if (!unknown.includes(normalized)) unknown.push(normalized);
+  tokens.forEach(raw => {
+    const token = normalize(raw);
+    const loc = locus(token);
+    if (!loc) {
+      if (!unknown.includes(token)) unknown.push(token);
       return;
     }
-
-    /* Keep the first value chosen for each locus. This prevents outputs like
-       e/e A/A A/a Cr/Cr from saving both A/A and A/a. */
-    if (!byLocus[locus]) {
-      byLocus[locus] = normalized;
-    }
+    if (!byLocus[loc]) byLocus[loc] = token;
   });
 
   const cleaned = [];
-
-  locusOrder.forEach(locus => {
-    if (byLocus[locus]) cleaned.push(byLocus[locus]);
+  order.forEach(loc => {
+    if (byLocus[loc]) cleaned.push(byLocus[loc]);
   });
-
   unknown.forEach(token => {
     if (!cleaned.includes(token)) cleaned.push(token);
   });
@@ -800,653 +669,207 @@ function cleanAutoHorseGenotype(genotypeText) {
   return cleaned.join(" ");
 }
 
-/* =========================
-   PARSERS
-========================= */
+async function ensureGenotype() {
+  const existing = getValue("genotype");
+  if (existing) return existing;
 
-function parseHorseGenotype(genotypeText) {
-  const text = String(genotypeText || "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const species = getValue("species");
+  const colour = getValue("colour");
 
-  return {
-    Extension: findGenePair(text, ["E/E", "E/e", "e/E", "e/e"], "e/e"),
-    Agouti: findGenePair(text, ["A/A", "A/a", "a/A", "a/a"], "a/a"),
-    Cream: findHorseCreamGene(text),
+  if (!species || !colour) return "";
 
-    Dun: findGenePair(
-      text,
-      [
-        "D/D",
-        "D/nd1",
-        "nd1/D",
-        "D/nd2",
-        "nd2/D",
-        "D/n",
-        "n/D",
-        "nd1/nd1",
-        "nd1/nd2",
-        "nd2/nd1",
-        "nd1/n",
-        "n/nd1",
-        "nd2/nd2",
-        "nd2/n",
-        "n/nd2",
-        "n/n"
-      ],
-      "n/n"
-    ),
+  const button = document.getElementById("addAnimalBtn");
+  const oldText = button.textContent;
+  button.textContent = "Generating genotype...";
+  button.disabled = true;
 
-    Champagne: findGenePair(text, ["Ch/Ch", "Ch/n", "n/Ch", "n/n"], "n/n"),
-    Silver: findGenePair(text, ["Z/Z", "Z/n", "n/Z", "n/n"], "n/n"),
-    Pearl: findHorsePearlGene(text),
-    Mushroom: findGenePair(text, ["mu/mu", "Mu/mu", "mu/Mu", "Mu/Mu", "n/n"], "n/n"),
-
-    Flaxen: findGenePair(text, ["F/F", "F/f", "f/F", "f/f"], "F/F"),
-    Sooty: findGenePair(text, ["Sty/Sty", "Sty/n", "n/Sty", "n/n"], "n/n"),
-    Pangare: findGenePair(text, ["P/P", "P/n", "n/P", "n/n"], "n/n"),
-
-    Roan: findGenePair(text, ["Rn/Rn", "Rn/n", "n/Rn", "n/n"], "n/n"),
-    Grey: findGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
-
-    Tobiano: findGenePair(text, ["To/To", "To/n", "n/To", "n/n"], "n/n"),
-    Frame: findGenePair(text, ["OLW/OLW", "OLW/n", "n/OLW", "n/n"], "n/n"),
-    Splash: findGenePair(text, ["Spl/Spl", "Spl/n", "n/Spl", "n/n"], "n/n"),
-    Sabino: findGenePair(text, ["Sb/Sb", "Sb/n", "n/Sb", "n/n"], "n/n"),
-    Rabicano: findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
-
-    Appaloosa: findGenePair(
-      text,
-      ["Lp/Lp", "Lp/lp", "lp/Lp", "lp/lp", "Lp/n", "n/Lp", "n/n"],
-      "lp/lp"
-    ),
-
-    PATN1: findGenePair(
-      text,
-      ["PATN1/PATN1", "PATN1/patn1", "patn1/PATN1", "patn1/patn1", "PATN1/n", "n/PATN1", "n/n"],
-      "patn1/patn1"
-    ),
-
-    PATN2: findGenePair(
-      text,
-      ["PATN2/PATN2", "PATN2/patn2", "patn2/PATN2", "patn2/patn2", "PATN2/n", "n/PATN2", "n/n"],
-      "patn2/patn2"
-    )
-  };
+  try {
+    const gender = getValue("gender");
+    const generated = await generateGenotypeFromColour(species, colour, gender);
+    setValue("genotype", generated);
+    return generated;
+  } finally {
+    button.textContent = oldText;
+    button.disabled = false;
+  }
 }
 
-function parseHorsePhenotype(phenotypeText) {
-  return {
-    base: "",
-    modifiers: [],
-    patterns: []
-  };
-}
+async function fetchBreedHealthIssues(species, breed) {
+  const supabase = window.supabaseClient;
 
-function findHorseCreamGene(text) {
-  const tokens = String(text || "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ");
+  if (!supabase) return [];
 
-  for (const token of tokens) {
-    if (token === "Cr/Cr") return "Cr/Cr";
+  const { data, error } = await supabase
+    .from("breed_health_tests")
+    .select("*")
+    .ilike("species", species.toLowerCase())
+    .ilike("breed", `%${breed.toLowerCase()}%`);
 
-    if (
-      token === "Cr/n" ||
-      token === "n/Cr"
-    ) {
-      return "Cr/n";
-    }
-
-    if (
-      token === "Cr/Prl" ||
-      token === "Prl/Cr"
-    ) {
-      return "Cr/Prl";
-    }
+  if (error) {
+    console.error(error);
+    return [];
   }
 
-  return "n/n";
+  return (data || [])
+    .map(item => item.breed_issues)
+    .filter(Boolean);
 }
 
-function findHorsePearlGene(text) {
-  const tokens = String(text || "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ");
+function randomHealthStatus() {
+  const statuses = ["Affected", "Carrier", "Clear"];
+  return statuses[Math.floor(Math.random() * statuses.length)];
+}
 
-  for (const token of tokens) {
-    if (token === "Prl/Prl") return "Prl/Prl";
+function randomHealthResult() {
+  const roll = Math.random() * 100;
 
-    if (
-      token === "Prl/n" ||
-      token === "n/Prl"
-    ) {
-      return "Prl/n";
-    }
+  if (roll < 5) return "Poor";
+  if (roll < 45) return "Okay";
+  if (roll < 95) return "Good";
+  return "Excellent";
+}
 
-    if (
-      token === "Cr/Prl" ||
-      token === "Prl/Cr"
-    ) {
-      return "Cr/Prl";
-    }
+function shouldAutoRunHealth(species, originType) {
+  return (
+    originType === "Created" &&
+    (species === "dog" || species === "cat")
+  );
+}
+
+async function addAnimal() {
+  const supabase = window.supabaseClient;
+
+  if (!supabase) {
+    alert("Supabase not loaded");
+    return;
   }
 
-  return "n/n";
-}
-
-function findGenePair(text, options, fallback) {
-  const cleanText = String(text || "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const tokens = cleanText.split(" ");
-
-  for (const option of options) {
-    const compactOption = option.replace(/\//g, "");
-
-    for (const token of tokens) {
-      const compactToken = token.replace(/\//g, "");
-
-      if (
-        token === option ||
-        token === compactOption ||
-        compactToken === compactOption
-      ) {
-        if (option.startsWith("n/")) {
-          return option.split("/").reverse().join("/");
-        }
-
-        if (option === "lp/Lp") return "Lp/lp";
-        if (option === "patn1/PATN1") return "PATN1/patn1";
-        if (option === "patn2/PATN2") return "PATN2/patn2";
-
-        if (option === "e/E") return "E/e";
-        if (option === "a/A") return "A/a";
-        if (option === "g/G") return "G/g";
-
-        return option;
-      }
-    }
+  if (!validateRequiredFields()) {
+    return;
   }
 
-  return fallback;
-}
+  let genotype = "";
 
-/* =========================
-   BASE COLOUR LOGIC
-========================= */
-
-function getHorseBaseColour(parsed) {
-  if (parsed.Extension === "e/e") return "Chestnut";
-  if (parsed.Agouti === "a/a") return "Black";
-  return "Bay";
-}
-
-function getHorsePhenotype(parsed) {
-  if (parsed.Frame === "OLW/OLW") {
-    return "⚠ Homozygous Frame Overo (OLW/OLW) - Lethal White Syndrome / non-viable genotype";
+  try {
+    genotype = await ensureGenotype();
+  } catch (error) {
+    alert(error.message || error);
+    return;
   }
 
-  if (hasDominantGene(parsed.Grey, "G")) {
-    return "Grey";
+  if (!genotype) {
+    alert("Please enter a genotype, or enter a colour that the Genetics Lab can use to auto-generate one.");
+    return;
   }
 
-  return buildHorseVisibleColour(parsed);
-}
+  const name = getValue("name");
+  const normalized_name =
+    getValue("normalized_name") || normalizeName(name);
 
-function getHorseVisibleColourWithoutGrey(parsed) {
-  return buildHorseVisibleColour(parsed);
-}
+  const species = getValue("species");
+  const gender = getValue("gender");
+  const breed = getValue("breed");
+  const colour = getValue("colour");
+  const birthyear = getValue("birthyear") || null;
 
-function buildHorseVisibleColour(parsed) {
-  let colour = getHorseBaseColour(parsed);
+  const originType = getValue("originType");
+  const originDetails = getValue("originDetails");
 
-  colour = applyHorseFlaxen(colour, parsed);
+  const origins = originDetails
+    ? `${originType} • ${originDetails}`
+    : originType;
 
-  colour = applyHorseCream(colour, parsed);
-  colour = applyHorseDun(colour, parsed);
-  colour = applyHorseChampagne(colour, parsed);
-  colour = applyHorseSilver(colour, parsed);
-  colour = applyHorsePearl(colour, parsed);
-  colour = applyHorseMushroom(colour, parsed);
+  const owner = getValue("owner");
+  const breeder = getValue("breeder");
 
-  colour = applyHorseSooty(colour, parsed);
-  colour = applyHorsePangare(colour, parsed);
-  colour = applyHorseRoan(colour, parsed);
+  const sireInput = getValue("sire");
+  const damInput = getValue("dam");
 
-  colour = applyHorsePatterns(colour, parsed);
-  colour = applyHorseAppaloosa(colour, parsed);
+  const sire = isUUID(sireInput) ? sireInput : null;
+  const dam = isUUID(damInput) ? damInput : null;
 
-  return colour.trim();
-}
-
-/* =========================
-   MODIFIER LOGIC
-========================= */
-
-function applyHorseFlaxen(baseColour, parsed) {
-  if (parsed.Flaxen !== "f/f") return baseColour;
-
-  if (baseColour === "Chestnut") {
-    return "Flaxen Chestnut";
+  if (sireInput && !sire) {
+    alert("Sire must be a valid parent UUID from the animal profile page.");
+    return;
   }
 
-  return baseColour;
-}
-
-function applyHorseCream(baseColour, parsed) {
-  const cream = parsed.Cream;
-
-  if (
-    cream === "Cr/n" ||
-    cream === "Cr/Prl"
-  ) {
-    if (baseColour === "Chestnut") return "Palomino";
-    if (baseColour === "Flaxen Chestnut") return "Flaxen Palomino";
-    if (baseColour === "Bay") return "Buckskin";
-    if (baseColour === "Black") return "Smokey Black";
+  if (damInput && !dam) {
+    alert("Dam must be a valid parent UUID from the animal profile page.");
+    return;
   }
 
-  if (cream === "Cr/Cr") {
-    if (baseColour === "Chestnut") return "Cremello";
-    if (baseColour === "Flaxen Chestnut") return "Flaxen Cremello";
-    if (baseColour === "Bay") return "Perlino";
-    if (baseColour === "Black") return "Smokey Cream";
+  const bio = getValue("bio");
+
+  if (originType === "Bred") {
+    alert(
+      "Bred animal registration should eventually be handled automatically through the Breeding Center.\n\nFor now, you can still register this animal manually."
+    );
   }
 
-  return baseColour;
-}
+  const autoHealth = shouldAutoRunHealth(species, originType);
 
-function applyHorseDun(baseColour, parsed) {
-  const dun = parsed.Dun;
+  const health_hips = autoHealth ? randomHealthResult() : null;
+  const health_elbows = autoHealth ? randomHealthResult() : null;
+  const health_eyes = autoHealth ? randomHealthResult() : null;
+  const health_hearing = autoHealth ? randomHealthResult() : null;
 
-  if (
-    dun === "D/D" ||
-    dun === "D/nd1" ||
-    dun === "D/nd2" ||
-    dun === "D/n"
-  ) {
-    if (baseColour === "Chestnut") return "Red Dun";
-    if (baseColour === "Flaxen Chestnut") return "Flaxen Red Dun";
-    if (baseColour === "Bay") return "Bay Dun";
-    if (baseColour === "Black") return "Grullo";
+  const autoIssues = await fetchBreedHealthIssues(species, breed);
 
-    if (baseColour === "Palomino") return "Dunalino";
-    if (baseColour === "Flaxen Palomino") return "Flaxen Dunalino";
-    if (baseColour === "Buckskin") return "Dunskin";
-    if (baseColour === "Smokey Black") return "Smokey Grullo";
+  const breed_issues =
+    autoIssues.length
+      ? autoIssues
+          .map(issue => `${issue}: ${randomHealthStatus()}`)
+          .join(" • ")
+      : null;
 
-    if (baseColour === "Cremello") return "Cremello Dun";
-    if (baseColour === "Flaxen Cremello") return "Flaxen Cremello Dun";
-    if (baseColour === "Perlino") return "Perlino Dun";
-    if (baseColour === "Smokey Cream") return "Smokey Cream Dun";
+  const { error } = await supabase
+    .from("animals")
+    .insert([{
+      name,
+      normalized_name,
+      species,
+      gender,
+      breed,
+      colour,
+      birthyear,
+      origins,
+      genotype,
+      owner,
+      breeder,
+      bio,
+      sire,
+      dam,
+      health_eyes,
+      health_hips,
+      health_hearing,
+      health_elbows,
+      breed_issues
+    }]);
 
-    return baseColour + " Dun";
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return;
   }
 
-  if (
-    dun === "nd1/nd1" ||
-    dun === "nd1/nd2" ||
-    dun === "nd1/n"
-  ) {
-    return baseColour + " Primitive Markings";
+  alert("Animal added successfully!");
+  location.reload();
+}
+
+function bindAddAnimalButton() {
+  const button = document.getElementById("addAnimalBtn");
+
+  if (!button) {
+    console.error("Add Animal button was not found.");
+    return;
   }
 
-  return baseColour;
+  button.addEventListener("click", addAnimal);
 }
 
-function applyHorseChampagne(baseColour, parsed) {
-  if (!hasDominantGene(parsed.Champagne, "Ch")) return baseColour;
-
-  if (baseColour === "Chestnut") return "Gold Champagne";
-  if (baseColour === "Flaxen Chestnut") return "Flaxen Gold Champagne";
-  if (baseColour === "Bay") return "Amber Champagne";
-  if (baseColour === "Black") return "Classic Champagne";
-
-  if (baseColour === "Red Dun") return "Gold Dun Champagne";
-  if (baseColour === "Flaxen Red Dun") return "Flaxen Gold Dun Champagne";
-  if (baseColour === "Bay Dun") return "Amber Dun Champagne";
-  if (baseColour === "Grullo") return "Classic Dun Champagne";
-
-  if (baseColour === "Palomino") return "Gold Cream Champagne";
-  if (baseColour === "Flaxen Palomino") return "Flaxen Gold Cream Champagne";
-  if (baseColour === "Buckskin") return "Amber Cream Champagne";
-  if (baseColour === "Smokey Black") return "Classic Cream Champagne";
-
-  if (baseColour === "Dunalino") return "Gold Dun Champagne";
-  if (baseColour === "Flaxen Dunalino") return "Flaxen Gold Dun Champagne";
-  if (baseColour === "Dunskin") return "Amber Dun Champagne";
-  if (baseColour === "Smokey Grullo") return "Classic Dun Champagne";
-
-  return baseColour + " Champagne";
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bindAddAnimalButton);
+} else {
+  bindAddAnimalButton();
 }
-
-function applyHorseSilver(baseColour, parsed) {
-  if (!hasDominantGene(parsed.Silver, "Z")) return baseColour;
-
-  if (baseColour === "Chestnut" || baseColour.includes("Chestnut")) return baseColour;
-  if (baseColour.includes("Gold")) return baseColour;
-
-  if (baseColour === "Black") return "Silver Black";
-  if (baseColour === "Bay") return "Silver Bay";
-  if (baseColour === "Buckskin") return "Silver Buckskin";
-  if (baseColour === "Perlino") return "Silver Perlino";
-  if (baseColour === "Smokey Black") return "Silver Smokey Black";
-  if (baseColour === "Smokey Cream") return "Silver Smokey Cream";
-
-  if (baseColour === "Grullo" || baseColour === "Smokey Grullo") return "Silver Grullo";
-  if (baseColour === "Bay Dun") return "Silver Bay Dun";
-  if (baseColour === "Dunskin") return "Silver Dunskin";
-
-  if (baseColour === "Amber Champagne") return "Silver Amber Champagne";
-  if (baseColour === "Classic Champagne") return "Silver Classic Champagne";
-  if (baseColour === "Amber Dun Champagne") return "Silver Amber Dun Champagne";
-  if (baseColour === "Classic Dun Champagne") return "Silver Classic Dun Champagne";
-  if (baseColour === "Amber Cream Champagne") return "Silver Amber Cream Champagne";
-  if (baseColour === "Classic Cream Champagne") return "Silver Classic Cream Champagne";
-
-  return "Silver " + baseColour;
-}
-
-function applyHorsePearl(baseColour, parsed) {
-  const pearl = parsed.Pearl;
-
-  if (pearl === "Prl/Prl") {
-    if (baseColour === "Chestnut") return "Apricot";
-    if (baseColour === "Flaxen Chestnut") return "Flaxen Apricot";
-    if (baseColour === "Bay") return "Bay Pearl";
-    if (baseColour === "Black") return "Black Pearl";
-    if (baseColour === "Palomino") return "Palomino Pearl";
-    if (baseColour === "Buckskin") return "Buckskin Pearl";
-    if (baseColour === "Smokey Black") return "Smokey Black Pearl";
-
-    return baseColour + " Pearl";
-  }
-
-  if (pearl === "Cr/Prl") {
-    if (baseColour === "Chestnut") return "Cream Pearl";
-    if (baseColour === "Flaxen Chestnut") return "Flaxen Cream Pearl";
-    if (baseColour === "Bay") return "Buckskin Pearl";
-    if (baseColour === "Black") return "Smokey Black Pearl";
-    if (baseColour === "Palomino") return "Cream Pearl";
-    if (baseColour === "Buckskin") return "Buckskin Pearl";
-    if (baseColour === "Smokey Black") return "Smokey Black Pearl";
-
-    return baseColour + " Pearl";
-  }
-
-  return baseColour;
-}
-
-function applyHorseMushroom(baseColour, parsed) {
-  const mushroom = parsed.Mushroom;
-
-  if (
-    mushroom !== "mu/mu" &&
-    mushroom !== "Mu/mu" &&
-    mushroom !== "Mu/Mu"
-  ) {
-    return baseColour;
-  }
-
-  if (baseColour === "Chestnut") return "Mushroom";
-  if (baseColour === "Flaxen Chestnut") return "Flaxen Mushroom";
-  if (baseColour === "Palomino") return "Mushmello";
-
-  return baseColour;
-}
-
-function applyHorseSooty(baseColour, parsed) {
-  if (!hasDominantGene(parsed.Sooty, "Sty")) return baseColour;
-
-  return "Sooty " + baseColour;
-}
-
-function applyHorsePangare(baseColour, parsed) {
-  if (!hasDominantGene(parsed.Pangare, "P")) return baseColour;
-
-  return "Pangare " + baseColour;
-}
-
-function applyHorseRoan(baseColour, parsed) {
-  if (!hasDominantGene(parsed.Roan, "Rn")) return baseColour;
-
-  if (baseColour === "Chestnut") return "Red Roan";
-  if (baseColour === "Flaxen Chestnut") return "Flaxen Red Roan";
-  if (baseColour === "Bay") return "Bay Roan";
-  if (baseColour === "Black") return "Blue Roan";
-
-  return baseColour + " Roan";
-}
-
-/* =========================
-   WHITE / PATTERN LOGIC
-========================= */
-
-function applyHorsePatterns(colour, parsed) {
-  if (parsed.Frame === "OLW/OLW") {
-    return "⚠ Homozygous Frame Overo (OLW/OLW) - Lethal White Syndrome / non-viable genotype";
-  }
-
-  const patterns = [];
-  const score = calculateHorseWhiteScore(parsed);
-
-  const hasTobiano = hasDominantGene(parsed.Tobiano, "To");
-  const hasFrame = hasDominantGene(parsed.Frame, "OLW");
-
-  if (hasTobiano && hasFrame) {
-    patterns.push("Tovero");
-  } else {
-    if (hasTobiano) patterns.push("Tobiano");
-    if (hasFrame) patterns.push("Frame Overo");
-  }
-
-  if (hasDominantGene(parsed.Splash, "Spl")) {
-    patterns.push("Splash");
-  }
-
-  if (hasDominantGene(parsed.Sabino, "Sb")) {
-    patterns.push("Sabino");
-  }
-
-  if (hasDominantGene(parsed.Rabicano, "Rb")) {
-    patterns.push("Rabicano");
-  }
-
-  if (patterns.length > 0) {
-    return colour + " " + getHorseWhiteExpression(score) + " " + patterns.join(" ");
-  }
-
-  return colour;
-}
-
-function calculateHorseWhiteScore(parsed) {
-  let score = 0;
-
-  if (parsed.Tobiano === "To/To") score += 3;
-  else if (parsed.Tobiano === "To/n") score += 2;
-
-  if (parsed.Frame === "OLW/n") score += 1;
-
-  if (parsed.Splash === "Spl/Spl") score += 2;
-  else if (parsed.Splash === "Spl/n") score += 1;
-
-  if (parsed.Sabino === "Sb/Sb") score += 2;
-  else if (parsed.Sabino === "Sb/n") score += 1;
-
-  if (parsed.Rabicano === "Rb/Rb") score += 1;
-  else if (parsed.Rabicano === "Rb/n") score += 0.5;
-
-  return score;
-}
-
-function getHorseWhiteExpression(score) {
-  if (score <= 1) return "Minimal White";
-  if (score <= 3) return "Moderate White";
-  if (score <= 5) return "High White";
-  return "Maximum White";
-}
-
-function applyHorseAppaloosa(colour, parsed) {
-  const lp = parsed.Appaloosa;
-  const patn1 = parsed.PATN1;
-  const patn2 = parsed.PATN2;
-
-  const hasLp =
-    lp === "Lp/Lp" ||
-    lp === "Lp/lp";
-
-  const isLpLp = lp === "Lp/Lp";
-
-  const hasPatn1 =
-    patn1 === "PATN1/PATN1" ||
-    patn1 === "PATN1/patn1";
-
-  const hasPatn2 =
-    patn2 === "PATN2/PATN2" ||
-    patn2 === "PATN2/patn2";
-
-  if (!hasLp) return colour;
-
-  const appaloosaPatterns = [];
-
-  if (hasPatn1) {
-    appaloosaPatterns.push(isLpLp ? "Few Spot" : "Leopard");
-  }
-
-  if (hasPatn2) {
-    appaloosaPatterns.push(isLpLp ? "Snow Cap" : "Blanket");
-  }
-
-  if (appaloosaPatterns.length === 0) {
-    appaloosaPatterns.push("Varnish Roan");
-  }
-
-  return colour + " " + appaloosaPatterns.join(" ");
-}
-
-/* =========================
-   OUTPUT HELPERS
-========================= */
-
-function renderHorseResults(title, html) {
-  return `
-    <h4>${title}</h4>
-    ${html}
-  `;
-}
-
-/* =========================
-   GENERAL HELPERS
-========================= */
-
-function hasDominantGene(pair, gene) {
-  return String(pair || "")
-    .split("/")
-    .includes(gene);
-}
-
-function randomFrom(array) {
-  return array[
-    Math.floor(Math.random() * array.length)
-  ];
-}
-
-function sortHorseGenePair(alleles) {
-  return alleles
-    .sort((a, b) => {
-      if (a === "n" && b !== "n") return 1;
-      if (a !== "n" && b === "n") return -1;
-
-      const aUpper = a === a.toUpperCase();
-      const bUpper = b === b.toUpperCase();
-
-      if (aUpper && !bUpper) return -1;
-      if (!aUpper && bUpper) return 1;
-
-      return a.localeCompare(b);
-    })
-    .join("/");
-}
-
-function horseOutcomeRow(label, sirePair, damPair) {
-  const outcomes = calculateHorseGeneOutcomes(sirePair, damPair);
-
-  return `
-    <tr>
-      <td>${label}</td>
-      <td>${outcomes}</td>
-    </tr>
-  `;
-}
-
-function calculateHorseGeneOutcomes(sirePair, damPair) {
-  const sireAlleles = String(sirePair || "n/n").split("/");
-  const damAlleles = String(damPair || "n/n").split("/");
-
-  const counts = {};
-
-  for (const sireAllele of sireAlleles) {
-    for (const damAllele of damAlleles) {
-      const pair = sortHorseGenePair([sireAllele, damAllele]);
-      counts[pair] = (counts[pair] || 0) + 1;
-    }
-  }
-
-  return Object.entries(counts)
-    .map(([pair, count]) => {
-      const percent = Math.round((count / 4) * 100);
-      return `${pair}: ${percent}%`;
-    })
-    .join("<br>");
-}
-
-
-/* =========================
-   HORSE GENE SUMMARY TABLE
-========================= */
-
-/*
-| Gene / Locus | Code | What It Does |
-|---|---|---|
-| Extension | E/e | Controls black pigment. E/- allows black pigment; e/e creates red/chestnut base. |
-| Agouti | A/a | Controls black pigment placement. A/- makes bay on E/- horses; a/a makes black. Hidden on chestnut. |
-| Cream | Cr | Incomplete dominant dilution. Cr/n makes palomino, buckskin, or smokey black. Cr/Cr makes cremello, perlino, or smokey cream. |
-| Pearl | Prl | Recessive dilution. Prl/Prl creates pearl/apricot colours; Cr/Prl creates cream-pearl colours. |
-| Dun | D, nd1, nd2 | D/- creates dun dilution and primitive markings. nd1 can show primitive markings without full dun dilution. |
-| Champagne | Ch | Dominant dilution. Creates gold, amber, classic, cream champagne, and dun champagne colours. |
-| Silver | Z | Dilutes black pigment only. Affects black/bay-based horses; hidden on chestnut. |
-| Mushroom | mu | Recessive red-based dilution. Creates mushroom and mushmello. |
-| Flaxen | f | Recessive modifier that lightens mane/tail on chestnut-based horses. |
-| Sooty | Sty | Darkening modifier. Adds sooty shading to the visible colour. |
-| Pangare | P | Light-point modifier. Adds pangare/mealy shading. |
-| Grey | G | Dominant progressive greying. In this engine, G/- displays simply as Grey. |
-| Roan | Rn | Dominant roaning. Creates red roan, bay roan, blue roan, etc. |
-| Tobiano | To | Dominant white pattern. Adds to white-expression score; To/To scores higher than To/n. |
-| Frame Overo | OLW | Dominant frame pattern. OLW/n displays Frame Overo; OLW/OLW returns lethal white warning. |
-| Splash | Spl | Dominant white pattern. Spl/Spl scores higher than Spl/n. |
-| Sabino | Sb | Dominant white pattern. Sb/Sb scores higher than Sb/n. |
-| Rabicano | Rb | Roaning/white pattern modifier. Adds a smaller amount to white-expression score. |
-| Appaloosa / Leopard Complex | Lp | Required for Appaloosa patterning. Lp with no PATN displays Varnish Roan. |
-| PATN1 | PATN1 | Appaloosa modifier. With Lp/lp gives Leopard; with Lp/Lp gives Few Spot. |
-| PATN2 | PATN2 | Appaloosa modifier. With Lp/lp gives Blanket; with Lp/Lp gives Snow Cap. |
-|
-| White Expression Score | — | Tobiano, Frame, Splash, Sabino, and Rabicano are scored together as Minimal, Moderate, High, or Maximum White while keeping pattern names visible. |
-*/
-
-/* =========================
-   EXPORTS
-========================= */
-
-window.runHorsePredictor = runHorsePredictor;
-window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
-window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
-window.runHorseGenetics = runHorseGenetics;
-window.buildAutoHorseGenotype = buildAutoHorseGenotype;
-window.cleanAutoHorseGenotype = cleanAutoHorseGenotype;
-window.parseHorseGenotype = parseHorseGenotype;
-window.getHorsePhenotype = getHorsePhenotype;
-window.applyHorsePatterns = applyHorsePatterns;
+</script>
