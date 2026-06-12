@@ -1,4 +1,4 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 17 - OVERO NOTE FIX */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 18 - AUTO ANIMAL GENOTYPE MODE */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -10,6 +10,7 @@ function runHorseGenetics(inputs) {
   if (mode === "predictor") return runHorsePredictor(inputs);
   if (mode === "phenotypeFromGenotype") return runHorsePhenotypeCalculator(inputs);
   if (mode === "genotypeFromPhenotype") return runHorseGenotypeBuilder(inputs);
+  if (mode === "autoAnimalGenotype") return buildAutoHorseGenotype(inputs.phenotype);
 
   return "Invalid horse genetics mode.";
 }
@@ -564,6 +565,108 @@ function runHorseGenotypeBuilder(inputs) {
       <p><b>Note:</b> These are possible genotype examples, not the only valid combinations.</p>
     `
   );
+}
+
+
+function buildAutoHorseGenotype(phenotypeInput) {
+  const phenotype = String(phenotypeInput || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[–—]/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!phenotype) return "";
+
+  function has(phrase) {
+    return phenotype.includes(String(phrase || "").toLowerCase());
+  }
+
+  const parts = [];
+
+  function add(gene) {
+    if (gene && !parts.includes(gene)) parts.push(gene);
+  }
+
+  /* Named cream / double-cream colours must be checked before base colours. */
+  if (has("cremello")) {
+    add("e/e"); add("A/A"); add("Cr/Cr");
+  } else if (has("perlino")) {
+    add("E/E"); add("A/A"); add("Cr/Cr");
+  } else if (has("smokey cream") || has("smoky cream")) {
+    add("E/E"); add("a/a"); add("Cr/Cr");
+  } else if (has("dunalino")) {
+    add("e/e"); add("A/A"); add("Cr/n"); add("D/n");
+  } else if (has("dunskin") || has("dun skin")) {
+    add("E/E"); add("A/A"); add("Cr/n"); add("D/n");
+  } else if (has("smokey grullo") || has("smoky grullo")) {
+    add("E/E"); add("a/a"); add("Cr/n"); add("D/n");
+  } else if (has("palomino")) {
+    add("e/e"); add("A/A"); add("Cr/n");
+  } else if (has("buckskin")) {
+    add("E/E"); add("A/A"); add("Cr/n");
+  } else if (has("smokey black") || has("smoky black")) {
+    add("E/E"); add("a/a"); add("Cr/n");
+  } else if (has("red dun")) {
+    add("e/e"); add("A/A"); add("D/n");
+  } else if (has("bay dun")) {
+    add("E/E"); add("A/A"); add("D/n");
+  } else if (has("grullo") || has("grulla")) {
+    add("E/E"); add("a/a"); add("D/n");
+  } else if (has("silver black")) {
+    add("E/E"); add("a/a"); add("Z/n");
+  } else if (has("silver bay")) {
+    add("E/E"); add("A/A"); add("Z/n");
+  } else if (has("classic champagne")) {
+    add("E/E"); add("a/a"); add("Ch/n");
+  } else if (has("amber champagne")) {
+    add("E/E"); add("A/A"); add("Ch/n");
+  } else if (has("gold champagne")) {
+    add("e/e"); add("A/A"); add("Ch/n");
+  } else if (has("apricot")) {
+    add("e/e"); add("A/A"); add("Prl/Prl");
+  } else if (has("mushmello")) {
+    add("e/e"); add("A/A"); add("Cr/n"); add("mu/mu");
+  } else if (has("mushroom")) {
+    add("e/e"); add("A/A"); add("mu/mu");
+  } else if (has("chestnut") || has("sorrel") || has("red")) {
+    add("e/e"); add("A/A");
+  } else if (has("bay") || has("brown")) {
+    add("E/E"); add("A/A");
+  } else if (has("black")) {
+    add("E/E"); add("a/a");
+  }
+
+  if (!parts.length) return "";
+
+  /* Add extra modifiers/patterns if they appear in the colour name and are not already present. */
+  if (has("cream") && !parts.some(g => g.includes("Cr/"))) add("Cr/n");
+  if (has("champagne") && !parts.some(g => g.includes("Ch/"))) add("Ch/n");
+  if ((has("dun") || has("grullo") || has("grulla")) && !parts.some(g => g.includes("D/"))) add("D/n");
+  if (has("silver") && !parts.some(g => g.includes("Z/"))) add("Z/n");
+  if ((has("grey") || has("gray")) && !parts.some(g => g.includes("G/"))) add("G/g");
+  if (has("roan") && !parts.some(g => g.includes("Rn/"))) add("Rn/n");
+  if (has("tobiano") && !parts.some(g => g.includes("To/"))) add("To/n");
+  if ((has("frame") || has("overo")) && !parts.some(g => g.includes("OLW/"))) add("OLW/n");
+  if (has("splash") && !parts.some(g => g.includes("Spl/"))) add("Spl/n");
+  if (has("sabino") && !parts.some(g => g.includes("Sb/"))) add("Sb/n");
+  if (has("rabicano") && !parts.some(g => g.includes("Rb/"))) add("Rb/n");
+
+  if (has("few spot")) {
+    add("Lp/Lp"); add("PATN1/patn1");
+  } else if (has("leopard")) {
+    add("Lp/lp"); add("PATN1/patn1");
+  } else if (has("snow cap")) {
+    add("Lp/Lp"); add("PATN2/patn2");
+  } else if (has("blanket")) {
+    add("Lp/lp"); add("PATN2/patn2");
+  } else if (has("varnish") || has("appaloosa")) {
+    add("Lp/lp");
+  }
+
+  return parts.join(" ");
 }
 
 /* =========================
@@ -1211,6 +1314,7 @@ window.runHorsePredictor = runHorsePredictor;
 window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
 window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
 window.runHorseGenetics = runHorseGenetics;
+window.buildAutoHorseGenotype = buildAutoHorseGenotype;
 window.parseHorseGenotype = parseHorseGenotype;
 window.getHorsePhenotype = getHorsePhenotype;
 window.applyHorsePatterns = applyHorsePatterns;
