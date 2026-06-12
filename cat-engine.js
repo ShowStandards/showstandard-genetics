@@ -3,7 +3,7 @@
 ========================= */
 
 console.log("CAT ENGINE VERSION: FINAL CAT ORDER NORMALIZER + LYNX BUILDER FIX 2026-06-09");
-window.__CAT_ENGINE_VERSION = "FINAL CAT ORDER NORMALIZER + LYNX BUILDER FIX 2026-06-09";
+window.__CAT_ENGINE_VERSION = "AUTO ANIMAL GENOTYPE + FINAL CAT ORDER NORMALIZER 2026-06-12";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -12,6 +12,7 @@ function runCatGenetics(inputs) {
   if (mode === "roll") return runCatRoll(inputs);
   if (mode === "phenotypeFromGenotype") return runCatPhenotypeCalculator(inputs);
   if (mode === "genotypeFromPhenotype") return runCatGenotypeBuilder(inputs);
+  if (mode === "autoAnimalGenotype") return buildAutoCatGenotype(inputs.phenotype, inputs.gender);
 
   return "Invalid cat genetics mode.";
 }
@@ -815,6 +816,245 @@ function runCatGenotypeBuilder(inputs) {
   suggestions.push("No simple genotype match found yet.");
   return renderBuilder();
 }
+
+/* =========================
+   AUTO ANIMAL GENOTYPE MODE
+   Returns one clean genotype string for Add Animal.
+   This does not affect the Genetics Lab report modes.
+========================= */
+
+function buildAutoCatGenotype(phenotypeInput, genderInput) {
+  const phenotype = String(phenotypeInput || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[–—]/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!phenotype) return "";
+
+  const gender = String(genderInput || "").toLowerCase();
+  const isMale = gender.includes("male") && !gender.includes("female");
+
+  function has(phrase) {
+    return phenotype.includes(String(phrase || "").toLowerCase());
+  }
+
+  const wantsBlueCream = has("blue cream") || has("bluecream");
+  const wantsCalico = has("calico");
+  const wantsTortie = has("tortie") || wantsBlueCream || wantsCalico;
+  const wantsCameo = has("cameo");
+  const wantsSmoke = has("smoke");
+  const wantsSilver = has("silver");
+  const wantsBlue = has("blue") && !wantsBlueCream && !has("blue eyed");
+  const wantsCream = has("cream") && !wantsBlueCream;
+  const wantsRed = has("red") || has("orange") || wantsCameo;
+  const wantsChocolate = has("chocolate");
+  const wantsLilac = has("lilac");
+  const wantsCinnamon = has("cinnamon");
+  const wantsFawn = has("fawn");
+  const wantsCaramel = has("caramel") || has("taupe");
+  const wantsApricot = has("apricot");
+  const wantsLynx = has("lynx");
+  const wantsTabby = has("tabby") || has("classic") || has("mackerel") || has("spotted") || has("ticked") || wantsLynx || wantsSilver;
+  const wantsClassic = has("classic");
+  const wantsSpotted = has("spotted");
+  const wantsTicked = has("ticked");
+  const wantsBurmese = has("burmese");
+  const wantsPoint = has("siamese") || has("point");
+  const wantsMink = has("mink");
+  const wantsBlueEyedAlbino = has("blue eyed albino");
+  const wantsRedEyedAlbino = has("red eyed albino");
+  const wantsWhite = has("white") && !wantsBlueEyedAlbino && !wantsRedEyedAlbino;
+  const wantsPolydactyl = has("polydactyl");
+  const wantsAmber = has("amber");
+  const wantsSunshine = has("sunshine") && !has("extreme sunshine");
+  const wantsExtremeSunshine = has("extreme sunshine");
+  const wantsCharcoal = has("charcoal");
+  const wantsShaded = has("shaded");
+  const wantsRufoused = has("rufoused");
+  const wantsGlitter = has("glitter");
+  const wantsKarpati = has("karpati");
+  const wantsLonghair = has("longhair") || has("long hair") || has("long haired");
+  const wantsShorthair = has("shorthair") || has("short hair") || has("short haired");
+  const wantsRex = has("rex");
+  const wantsHairless = has("hairless") || has("sphynx");
+
+  const genes = [];
+
+  function setGene(locus, value) {
+    const prefixes = {
+      Orange: /^(O|o)\//,
+      Agouti: /^(A|a)\//,
+      Brown: /^(B|b|bl)\//,
+      Dilute: /^(D|d)\//,
+      DiluteModifier: /^(Dm|dm)\//,
+      White: /^(W|w)\//,
+      WhiteSpotting: /^(S|s)\//,
+      Silver: /^(I|i)\//,
+      Colourpoint: /^(C|cb|cs|ca|c)\//,
+      Tabby: /^(Mc|mc)\//,
+      Spotted: /^(Sp|sp)\//,
+      Ticked: /^(Ta|ta)\//,
+      Polydactyl: /^(Pd|pd)\//,
+      Amber: /^(Amb|n)\//,
+      Sunshine: /^(Su|n)\//,
+      ExtremeSunshine: /^(Es|n)\//,
+      Charcoal: /^(Ch|n)\//,
+      Wideband: /^(Wb|n)\//,
+      Rufousing: /^(Rf|n)\//,
+      Glitter: /^(Gl|n)\//,
+      Karpati: /^(Kp|n)\//,
+      HairLength: /^(L|l)\//,
+      Rex: /^(Rx|rx)\//,
+      Hairless: /^(Hr|hr)\//
+    };
+
+    const re = prefixes[locus];
+    if (!re || !value) return;
+
+    for (let i = genes.length - 1; i >= 0; i--) {
+      if (re.test(genes[i])) genes.splice(i, 1);
+    }
+
+    genes.push(value);
+  }
+
+  function orangeGene(redBased) {
+    if (wantsTortie || wantsCalico || wantsBlueCream) return "O/o";
+    if (redBased) return isMale ? "O/Y" : "O/O";
+    return isMale ? "o/Y" : "o/o";
+  }
+
+  // Base colour.
+  if (wantsWhite) {
+    setGene("White", "W/w");
+  }
+
+  if (wantsBlueCream || (wantsTortie && wantsCream)) {
+    setGene("Orange", "O/o");
+    setGene("Brown", "B/B");
+    setGene("Dilute", "d/d");
+  } else if (wantsTortie) {
+    setGene("Orange", "O/o");
+    setGene("Brown", wantsChocolate ? "b/b" : wantsCinnamon ? "bl/bl" : "B/B");
+    setGene("Dilute", wantsBlue || wantsLilac || wantsFawn ? "d/d" : "D/D");
+  } else if (wantsCream) {
+    setGene("Orange", orangeGene(true));
+    setGene("Brown", "B/B");
+    setGene("Dilute", "d/d");
+  } else if (wantsRed || wantsCameo) {
+    setGene("Orange", orangeGene(true));
+    setGene("Brown", "B/B");
+    setGene("Dilute", "D/D");
+  } else if (wantsLilac) {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "b/b");
+    setGene("Dilute", "d/d");
+  } else if (wantsFawn) {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "bl/bl");
+    setGene("Dilute", "d/d");
+  } else if (wantsChocolate) {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "b/b");
+    setGene("Dilute", "D/D");
+  } else if (wantsCinnamon) {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "bl/bl");
+    setGene("Dilute", "D/D");
+  } else if (wantsBlue) {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "B/B");
+    setGene("Dilute", "d/d");
+  } else {
+    setGene("Orange", orangeGene(false));
+    setGene("Brown", "B/B");
+    setGene("Dilute", "D/D");
+  }
+
+  // Pattern and modifier overlays.
+  setGene("Agouti", wantsTabby || wantsLynx || wantsSilver ? "A/a" : "a/a");
+
+  if (wantsCaramel || wantsApricot) {
+    setGene("Dilute", "d/d");
+    setGene("DiluteModifier", "Dm/dm");
+  }
+
+  if (wantsSmoke || wantsSilver || wantsCameo) setGene("Silver", "I/i");
+  if (wantsCalico || has("bicolour") || has("bicolor") || has("with white") || has("and white")) setGene("WhiteSpotting", "S/s");
+  if (has("high white")) setGene("WhiteSpotting", "S/S");
+
+  if (wantsClassic) setGene("Tabby", "mc/mc");
+  else if (wantsTabby || wantsLynx) setGene("Tabby", "Mc/mc");
+
+  if (wantsSpotted) setGene("Spotted", "Sp/sp");
+  if (wantsTicked) setGene("Ticked", "Ta/ta");
+
+  if (wantsBurmese) setGene("Colourpoint", "cb/cb");
+  if (wantsPoint || wantsLynx) setGene("Colourpoint", "cs/cs");
+  if (wantsMink) setGene("Colourpoint", "cb/cs");
+  if (wantsBlueEyedAlbino) setGene("Colourpoint", "ca/ca");
+  if (wantsRedEyedAlbino) setGene("Colourpoint", "c/c");
+
+  if (wantsPolydactyl) setGene("Polydactyl", "Pd/pd");
+  if (wantsAmber) setGene("Amber", "Amb/n");
+  if (wantsSunshine) setGene("Sunshine", "Su/n");
+  if (wantsExtremeSunshine) setGene("ExtremeSunshine", "Es/n");
+  if (wantsCharcoal) setGene("Charcoal", "Ch/n");
+  if (wantsShaded) setGene("Wideband", "Wb/n");
+  if (wantsRufoused) setGene("Rufousing", "Rf/n");
+  if (wantsGlitter) setGene("Glitter", "Gl/n");
+  if (wantsKarpati) setGene("Karpati", "Kp/n");
+  if (wantsLonghair) setGene("HairLength", "l/l");
+  if (wantsShorthair) setGene("HairLength", "L/l");
+  if (wantsRex) setGene("Rex", "Rx/rx");
+  if (wantsHairless) setGene("Hairless", "Hr/hr");
+
+  return cleanAutoCatGenotype(genes.join(" "));
+}
+
+function cleanAutoCatGenotype(genotype) {
+  const order = [
+    /^(O|o)\//,
+    /^(A|a)\//,
+    /^(B|b|bl)\//,
+    /^(D|d)\//,
+    /^(Dm|dm)\//,
+    /^(W|w)\//,
+    /^(S|s)\//,
+    /^(I|i)\//,
+    /^(C|cb|cs|ca|c)\//,
+    /^(Mc|mc)\//,
+    /^(Sp|sp)\//,
+    /^(Ta|ta)\//,
+    /^(Pd|pd)\//,
+    /^(Amb|n)\//,
+    /^(Su|n)\//,
+    /^(Es|n)\//,
+    /^(Ch|n)\//,
+    /^(Wb|n)\//,
+    /^(Rf|n)\//,
+    /^(Gl|n)\//,
+    /^(Kp|n)\//,
+    /^(L|l)\//,
+    /^(Rx|rx)\//,
+    /^(Hr|hr)\//
+  ];
+
+  const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
+  const kept = [];
+
+  for (const re of order) {
+    const found = tokens.find(token => re.test(token));
+    if (found && !kept.includes(found)) kept.push(found);
+  }
+
+  return kept.join(" ");
+}
+
 /* =========================
    PARSERS
 ========================= */
@@ -1901,6 +2141,7 @@ window.runCatPredictor = runCatPredictor;
 window.runCatRoll = runCatRoll;
 window.runCatPhenotypeCalculator = runCatPhenotypeCalculator;
 window.runCatGenotypeBuilder = runCatGenotypeBuilder;
+window.buildAutoCatGenotype = buildAutoCatGenotype;
 window.runCatGenetics = runCatGenetics;
 
 window.applyCatPointModifier = applyCatPointModifier;
