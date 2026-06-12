@@ -12,6 +12,7 @@ function runDogGenetics(inputs) {
   if (mode === "roll") return runDogRoll(inputs);
   if (mode === "phenotypeFromGenotype") return runDogPhenotypeCalculator(inputs);
   if (mode === "genotypeFromPhenotype") return runDogGenotypeBuilder(inputs);
+  if (mode === "autoAnimalGenotype") return buildAutoDogGenotype(inputs.phenotype);
   if (mode === "geneIntroTable") return renderDogGeneIntroTable();
 
   return "Invalid dog genetics mode.";
@@ -522,6 +523,266 @@ function runDogGenotypeBuilder(inputs) {
   );
 }
 
+
+
+/* =========================
+   AUTO ANIMAL GENOTYPE MODE
+   Returns one clean genotype string for Add Animal.
+   This does not affect the Genetics Lab report modes.
+========================= */
+
+function buildAutoDogGenotype(phenotypeInput) {
+  const phenotype = String(phenotypeInput || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[–—]/g, " ")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!phenotype) return "";
+
+  function has(phrase) {
+    return phenotype.includes(String(phrase || "").toLowerCase());
+  }
+
+  const wantsMask = has("mask") || has("masked");
+  const wantsTanPoint = has("tan") || has("tricolor") || has("tricolour") || has("tri colour") || has("tri color");
+  const wantsBlackAndTan = has("black and tan") || has("black tan") || has("tan point");
+  const wantsChocolate = has("chocolate") || has("liver") || has("brown");
+  const wantsCocoa = has("cocoa");
+  const wantsBlueMerle = has("blue merle") || has("blue tricolor merle") || has("blue tricolour merle");
+  const wantsRedMerle = has("red merle") || has("liver merle") || has("chocolate merle") || has("red tricolor merle") || has("red tricolour merle");
+  const wantsSlateMerle = has("slate merle") || has("slated merle");
+  const wantsLilacMerle = has("lilac merle") || has("isabella merle");
+  const wantsGenericMerle = has("merle") && !wantsBlueMerle && !wantsRedMerle && !wantsSlateMerle && !wantsLilacMerle;
+  const wantsHarlequin = has("harlequin");
+  const wantsBlue = has("blue") && !wantsBlueMerle && !wantsSlateMerle && !has("blue fawn") && !has("blue sable") && !has("blue roan") && !has("blue belton");
+  const wantsLilac = has("lilac") || has("isabella");
+  const wantsCream = has("cream") || has("yellow");
+  const wantsSilver = has("silver") && !has("silver sable") && !has("silver black and tan") && !has("silver black tan");
+  const wantsRed = has("red") || has("gold") || has("golden");
+  const wantsSable = has("sable") && !has("wolf sable") && !has("silver sable") && !has("cocker sable");
+  const wantsWolfSable = has("wolf sable");
+  const wantsFawn = has("fawn");
+  const wantsBlueFawn = has("blue fawn");
+  const wantsBrindle = has("brindle");
+  const wantsDomino = has("domino") && !has("northern domino");
+  const wantsNorthernDomino = has("northern domino");
+  const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
+  const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
+
+  const genes = [];
+
+  function setGene(locus, value) {
+    const prefixes = {
+      Extension: /^(Em|Eg|Eh|Ea|E|e)\//,
+      K: /^(K|kbr|ky)\//,
+      Agouti: /^(Ay|aw|at|asa|a)\//,
+      Brown: /^(B|b)\//,
+      Cocoa: /^(Co|co)\//,
+      Dilute: /^(D|d)\//,
+      Merle: /^(M|m)\//,
+      WhiteSpotting: /^(S|sp|si|sw)\//,
+      Ticking: /^(T|t)\//,
+      Roan: /^(R|r)\//,
+      Harlequin: /^(H|h)\//,
+      Intensity: /^(I|i)\//,
+      Greying: /^(G|g)\//,
+      LongCoat: /^(L|l)\//,
+      Furnishings: /^(F|n)\//,
+      Curl: /^(Cu|n)\//
+    };
+
+    const re = prefixes[locus];
+    if (!re || !value) return;
+
+    for (let i = genes.length - 1; i >= 0; i--) {
+      if (re.test(genes[i])) genes.splice(i, 1);
+    }
+
+    genes.push(value);
+  }
+
+  function addGene(locus, value) {
+    if (!value) return;
+    setGene(locus, value);
+  }
+
+  // Base colour first, using the same naming assumptions as the visible engine.
+  if (wantsWhite) {
+    addGene("Extension", "e/e");
+    addGene("K", "K/ky");
+    addGene("WhiteSpotting", "sw/sw");
+    addGene("Intensity", "i/i");
+  } else if (wantsBlueMerle) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Brown", "B/B");
+    addGene("Dilute", "D/D");
+    addGene("Merle", "M/m");
+  } else if (wantsRedMerle) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Brown", "b/b");
+    addGene("Dilute", "D/D");
+    addGene("Merle", "M/m");
+  } else if (wantsSlateMerle) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Brown", "B/B");
+    addGene("Dilute", "d/d");
+    addGene("Merle", "M/m");
+  } else if (wantsLilacMerle) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Brown", "b/b");
+    addGene("Dilute", "d/d");
+    addGene("Merle", "M/m");
+  } else if (wantsGenericMerle) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
+    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : "D/D");
+    addGene("Merle", has("double") ? "M/M" : "M/m");
+  } else if (wantsCream || wantsSilver || (wantsRed && !wantsChocolate)) {
+    addGene("Extension", "e/e");
+    addGene("K", "K/ky");
+    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
+    addGene("Dilute", wantsLilac ? "d/d" : "D/D");
+    addGene("Intensity", wantsSilver ? "i/i" : wantsCream ? "I/i" : "I/I");
+  } else if (wantsDomino) {
+    addGene("Extension", "Eg/e");
+    addGene("K", "ky/ky");
+    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? "at/a" : "aw/a");
+    addGene("Intensity", "I/I");
+  } else if (wantsNorthernDomino) {
+    addGene("Extension", "Ea/e");
+    addGene("K", "ky/ky");
+    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? "at/a" : "aw/a");
+    addGene("Intensity", "I/I");
+  } else if (wantsCockerSable) {
+    addGene("Extension", "Eh/e");
+    addGene("K", "ky/ky");
+    addGene("Agouti", wantsTanPoint ? "at/a" : "Ay/a");
+    addGene("Intensity", "I/I");
+  } else if (wantsBlueFawn) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "ky/ky");
+    addGene("Agouti", "Ay/a");
+    addGene("Dilute", "d/d");
+    addGene("Intensity", "I/i");
+  } else if (wantsSable || wantsFawn) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+    addGene("Agouti", "Ay/a");
+    addGene("Intensity", wantsFawn ? "I/i" : "I/I");
+  } else if (wantsWolfSable) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+    addGene("Agouti", "aw/a");
+  } else if (wantsTanPoint || wantsBlackAndTan) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+    addGene("Agouti", "at/a");
+    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
+    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : "D/D");
+  } else if (wantsChocolate) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "K/ky");
+    addGene("Agouti", "a/a");
+    addGene("Brown", "b/b");
+    addGene("Dilute", "D/D");
+  } else if (wantsCocoa) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "K/ky");
+    addGene("Agouti", "a/a");
+    addGene("Cocoa", "co/co");
+  } else if (wantsLilac) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "K/ky");
+    addGene("Agouti", "a/a");
+    addGene("Brown", "b/b");
+    addGene("Dilute", "d/d");
+  } else if (wantsBlue) {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "K/ky");
+    addGene("Agouti", "a/a");
+    addGene("Brown", "B/B");
+    addGene("Dilute", "d/d");
+  } else {
+    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("K", "K/ky");
+    addGene("Agouti", "a/a");
+    addGene("Brown", "B/B");
+    addGene("Dilute", "D/D");
+  }
+
+  // Pattern / modifier overlays.
+  if (wantsBrindle && !genes.some(g => /^K\//.test(g) || /^kbr\//.test(g) || /^ky\//.test(g))) {
+    addGene("K", "kbr/ky");
+  } else if (wantsBrindle) {
+    addGene("K", "kbr/ky");
+  }
+
+  if (wantsHarlequin) {
+    addGene("Merle", "M/m");
+    addGene("Harlequin", "H/h");
+  }
+
+  if (has("piebald")) addGene("WhiteSpotting", has("heavy") ? "sp/sw" : "sp/sp");
+  else if (has("extreme white")) addGene("WhiteSpotting", "sw/sw");
+  else if (has("high irish")) addGene("WhiteSpotting", "si/sw");
+  else if (has("irish")) addGene("WhiteSpotting", "si/si");
+  else if (has("with white") || has("and white") || has("white markings") || has("tricolor") || has("tricolour")) addGene("WhiteSpotting", "si/si");
+
+  if (has("ticked") || has("ticking") || has("belton")) addGene("Ticking", "T/t");
+  if (has("roan") || has("belton")) addGene("Roan", "R/r");
+  if (has("faded") || has("grey") || has("gray")) addGene("Greying", "G/g");
+  if (has("long coat") || has("longcoat") || has("long coated")) addGene("LongCoat", "l/l");
+  if (has("furnished") || has("furnishings")) addGene("Furnishings", "F/n");
+  if (has("curly") || has("curl")) addGene("Curl", "Cu/n");
+
+  return cleanAutoDogGenotype(genes.join(" "));
+}
+
+function cleanAutoDogGenotype(genotype) {
+  const order = [
+    /^(Em|Eg|Eh|Ea|E|e)\//,
+    /^(Ay|aw|at|asa|a)\//,
+    /^(K|kbr|ky)\//,
+    /^(B|b)\//,
+    /^(Co|co)\//,
+    /^(D|d)\//,
+    /^(M|m)\//,
+    /^(S|sp|si|sw)\//,
+    /^(T|t)\//,
+    /^(R|r)\//,
+    /^(H|h)\//,
+    /^(I|i)\//,
+    /^(G|g)\//,
+    /^(L|l)\//,
+    /^(F|n)\//,
+    /^(Cu|n)\//
+  ];
+
+  const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
+  const kept = [];
+
+  for (const re of order) {
+    const found = tokens.find(token => re.test(token));
+    if (found && !kept.includes(found)) kept.push(found);
+  }
+
+  return kept.join(" ");
+}
 
 /* =========================
    SHADE / BREED NAME NOTES
@@ -1277,11 +1538,12 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "19.4-builder-domino-cleanup";
+window.DOG_GENETICS_ENGINE_VERSION = "20.0-auto-animal-genotype";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
 window.runDogGenotypeBuilder = runDogGenotypeBuilder;
+window.buildAutoDogGenotype = buildAutoDogGenotype;
 window.runDogGenetics = runDogGenetics;
 window.parseDogGenotype = parseDogGenotype;
 window.getDogPhenotype = getDogPhenotype;
