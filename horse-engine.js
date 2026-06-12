@@ -1,4 +1,4 @@
-/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 18 - AUTO ANIMAL GENOTYPE MODE */
+/* HORSE ENGINE WHITE SCORE + APPALOOSA STACKING VERSION 19 - AUTO ANIMAL GENOTYPE LOCUS CLEANUP */
 
 /* =========================
    EQUINE GENETICS ENGINE
@@ -9,6 +9,16 @@ function runHorseGenetics(inputs) {
 
   if (mode === "predictor") return runHorsePredictor(inputs);
   if (mode === "phenotypeFromGenotype") return runHorsePhenotypeCalculator(inputs);
+
+  /*
+    The Genetics Lab uses genotypeFromPhenotype to display the full educational
+    report. Add Animal can request genotype-only output by passing
+    returnType: "genotypeOnly" without changing the Genetics Lab page.
+  */
+  if (mode === "genotypeFromPhenotype" && inputs.returnType === "genotypeOnly") {
+    return buildAutoHorseGenotype(inputs.phenotype);
+  }
+
   if (mode === "genotypeFromPhenotype") return runHorseGenotypeBuilder(inputs);
   if (mode === "autoAnimalGenotype") return buildAutoHorseGenotype(inputs.phenotype);
 
@@ -666,7 +676,128 @@ function buildAutoHorseGenotype(phenotypeInput) {
     add("Lp/lp");
   }
 
-  return parts.join(" ");
+  return cleanAutoHorseGenotype(parts.join(" "));
+}
+
+function cleanAutoHorseGenotype(genotypeText) {
+  const tokens = String(genotypeText || "")
+    .replace(/[,;]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean);
+
+  const locusOrder = [
+    "Extension",
+    "Agouti",
+    "Cream",
+    "Pearl",
+    "Dun",
+    "Champagne",
+    "Silver",
+    "Mushroom",
+    "Flaxen",
+    "Sooty",
+    "Pangare",
+    "Grey",
+    "Roan",
+    "Tobiano",
+    "Frame",
+    "Splash",
+    "Sabino",
+    "Rabicano",
+    "Appaloosa",
+    "PATN1",
+    "PATN2"
+  ];
+
+  const byLocus = {};
+  const unknown = [];
+
+  function locusForGene(token) {
+    const clean = String(token || "").trim();
+
+    if (/^(E\/E|E\/e|e\/E|e\/e)$/.test(clean)) return "Extension";
+    if (/^(A\/A|A\/a|a\/A|a\/a)$/.test(clean)) return "Agouti";
+    if (/^(Cr\/Cr|Cr\/n|n\/Cr|Cr\/Prl|Prl\/Cr)$/.test(clean)) return "Cream";
+    if (/^(Prl\/Prl|Prl\/n|n\/Prl)$/.test(clean)) return "Pearl";
+    if (/^(D\/D|D\/nd1|nd1\/D|D\/nd2|nd2\/D|D\/n|n\/D|nd1\/nd1|nd1\/nd2|nd2\/nd1|nd1\/n|n\/nd1|nd2\/nd2|nd2\/n|n\/nd2)$/.test(clean)) return "Dun";
+    if (/^(Ch\/Ch|Ch\/n|n\/Ch)$/.test(clean)) return "Champagne";
+    if (/^(Z\/Z|Z\/n|n\/Z)$/.test(clean)) return "Silver";
+    if (/^(mu\/mu|Mu\/mu|mu\/Mu|Mu\/Mu)$/.test(clean)) return "Mushroom";
+    if (/^(F\/F|F\/f|f\/F|f\/f)$/.test(clean)) return "Flaxen";
+    if (/^(Sty\/Sty|Sty\/n|n\/Sty)$/.test(clean)) return "Sooty";
+    if (/^(P\/P|P\/n|n\/P)$/.test(clean)) return "Pangare";
+    if (/^(G\/G|G\/g|g\/G)$/.test(clean)) return "Grey";
+    if (/^(Rn\/Rn|Rn\/n|n\/Rn)$/.test(clean)) return "Roan";
+    if (/^(To\/To|To\/n|n\/To)$/.test(clean)) return "Tobiano";
+    if (/^(OLW\/OLW|OLW\/n|n\/OLW)$/.test(clean)) return "Frame";
+    if (/^(Spl\/Spl|Spl\/n|n\/Spl)$/.test(clean)) return "Splash";
+    if (/^(Sb\/Sb|Sb\/n|n\/Sb)$/.test(clean)) return "Sabino";
+    if (/^(Rb\/Rb|Rb\/n|n\/Rb)$/.test(clean)) return "Rabicano";
+    if (/^(Lp\/Lp|Lp\/lp|lp\/Lp|Lp\/n|n\/Lp)$/.test(clean)) return "Appaloosa";
+    if (/^(PATN1\/PATN1|PATN1\/patn1|patn1\/PATN1|PATN1\/n|n\/PATN1)$/.test(clean)) return "PATN1";
+    if (/^(PATN2\/PATN2|PATN2\/patn2|patn2\/PATN2|PATN2\/n|n\/PATN2)$/.test(clean)) return "PATN2";
+
+    return "";
+  }
+
+  function normalizeGeneToken(token) {
+    if (token === "e/E") return "E/e";
+    if (token === "a/A") return "A/a";
+    if (token === "g/G") return "G/g";
+    if (token === "n/Cr") return "Cr/n";
+    if (token === "n/Prl") return "Prl/n";
+    if (token === "Prl/Cr") return "Cr/Prl";
+    if (token === "n/D") return "D/n";
+    if (token === "n/Ch") return "Ch/n";
+    if (token === "n/Z") return "Z/n";
+    if (token === "mu/Mu") return "Mu/mu";
+    if (token === "f/F") return "F/f";
+    if (token === "n/Sty") return "Sty/n";
+    if (token === "n/P") return "P/n";
+    if (token === "n/Rn") return "Rn/n";
+    if (token === "n/To") return "To/n";
+    if (token === "n/OLW") return "OLW/n";
+    if (token === "n/Spl") return "Spl/n";
+    if (token === "n/Sb") return "Sb/n";
+    if (token === "n/Rb") return "Rb/n";
+    if (token === "lp/Lp") return "Lp/lp";
+    if (token === "n/Lp") return "Lp/n";
+    if (token === "patn1/PATN1") return "PATN1/patn1";
+    if (token === "n/PATN1") return "PATN1/n";
+    if (token === "patn2/PATN2") return "PATN2/patn2";
+    if (token === "n/PATN2") return "PATN2/n";
+    return token;
+  }
+
+  tokens.forEach(token => {
+    const normalized = normalizeGeneToken(token);
+    const locus = locusForGene(normalized);
+
+    if (!locus) {
+      if (!unknown.includes(normalized)) unknown.push(normalized);
+      return;
+    }
+
+    /* Keep the first value chosen for each locus. This prevents outputs like
+       e/e A/A A/a Cr/Cr from saving both A/A and A/a. */
+    if (!byLocus[locus]) {
+      byLocus[locus] = normalized;
+    }
+  });
+
+  const cleaned = [];
+
+  locusOrder.forEach(locus => {
+    if (byLocus[locus]) cleaned.push(byLocus[locus]);
+  });
+
+  unknown.forEach(token => {
+    if (!cleaned.includes(token)) cleaned.push(token);
+  });
+
+  return cleaned.join(" ");
 }
 
 /* =========================
@@ -1315,6 +1446,7 @@ window.runHorsePhenotypeCalculator = runHorsePhenotypeCalculator;
 window.runHorseGenotypeBuilder = runHorseGenotypeBuilder;
 window.runHorseGenetics = runHorseGenetics;
 window.buildAutoHorseGenotype = buildAutoHorseGenotype;
+window.cleanAutoHorseGenotype = cleanAutoHorseGenotype;
 window.parseHorseGenotype = parseHorseGenotype;
 window.getHorsePhenotype = getHorsePhenotype;
 window.applyHorsePatterns = applyHorsePatterns;
