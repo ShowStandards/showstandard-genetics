@@ -604,7 +604,7 @@ function buildAutoDogGenotype(phenotypeInput) {
       WhiteSpotting: /^(S|sp|si|sw)\//,
       Ticking: /^(T|t)\//,
       Roan: /^(R|r)\//,
-      Harlequin: /^(H|h)\//,
+      Harlequin: /^(H\/H|H\/h|h\/H|h\/h)$/,
       Intensity: /^(I|i)\//,
       Greying: /^(G|g)\//,
       LongCoat: /^(L|l)\//,
@@ -783,13 +783,14 @@ function cleanAutoDogGenotype(genotype) {
     /^(S|sp|si|sw)\//,
     /^(T|t)\//,
     /^(R|r)\//,
+    /^(Hr|hr)\//,
+    /^(Hr|hr)\//,
     /^(H|h)\//,
     /^(I|i)\//,
     /^(G|g)\//,
     /^(L|l)\//,
     /^(F|n)\//,
-    /^(Cu|n)\//,
-    /^(Hr|hr)\//
+    /^(Cu|n)\//
   ];
 
   const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
@@ -914,6 +915,7 @@ function parseDogPhenotype(phenotypeText) {
 ========================= */
 
 function getDogPhenotype(parsed) {
+  if (parsed.Hairless === "Hr/Hr") return "Non-Viable Hairless";
   if (isDogGeneticWhite(parsed)) return "Genetic White";
 
   let colour = getDogBaseColour(parsed);
