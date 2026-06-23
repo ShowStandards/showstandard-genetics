@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 19.4 - HAIRLESS LOCUS ADDED */
 /* DOG ENGINE VERSION 19.3 - RED MERLE CACHE CHECK */
 /* DOG ENGINE VERSION 19.1 - E LOCUS REBUILD + MERLE RENAMES + SHADE NOTES + WHITE SPOTTING + COAT CLEANUP */
 
@@ -84,7 +85,8 @@ function runDogPredictor(inputs) {
     dogOutcomeRow("Greying", sire.Greying, dam.Greying),
     dogOutcomeRow("Long Coat", sire.LongCoat, dam.LongCoat),
     dogOutcomeRow("Furnishings", sire.Furnishings, dam.Furnishings),
-    dogOutcomeRow("Curl", sire.Curl, dam.Curl)
+    dogOutcomeRow("Curl", sire.Curl, dam.Curl),
+    dogOutcomeRow("Hairless", sire.Hairless, dam.Hairless)
   ].join("");
 
   return renderDogResults(
@@ -192,6 +194,7 @@ function runDogGenotypeBuilder(inputs) {
   const wantsLongCoat = phenotype.includes("long coat") || phenotype.includes("longcoat") || phenotype.includes("long coated");
   const wantsFurnished = phenotype.includes("furnished") || phenotype.includes("furnishings");
   const wantsCurly = phenotype.includes("curly") || phenotype.includes("curl");
+  const wantsHairless = phenotype.includes("hairless") || phenotype.includes("chinese crested") || phenotype.includes("xolo") || phenotype.includes("peruvian inca orchid");
 
   const wantsSilverSable = phenotype.includes("silver sable");
   const wantsCockerSable = phenotype.includes("cocker sable") || phenotype.includes("cocker spaniel sable");
@@ -225,6 +228,7 @@ function runDogGenotypeBuilder(inputs) {
     if (parts.LongCoat) geneParts.push(parts.LongCoat);
     if (parts.Furnishings) geneParts.push(parts.Furnishings);
     if (parts.Curl) geneParts.push(parts.Curl);
+    if (parts.Hairless) geneParts.push(parts.Hairless);
 
     return geneParts.join(" ");
   }
@@ -256,6 +260,7 @@ function runDogGenotypeBuilder(inputs) {
     if (wantsLongCoat) copy.LongCoat = "l/l";
     if (wantsFurnished) copy.Furnishings = "F/n";
     if (wantsCurly) copy.Curl = "Cu/n";
+    if (wantsHairless) copy.Hairless = "Hr/hr";
 
     return copy;
   }
@@ -281,6 +286,7 @@ function runDogGenotypeBuilder(inputs) {
     if (wantsLongCoat) addSuggestion("Long Coat: l/l");
     if (wantsFurnished) addSuggestion("Furnishings: F/-");
     if (wantsCurly) addSuggestion("Curl: Cu/-");
+    if (wantsHairless) addSuggestion("Hairless: Hr/hr. Hr/Hr is non-viable; hr/hr is coated/powderpuff.");
   }
 
   if (isPlainGeneticWhite) {
@@ -496,6 +502,15 @@ function runDogGenotypeBuilder(inputs) {
     addHidden("Mask is part of the Extension locus and should replace E, not be added as a separate gene.");
   }
 
+
+  if (wantsHairless) {
+    addSuggestion("Hairless: Hr/hr");
+    addHidden("Hairless breeds can produce coated/powderpuff offspring when hr/hr is inherited.");
+    if (!examples.some(example => example.includes("Hr/hr"))) {
+      addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Hairless: "Hr/hr" });
+    }
+  }
+
   addGeneralPatternSuggestions();
 
   if (suggestions.length === 0) suggestions.push("No simple genotype match found yet.");
@@ -573,6 +588,7 @@ function buildAutoDogGenotype(phenotypeInput) {
   const wantsNorthernDomino = has("northern domino");
   const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
   const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
+  const wantsHairless = has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid");
 
   const genes = [];
 
@@ -593,7 +609,8 @@ function buildAutoDogGenotype(phenotypeInput) {
       Greying: /^(G|g)\//,
       LongCoat: /^(L|l)\//,
       Furnishings: /^(F|n)\//,
-      Curl: /^(Cu|n)\//
+      Curl: /^(Cu|n)\//,
+      Hairless: /^(Hr|hr)\//
     };
 
     const re = prefixes[locus];
@@ -749,6 +766,7 @@ function buildAutoDogGenotype(phenotypeInput) {
   if (has("long coat") || has("longcoat") || has("long coated")) addGene("LongCoat", "l/l");
   if (has("furnished") || has("furnishings")) addGene("Furnishings", "F/n");
   if (has("curly") || has("curl")) addGene("Curl", "Cu/n");
+  if (wantsHairless) addGene("Hairless", "Hr/hr");
 
   return cleanAutoDogGenotype(genes.join(" "));
 }
@@ -770,7 +788,8 @@ function cleanAutoDogGenotype(genotype) {
     /^(G|g)\//,
     /^(L|l)\//,
     /^(F|n)\//,
-    /^(Cu|n)\//
+    /^(Cu|n)\//,
+    /^(Hr|hr)\//
   ];
 
   const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
@@ -876,7 +895,8 @@ function parseDogGenotype(genotypeText) {
     Greying: findDogGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
     LongCoat: findDogGenePair(text, ["L/L", "L/l", "l/L", "l/l"], "L/L"),
     Furnishings: findDogGenePair(text, ["F/F", "F/n", "n/F", "n/n"], "n/n"),
-    Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n")
+    Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n"),
+    Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr")
   };
 }
 
@@ -905,6 +925,7 @@ function getDogPhenotype(parsed) {
   colour = applyDogBrindleAndGreying(colour, parsed);
   colour = applyDogPatterns(colour, parsed);
   colour = applyDogCoatTraits(colour, parsed);
+  colour = applyDogHairless(colour, parsed);
 
   return cleanupDogColourName(colour.trim());
 }
@@ -1204,6 +1225,23 @@ function applyDogCoatTraits(colour, parsed) {
   return colour;
 }
 
+function applyDogHairless(colour, parsed) {
+  if (parsed.Hairless === "Hr/Hr") {
+    return "Non-Viable Hairless (" + colour + ")";
+  }
+
+  if (parsed.Hairless === "Hr/hr") {
+    return colour + " Hairless";
+  }
+
+  if (parsed.Hairless === "hr/hr") {
+    return colour + " Coated";
+  }
+
+  return colour;
+}
+
+
 /* =========================
    GENE INTRO TABLE
 ========================= */
@@ -1234,6 +1272,7 @@ function renderDogGeneIntroTable() {
         <tr><td>Long Coat</td><td>L, l</td><td>l/l creates long coat.</td></tr>
         <tr><td>Furnishings</td><td>F, n</td><td>Adds facial furnishings/wire-style coat traits.</td></tr>
         <tr><td>Curl</td><td>Cu, n</td><td>Adds curly coat texture.</td></tr>
+        <tr><td>Hairless</td><td>Hr, hr</td><td>Hr/hr creates hairless dogs. hr/hr creates coated/powderpuff dogs. Hr/Hr is non-viable.</td></tr>
       </table>
       ${renderDogGeneralShadeNotice()}
     `
@@ -1368,6 +1407,7 @@ function findDogGenePair(text, options, fallback) {
         if (option === "l/L") return "L/l";
         if (option === "n/F") return "F/n";
         if (option === "n/Cu") return "Cu/n";
+        if (option === "hr/Hr") return "Hr/hr";
         return option;
       }
     }
