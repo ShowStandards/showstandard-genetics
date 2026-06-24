@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 19.8 - COAT DISPLAY FINAL FIX */
 /* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
 /* DOG ENGINE VERSION 19.7 - EXPLICIT SHORT COAT + HAIRLESS DISPLAY FIX */
 /* DOG ENGINE VERSION 19.4 - HAIRLESS LOCUS ADDED */
@@ -786,7 +787,6 @@ function cleanAutoDogGenotype(genotype) {
     /^(T|t)\//,
     /^(R|r)\//,
     /^(Hr|hr)\//,
-    /^(Hr|hr)\//,
     /^(H|h)\//,
     /^(I|i)\//,
     /^(G|g)\//,
@@ -1223,17 +1223,23 @@ function applyDogCoatTraits(colour, parsed) {
   const isFurnished = hasDogGene(parsed.Furnishings, "F");
   const isCurly = hasDogGene(parsed.Curl, "Cu");
 
+  // Long coat combinations.
   if (isLong && isFurnished && isCurly) return colour + " Long Curly Furnished Coat";
   if (isLong && isCurly) return colour + " Long Curly Coat";
   if (isLong && isFurnished) return colour + " Long Furnished Coat";
-  if (isFurnished && isCurly) return colour + " Curly Furnished Coat";
   if (isLong) return colour + " Long Coat";
-  if (isFurnished) return colour + " Furnished";
-  if (isCurly) return colour + " Curly";
 
-  // Short coat is only printed when the user actually typed an L-locus genotype.
-  // This prevents every default dog from gaining an extra coat label.
+  // Short coat combinations only display Short Coat when the user actually typed L/L, L/l, or l/L.
+  // This avoids adding Short Coat to every dog by default.
+  if (parsed.LongCoatProvided && isShort && isFurnished && isCurly) return colour + " Short Curly Wirehaired Coat";
+  if (parsed.LongCoatProvided && isShort && isCurly) return colour + " Short Curly Coat";
+  if (parsed.LongCoatProvided && isShort && isFurnished) return colour + " Wirehaired Coat";
   if (parsed.LongCoatProvided && isShort) return colour + " Short Coat";
+
+  // If no L-locus was entered, still show texture genes when they were entered.
+  if (isFurnished && isCurly) return colour + " Curly Wirehaired Coat";
+  if (isFurnished) return colour + " Wirehaired Coat";
+  if (isCurly) return colour + " Curly Coat";
 
   return colour;
 }
@@ -1241,7 +1247,7 @@ function applyDogCoatTraits(colour, parsed) {
 function applyDogHairless(colour, parsed) {
   // Hairless is blank unless the user actually typed Hr/hr, hr/hr, etc.
   // This prevents normal dogs from being labelled Coated/Powderpuff by default.
-  if (!parsed.Hairless) return colour;
+  if (!parsed.HairlessProvided || !parsed.Hairless) return colour;
 
   if (parsed.Hairless === "Hr/Hr") {
     return "Non-Viable Hairless (" + colour + ")";
