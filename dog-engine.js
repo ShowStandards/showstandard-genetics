@@ -1,4 +1,5 @@
 /* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
+/* DOG ENGINE VERSION 19.7 - EXPLICIT SHORT COAT + HAIRLESS DISPLAY FIX */
 /* DOG ENGINE VERSION 19.4 - HAIRLESS LOCUS ADDED */
 /* DOG ENGINE VERSION 19.3 - RED MERLE CACHE CHECK */
 /* DOG ENGINE VERSION 19.1 - E LOCUS REBUILD + MERLE RENAMES + SHADE NOTES + WHITE SPOTTING + COAT CLEANUP */
@@ -895,10 +896,10 @@ function parseDogGenotype(genotypeText) {
     Harlequin: findDogGenePair(text, ["H/H", "H/h", "h/H", "h/h"], "h/h"),
     Intensity: findDogGenePair(text, ["I/I", "I/i", "i/I", "i/i"], "I/I"),
     Greying: findDogGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
-    LongCoat: findDogGenePair(text, ["L/L", "L/l", "l/L", "l/l"], "L/L"),
+    LongCoat: findDogGenePair(text, ["L/L", "L/l", "l/L", "l/l"], ""),
     Furnishings: findDogGenePair(text, ["F/F", "F/n", "n/F", "n/n"], "n/n"),
     Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n"),
-    Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr"),
+    Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], ""),
 
     // These flags stop default fallback genes from displaying as if the user entered them.
     LongCoatProvided: hasDogExplicitGene(text, ["L/L", "L/l", "l/L", "l/l"]),
@@ -1218,7 +1219,7 @@ function applyDogPatterns(colour, parsed) {
 
 function applyDogCoatTraits(colour, parsed) {
   const isLong = parsed.LongCoat === "l/l";
-  const isShort = parsed.LongCoat === "L/L" || parsed.LongCoat === "L/l";
+  const isShort = parsed.LongCoat === "L/L" || parsed.LongCoat === "L/l" || parsed.LongCoat === "l/L";
   const isFurnished = hasDogGene(parsed.Furnishings, "F");
   const isCurly = hasDogGene(parsed.Curl, "Cu");
 
@@ -1238,11 +1239,9 @@ function applyDogCoatTraits(colour, parsed) {
 }
 
 function applyDogHairless(colour, parsed) {
-  // Do not display the fallback/default hr/hr on ordinary dogs.
-  // Only display hairless/coated wording when the genotype actually included Hr/hr, hr/hr, etc.
-  if (!parsed.HairlessProvided) {
-    return colour;
-  }
+  // Hairless is blank unless the user actually typed Hr/hr, hr/hr, etc.
+  // This prevents normal dogs from being labelled Coated/Powderpuff by default.
+  if (!parsed.Hairless) return colour;
 
   if (parsed.Hairless === "Hr/Hr") {
     return "Non-Viable Hairless (" + colour + ")";
