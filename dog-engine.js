@@ -1,4 +1,4 @@
-/* DOG ENGINE VERSION 19.5 - HAIRLESS DISPLAY TWEAK */
+/* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
 /* DOG ENGINE VERSION 19.4 - HAIRLESS LOCUS ADDED */
 /* DOG ENGINE VERSION 19.3 - RED MERLE CACHE CHECK */
 /* DOG ENGINE VERSION 19.1 - E LOCUS REBUILD + MERLE RENAMES + SHADE NOTES + WHITE SPOTTING + COAT CLEANUP */
@@ -880,8 +880,6 @@ function parseDogGenotype(genotypeText) {
     .replace(/\s+/g, " ")
     .trim();
 
-  const hasHairlessLocus = /\b(?:Hr|hr)\/(?:Hr|hr)\b/.test(text);
-
   return {
     Extension: findDogExtensionGene(text),
     Agouti: findDogAgoutiGene(text),
@@ -901,7 +899,10 @@ function parseDogGenotype(genotypeText) {
     Furnishings: findDogGenePair(text, ["F/F", "F/n", "n/F", "n/n"], "n/n"),
     Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n"),
     Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr"),
-    HairlessProvided: hasHairlessLocus
+
+    // These flags stop default fallback genes from displaying as if the user entered them.
+    LongCoatProvided: hasDogExplicitGene(text, ["L/L", "L/l", "l/L", "l/l"]),
+    HairlessProvided: hasDogExplicitGene(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"])
   };
 }
 
@@ -1217,6 +1218,7 @@ function applyDogPatterns(colour, parsed) {
 
 function applyDogCoatTraits(colour, parsed) {
   const isLong = parsed.LongCoat === "l/l";
+  const isShort = parsed.LongCoat === "L/L" || parsed.LongCoat === "L/l";
   const isFurnished = hasDogGene(parsed.Furnishings, "F");
   const isCurly = hasDogGene(parsed.Curl, "Cu");
 
@@ -1228,10 +1230,16 @@ function applyDogCoatTraits(colour, parsed) {
   if (isFurnished) return colour + " Furnished";
   if (isCurly) return colour + " Curly";
 
+  // Short coat is only printed when the user actually typed an L-locus genotype.
+  // This prevents every default dog from gaining an extra coat label.
+  if (parsed.LongCoatProvided && isShort) return colour + " Short Coat";
+
   return colour;
 }
 
 function applyDogHairless(colour, parsed) {
+  // Do not display the fallback/default hr/hr on ordinary dogs.
+  // Only display hairless/coated wording when the genotype actually included Hr/hr, hr/hr, etc.
   if (!parsed.HairlessProvided) {
     return colour;
   }
@@ -1240,7 +1248,7 @@ function applyDogHairless(colour, parsed) {
     return "Non-Viable Hairless (" + colour + ")";
   }
 
-  if (parsed.Hairless === "Hr/hr" || parsed.Hairless === "hr/Hr") {
+  if (parsed.Hairless === "Hr/hr") {
     return colour + " Hairless";
   }
 
@@ -1388,6 +1396,29 @@ function cleanupDogColourName(colour) {
     .replace(/Blue Cream/g, "Blue Cream")
     .replace(/Lilac Cream/g, "Lilac Cream")
     .trim();
+}
+
+function hasDogExplicitGene(text, options) {
+  const cleanText = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleanText) return false;
+
+  const tokens = cleanText.split(" ");
+
+  for (const option of options) {
+    const compactOption = option.replace(/\//g, "");
+
+    for (const token of tokens) {
+      const compactToken = token.replace(/\//g, "");
+      if (token === option || token === compactOption || compactToken === compactOption) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 function findDogGenePair(text, options, fallback) {
