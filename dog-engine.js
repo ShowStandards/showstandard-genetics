@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 19.5 - HAIRLESS DISPLAY TWEAK */
 /* DOG ENGINE VERSION 19.4 - HAIRLESS LOCUS ADDED */
 /* DOG ENGINE VERSION 19.3 - RED MERLE CACHE CHECK */
 /* DOG ENGINE VERSION 19.1 - E LOCUS REBUILD + MERLE RENAMES + SHADE NOTES + WHITE SPOTTING + COAT CLEANUP */
@@ -879,6 +880,8 @@ function parseDogGenotype(genotypeText) {
     .replace(/\s+/g, " ")
     .trim();
 
+  const hasHairlessLocus = /\b(?:Hr|hr)\/(?:Hr|hr)\b/.test(text);
+
   return {
     Extension: findDogExtensionGene(text),
     Agouti: findDogAgoutiGene(text),
@@ -897,7 +900,8 @@ function parseDogGenotype(genotypeText) {
     LongCoat: findDogGenePair(text, ["L/L", "L/l", "l/L", "l/l"], "L/L"),
     Furnishings: findDogGenePair(text, ["F/F", "F/n", "n/F", "n/n"], "n/n"),
     Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n"),
-    Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr")
+    Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr"),
+    HairlessProvided: hasHairlessLocus
   };
 }
 
@@ -1228,16 +1232,20 @@ function applyDogCoatTraits(colour, parsed) {
 }
 
 function applyDogHairless(colour, parsed) {
+  if (!parsed.HairlessProvided) {
+    return colour;
+  }
+
   if (parsed.Hairless === "Hr/Hr") {
     return "Non-Viable Hairless (" + colour + ")";
   }
 
-  if (parsed.Hairless === "Hr/hr") {
+  if (parsed.Hairless === "Hr/hr" || parsed.Hairless === "hr/Hr") {
     return colour + " Hairless";
   }
 
   if (parsed.Hairless === "hr/hr") {
-    return colour + " Coated";
+    return colour + " Coated/Powderpuff";
   }
 
   return colour;
