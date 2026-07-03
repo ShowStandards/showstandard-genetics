@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 20.2 - DALMATIAN COMPLEX CACHE + GENETIC WHITE GUARD FIX */
 /* DOG ENGINE VERSION 20.1 - DALMATIAN SPOTTING + PATCH LOCI ADDED */
 /* DOG ENGINE VERSION 19.8 - COAT DISPLAY FINAL FIX */
 /* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
@@ -972,7 +973,8 @@ function parseDogPhenotype(phenotypeText) {
 
 function getDogPhenotype(parsed) {
   if (parsed.Hairless === "Hr/Hr") return "Non-Viable Hairless";
-  if (isDogGeneticWhite(parsed)) return "Genetic White";
+  // Do not let the generic Genetic White shortcut hide true Dalmatian-pattern dogs.
+  if (isDogGeneticWhite(parsed) && !hasDogDalmatianPattern(parsed)) return "Genetic White";
 
   let colour = getDogBaseColour(parsed);
 
@@ -990,6 +992,18 @@ function getDogPhenotype(parsed) {
 
 function isDogGeneticWhite(parsed) {
   return parsed.Extension === "e/e" && parsed.WhiteSpotting === "sw/sw" && parsed.Intensity === "i/i";
+}
+
+function hasDogDalmatianPattern(parsed) {
+  return (
+    parsed.WhiteSpotting === "sw/sw" &&
+    parsed.Roan === "R/R" &&
+    parsed.Dalmatian === "dsp/dsp"
+  );
+}
+
+function hasDogDalmatianPatch(parsed) {
+  return hasDogDalmatianPattern(parsed) && parsed.Patch === "p/p";
 }
 
 function getDogBaseColour(parsed) {
@@ -1250,14 +1264,8 @@ function applyDogBrindleAndGreying(colour, parsed) {
 function applyDogPatterns(colour, parsed) {
   const patterns = [];
 
-  const hasDalmatianPattern =
-    parsed.WhiteSpotting === "sw/sw" &&
-    parsed.Roan === "R/R" &&
-    parsed.Dalmatian === "dsp/dsp";
-
-  const hasDalmatianPatch =
-    hasDalmatianPattern &&
-    parsed.Patch === "p/p";
+  const hasDalmatianPattern = hasDogDalmatianPattern(parsed);
+  const hasDalmatianPatch = hasDogDalmatianPatch(parsed);
 
   // Dalmatian is a special pattern complex in this engine:
   // sw/sw creates the white base, R/R is required, and dsp/dsp converts that
@@ -1695,7 +1703,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "20.1-dalmatian-spots-patches";
+window.DOG_GENETICS_ENGINE_VERSION = "20.2-dalmatian-complex-fixed";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
