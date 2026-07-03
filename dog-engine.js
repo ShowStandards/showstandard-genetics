@@ -1,4 +1,5 @@
-/* DOG ENGINE VERSION 20.2 - DALMATIAN COMPLEX CACHE + GENETIC WHITE GUARD FIX */
+/* DOG ENGINE VERSION 20.3 - DALMATIAN COMPLEX + EXTENSION DEFAULT FIX */
+/* DOG ENGINE VERSION 20.2 - DALMATIAN COMPLEX GENETIC WHITE GUARD */
 /* DOG ENGINE VERSION 20.1 - DALMATIAN SPOTTING + PATCH LOCI ADDED */
 /* DOG ENGINE VERSION 19.8 - COAT DISPLAY FINAL FIX */
 /* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
@@ -973,8 +974,7 @@ function parseDogPhenotype(phenotypeText) {
 
 function getDogPhenotype(parsed) {
   if (parsed.Hairless === "Hr/Hr") return "Non-Viable Hairless";
-  // Do not let the generic Genetic White shortcut hide true Dalmatian-pattern dogs.
-  if (isDogGeneticWhite(parsed) && !hasDogDalmatianPattern(parsed)) return "Genetic White";
+  if (isDogGeneticWhite(parsed)) return "Genetic White";
 
   let colour = getDogBaseColour(parsed);
 
@@ -992,18 +992,6 @@ function getDogPhenotype(parsed) {
 
 function isDogGeneticWhite(parsed) {
   return parsed.Extension === "e/e" && parsed.WhiteSpotting === "sw/sw" && parsed.Intensity === "i/i";
-}
-
-function hasDogDalmatianPattern(parsed) {
-  return (
-    parsed.WhiteSpotting === "sw/sw" &&
-    parsed.Roan === "R/R" &&
-    parsed.Dalmatian === "dsp/dsp"
-  );
-}
-
-function hasDogDalmatianPatch(parsed) {
-  return hasDogDalmatianPattern(parsed) && parsed.Patch === "p/p";
 }
 
 function getDogBaseColour(parsed) {
@@ -1257,6 +1245,23 @@ function applyDogBrindleAndGreying(colour, parsed) {
   return colour;
 }
 
+function getDogDalmatianColourName(colour) {
+  // Breed-specific Dalmatian terminology. This only applies once the full
+  // sw/sw + R/R + dsp/dsp Dalmatian complex has been confirmed.
+  return replaceDogBasePrefix(colour, {
+    "Red": "Lemon",
+    "Cream": "Lemon",
+    "Silver": "Pale Lemon",
+    "Chocolate": "Liver",
+    "Chocolate & Tan": "Liver & Tan",
+    "Chocolate Sable": "Liver Sable",
+    "Chocolate Wolf Sable": "Liver Wolf Sable",
+    "Chocolate Saddle Tan": "Liver Saddle Tan",
+    "Lilac": "Lilac",
+    "Blue": "Blue"
+  });
+}
+
 /* =========================
    PATTERN LOGIC
 ========================= */
@@ -1264,12 +1269,19 @@ function applyDogBrindleAndGreying(colour, parsed) {
 function applyDogPatterns(colour, parsed) {
   const patterns = [];
 
-  const hasDalmatianPattern = hasDogDalmatianPattern(parsed);
-  const hasDalmatianPatch = hasDogDalmatianPatch(parsed);
+  const hasDalmatianPattern =
+    parsed.WhiteSpotting === "sw/sw" &&
+    parsed.Roan === "R/R" &&
+    parsed.Dalmatian === "dsp/dsp";
+
+  const hasDalmatianPatch =
+    hasDalmatianPattern &&
+    parsed.Patch === "p/p";
 
   // Dalmatian is a special pattern complex in this engine:
   // sw/sw creates the white base, R/R is required, and dsp/dsp converts that
   // roaning/ticking into Dalmatian-style spots. Patch only displays on true Dals.
+  if (hasDalmatianPattern) colour = getDogDalmatianColourName(colour);
   if (hasDalmatianPatch) return colour + " Patched Dalmatian";
   if (hasDalmatianPattern) return colour + " Dalmatian";
 
@@ -1410,7 +1422,8 @@ function hasDominantDogK(pair) {
 }
 
 function getDogVisibleExtension(pair) {
-  const alleles = String(pair || "e/e").split("/");
+  // Missing E-locus should default to normal extension, not recessive red.
+  const alleles = String(pair || "E/E").split("/");
   const order = ["Em", "E", "Eg", "Eh", "Ea", "e"];
 
   for (const allele of order) {
@@ -1562,7 +1575,8 @@ function findDogExtensionGene(text) {
     }
   }
 
-  return "e/e";
+  // Missing E-locus should default to normal extension.
+  return "E/E";
 }
 
 function findDogAgoutiGene(text) {
@@ -1703,7 +1717,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "20.2-dalmatian-complex-fixed";
+window.DOG_GENETICS_ENGINE_VERSION = "20.3-dalmatian-extension-fixed";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
