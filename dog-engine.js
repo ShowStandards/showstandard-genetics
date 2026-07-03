@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 20.4 - DALMATIAN BASE COLOUR HARDENED */
 /* DOG ENGINE VERSION 20.3 - DALMATIAN COMPLEX + EXTENSION DEFAULT FIX */
 /* DOG ENGINE VERSION 20.2 - DALMATIAN COMPLEX GENETIC WHITE GUARD */
 /* DOG ENGINE VERSION 20.1 - DALMATIAN SPOTTING + PATCH LOCI ADDED */
@@ -1245,21 +1246,45 @@ function applyDogBrindleAndGreying(colour, parsed) {
   return colour;
 }
 
-function getDogDalmatianColourName(colour) {
+function getDogDalmatianColourName(colour, parsed) {
   // Breed-specific Dalmatian terminology. This only applies once the full
   // sw/sw + R/R + dsp/dsp Dalmatian complex has been confirmed.
-  return replaceDogBasePrefix(colour, {
-    "Red": "Lemon",
-    "Cream": "Lemon",
-    "Silver": "Pale Lemon",
-    "Chocolate": "Liver",
-    "Chocolate & Tan": "Liver & Tan",
-    "Chocolate Sable": "Liver Sable",
-    "Chocolate Wolf Sable": "Liver Wolf Sable",
-    "Chocolate Saddle Tan": "Liver Saddle Tan",
-    "Lilac": "Lilac",
-    "Blue": "Blue"
-  });
+  // This function deliberately re-checks the parsed base genetics so an omitted
+  // E-locus can never accidentally display as Red/Lemon on dominant-black dogs.
+
+  let dalColour = String(colour || "").trim();
+
+  const isRecessiveRed = parsed.Extension === "e/e";
+  const isBrown = parsed.Brown === "b/b";
+  const isCocoa = parsed.Cocoa === "co/co";
+  const isDilute = parsed.Dilute === "d/d";
+  const isDominantBlack = hasDominantDogK(parsed.K);
+
+  if (isRecessiveRed) {
+    dalColour = parsed.Intensity === "i/i" ? "Pale Lemon" : "Lemon";
+  } else if (isDominantBlack) {
+    if (isBrown && isDilute) dalColour = "Lilac";
+    else if (isBrown) dalColour = "Liver";
+    else if (isCocoa && isDilute) dalColour = "Lilac Cocoa";
+    else if (isCocoa) dalColour = "Cocoa";
+    else if (isDilute) dalColour = "Blue";
+    else dalColour = "Black";
+  } else {
+    dalColour = replaceDogBasePrefix(dalColour, {
+      "Red": "Lemon",
+      "Cream": "Lemon",
+      "Silver": "Pale Lemon",
+      "Chocolate": "Liver",
+      "Chocolate & Tan": "Liver & Tan",
+      "Chocolate Sable": "Liver Sable",
+      "Chocolate Wolf Sable": "Liver Wolf Sable",
+      "Chocolate Saddle Tan": "Liver Saddle Tan",
+      "Lilac": "Lilac",
+      "Blue": "Blue"
+    });
+  }
+
+  return dalColour;
 }
 
 /* =========================
@@ -1281,7 +1306,7 @@ function applyDogPatterns(colour, parsed) {
   // Dalmatian is a special pattern complex in this engine:
   // sw/sw creates the white base, R/R is required, and dsp/dsp converts that
   // roaning/ticking into Dalmatian-style spots. Patch only displays on true Dals.
-  if (hasDalmatianPattern) colour = getDogDalmatianColourName(colour);
+  if (hasDalmatianPattern) colour = getDogDalmatianColourName(colour, parsed);
   if (hasDalmatianPatch) return colour + " Patched Dalmatian";
   if (hasDalmatianPattern) return colour + " Dalmatian";
 
@@ -1717,7 +1742,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "20.3-dalmatian-extension-fixed";
+window.DOG_GENETICS_ENGINE_VERSION = "20.4-dalmatian-base-colour-hardened";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
