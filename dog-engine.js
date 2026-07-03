@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 20.1 - DALMATIAN SPOTTING + PATCH LOCI ADDED */
 /* DOG ENGINE VERSION 19.8 - COAT DISPLAY FINAL FIX */
 /* DOG ENGINE VERSION 19.6 - HAIRLESS DISPLAY + SHORT COAT FIX */
 /* DOG ENGINE VERSION 19.7 - EXPLICIT SHORT COAT + HAIRLESS DISPLAY FIX */
@@ -83,6 +84,8 @@ function runDogPredictor(inputs) {
     dogOutcomeRow("White Spotting", sire.WhiteSpotting, dam.WhiteSpotting),
     dogOutcomeRow("Ticking", sire.Ticking, dam.Ticking),
     dogOutcomeRow("Roan", sire.Roan, dam.Roan),
+    dogOutcomeRow("Dalmatian Spotting", sire.Dalmatian, dam.Dalmatian),
+    dogOutcomeRow("Dalmatian Patch", sire.Patch, dam.Patch),
     dogOutcomeRow("Harlequin", sire.Harlequin, dam.Harlequin),
     dogOutcomeRow("Intensity", sire.Intensity, dam.Intensity),
     dogOutcomeRow("Greying", sire.Greying, dam.Greying),
@@ -190,6 +193,9 @@ function runDogGenotypeBuilder(inputs) {
   const wantsHighIrish = phenotype.includes("high irish");
   const wantsTicking = phenotype.includes("ticked") || phenotype.includes("ticking");
   const wantsRoan = phenotype.includes("roan");
+  const wantsDalmatian = phenotype.includes("dalmatian");
+  const wantsPatchedDalmatian = phenotype.includes("patched dalmatian") || phenotype.includes("dalmatian patch") || phenotype.includes("patch dalmatian");
+  const wantsDalmatianPatchCarrier = phenotype.includes("patch carrier") || phenotype.includes("patch-carrier");
   const wantsHarlequin = phenotype.includes("harlequin");
   const wantsBrindle = phenotype.includes("brindle");
   const wantsFaded = phenotype.includes("faded") || phenotype.includes("grey") || phenotype.includes("gray");
@@ -225,6 +231,8 @@ function runDogGenotypeBuilder(inputs) {
     if (parts.WhiteSpotting) geneParts.push(parts.WhiteSpotting);
     if (parts.Ticking) geneParts.push(parts.Ticking);
     if (parts.Roan) geneParts.push(parts.Roan);
+    if (parts.Dalmatian) geneParts.push(parts.Dalmatian);
+    if (parts.Patch) geneParts.push(parts.Patch);
     if (parts.Harlequin) geneParts.push(parts.Harlequin);
     if (parts.Intensity) geneParts.push(parts.Intensity);
     if (parts.Greying) geneParts.push(parts.Greying);
@@ -259,6 +267,12 @@ function runDogGenotypeBuilder(inputs) {
     if (white) copy.WhiteSpotting = white;
     if (wantsTicking) copy.Ticking = "T/t";
     if (wantsRoan) copy.Roan = "R/r";
+    if (wantsDalmatian) {
+      copy.WhiteSpotting = "sw/sw";
+      copy.Roan = "R/R";
+      copy.Dalmatian = "dsp/dsp";
+      copy.Patch = wantsPatchedDalmatian ? "p/p" : wantsDalmatianPatchCarrier ? "P/p" : (copy.Patch || "P/P");
+    }
     if (wantsFaded) copy.Greying = "G/g";
     if (wantsLongCoat) copy.LongCoat = "l/l";
     if (wantsFurnished) copy.Furnishings = "F/n";
@@ -284,7 +298,7 @@ function runDogGenotypeBuilder(inputs) {
     }
 
     if (wantsTicking) addSuggestion("Ticking: T/-");
-    if (wantsRoan) addSuggestion("Roan: R/-");
+    if (wantsRoan && !wantsDalmatian) addSuggestion("Roan: R/-");
     if (wantsFaded) addSuggestion("Greying/Fading: G/-");
     if (wantsLongCoat) addSuggestion("Long Coat: l/l");
     if (wantsFurnished) addSuggestion("Furnishings: F/-");
@@ -367,6 +381,26 @@ function runDogGenotypeBuilder(inputs) {
     addSuggestion("Harlequin: H/h");
     addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Merle: "M/m", Harlequin: "H/h" });
   }
+
+  if (wantsDalmatian) {
+    addSuggestion("White Spotting: sw/sw");
+    addSuggestion("Roan: R/R");
+    addSuggestion("Dalmatian Spotting: dsp/dsp");
+    addSuggestion("Dalmatian Patch: p/p only displays when sw/sw + R/R + dsp/dsp are also present");
+
+    if (wantsPatchedDalmatian) {
+      addSuggestion("Dalmatian Patch: p/p");
+      addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Brown: "B/B", Dilute: "D/D", WhiteSpotting: "sw/sw", Roan: "R/R", Dalmatian: "dsp/dsp", Patch: "p/p" });
+    } else if (wantsDalmatianPatchCarrier) {
+      addSuggestion("Dalmatian Patch Carrier: P/p");
+      addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Brown: "B/B", Dilute: "D/D", WhiteSpotting: "sw/sw", Roan: "R/R", Dalmatian: "dsp/dsp", Patch: "P/p" });
+    } else {
+      addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Brown: "B/B", Dilute: "D/D", WhiteSpotting: "sw/sw", Roan: "R/R", Dalmatian: "dsp/dsp", Patch: "P/P" });
+    }
+
+    addHidden("Dalmatian pattern requires sw/sw + R/R + dsp/dsp. Patch genes remain hidden unless the dog is a true Dalmatian-pattern dog.");
+  }
+
 
   if (wantsNorthernDomino) {
     addSuggestion("Extension: Ea/e or Ea/Ea");
@@ -592,6 +626,9 @@ function buildAutoDogGenotype(phenotypeInput) {
   const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
   const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
   const wantsHairless = has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid");
+  const wantsDalmatian = has("dalmatian");
+  const wantsPatchedDalmatian = has("patched dalmatian") || has("dalmatian patch") || has("patch dalmatian");
+  const wantsDalmatianPatchCarrier = has("patch carrier") || has("patch-carrier");
 
   const genes = [];
 
@@ -613,7 +650,9 @@ function buildAutoDogGenotype(phenotypeInput) {
       LongCoat: /^(L|l)\//,
       Furnishings: /^(F|n)\//,
       Curl: /^(Cu|n)\//,
-      Hairless: /^(Hr|hr)\//
+      Hairless: /^(Hr|hr)\//,
+      Dalmatian: /^(Dsp|dsp)\//,
+      Patch: /^(P|p)\//
     };
 
     const re = prefixes[locus];
@@ -765,6 +804,13 @@ function buildAutoDogGenotype(phenotypeInput) {
 
   if (has("ticked") || has("ticking") || has("belton")) addGene("Ticking", "T/t");
   if (has("roan") || has("belton")) addGene("Roan", "R/r");
+
+  if (wantsDalmatian) {
+    addGene("WhiteSpotting", "sw/sw");
+    addGene("Roan", "R/R");
+    addGene("Dalmatian", "dsp/dsp");
+    addGene("Patch", wantsPatchedDalmatian ? "p/p" : wantsDalmatianPatchCarrier ? "P/p" : "P/P");
+  }
   if (has("faded") || has("grey") || has("gray")) addGene("Greying", "G/g");
   if (has("long coat") || has("longcoat") || has("long coated")) addGene("LongCoat", "l/l");
   if (has("furnished") || has("furnishings")) addGene("Furnishings", "F/n");
@@ -786,6 +832,8 @@ function cleanAutoDogGenotype(genotype) {
     /^(S|sp|si|sw)\//,
     /^(T|t)\//,
     /^(R|r)\//,
+    /^(Dsp|dsp)\//,
+    /^(P|p)\//,
     /^(Hr|hr)\//,
     /^(H|h)\//,
     /^(I|i)\//,
@@ -893,6 +941,8 @@ function parseDogGenotype(genotypeText) {
     WhiteSpotting: findDogWhiteSpotting(text),
     Ticking: findDogGenePair(text, ["T/T", "T/t", "t/T", "t/t"], "t/t"),
     Roan: findDogGenePair(text, ["R/R", "R/r", "r/R", "r/r"], "r/r"),
+    Dalmatian: findDogGenePair(text, ["Dsp/Dsp", "Dsp/dsp", "dsp/Dsp", "dsp/dsp"], "Dsp/Dsp"),
+    Patch: findDogGenePair(text, ["P/P", "P/p", "p/P", "p/p"], "P/P"),
     Harlequin: findDogGenePair(text, ["H/H", "H/h", "h/H", "h/h"], "h/h"),
     Intensity: findDogGenePair(text, ["I/I", "I/i", "i/I", "i/i"], "I/I"),
     Greying: findDogGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
@@ -1200,6 +1250,21 @@ function applyDogBrindleAndGreying(colour, parsed) {
 function applyDogPatterns(colour, parsed) {
   const patterns = [];
 
+  const hasDalmatianPattern =
+    parsed.WhiteSpotting === "sw/sw" &&
+    parsed.Roan === "R/R" &&
+    parsed.Dalmatian === "dsp/dsp";
+
+  const hasDalmatianPatch =
+    hasDalmatianPattern &&
+    parsed.Patch === "p/p";
+
+  // Dalmatian is a special pattern complex in this engine:
+  // sw/sw creates the white base, R/R is required, and dsp/dsp converts that
+  // roaning/ticking into Dalmatian-style spots. Patch only displays on true Dals.
+  if (hasDalmatianPatch) return colour + " Patched Dalmatian";
+  if (hasDalmatianPattern) return colour + " Dalmatian";
+
   if (parsed.WhiteSpotting === "sp/sp") patterns.push("Piebald");
   if (parsed.WhiteSpotting === "sp/si") patterns.push("Irish Piebald");
   if (parsed.WhiteSpotting === "sp/sw") patterns.push("Heavy Piebald");
@@ -1289,7 +1354,9 @@ function renderDogGeneIntroTable() {
         <tr><td>Harlequin</td><td>H, h</td><td>Changes single merle into harlequin when H/h is present.</td></tr>
         <tr><td>White Spotting</td><td>S, sp, si, sw</td><td>Controls white markings, piebald, Irish white, high white, and extreme white.</td></tr>
         <tr><td>Ticking</td><td>T, t</td><td>Adds ticking to white areas.</td></tr>
-        <tr><td>Roan</td><td>R, r</td><td>Adds roan patterning to white areas.</td></tr>
+        <tr><td>Roan</td><td>R, r</td><td>Adds roan patterning to white areas. R/R is required for Dalmatian spotting in this engine.</td></tr>
+        <tr><td>Dalmatian Spotting</td><td>Dsp, dsp</td><td>Dogs with sw/sw + R/R + dsp/dsp display Dalmatian spotting. Spot colour follows the dog's base colour genetics.</td></tr>
+        <tr><td>Dalmatian Patch</td><td>P, p</td><td>p/p creates patched Dalmatians, but only when sw/sw + R/R + dsp/dsp are also present.</td></tr>
         <tr><td>Intensity</td><td>I, i</td><td>Controls red pigment depth, including red, cream, fawn, pale/silver sable, and silver points.</td></tr>
         <tr><td>Greying / Fading</td><td>G, g</td><td>Adds progressive fading/silvering.</td></tr>
         <tr><td>Long Coat</td><td>L, l</td><td>l/l creates long coat.</td></tr>
@@ -1447,6 +1514,8 @@ function findDogGenePair(text, options, fallback) {
         if (option === "m/M") return "M/m";
         if (option === "t/T") return "T/t";
         if (option === "r/R") return "R/r";
+        if (option === "dsp/Dsp") return "Dsp/dsp";
+        if (option === "p/P") return "P/p";
         if (option === "h/H") return "H/h";
         if (option === "i/I") return "I/i";
         if (option === "g/G") return "G/g";
@@ -1606,6 +1675,8 @@ function sortDogGenePair(alleles) {
         "S", "sp", "si", "sw",
         "T", "t",
         "R", "r",
+        "Dsp", "dsp",
+        "P", "p",
         "H", "h",
         "I", "i",
         "G", "g",
@@ -1624,7 +1695,7 @@ function sortDogGenePair(alleles) {
     .join("/");
 }
 
-window.DOG_GENETICS_ENGINE_VERSION = "20.0-auto-animal-genotype";
+window.DOG_GENETICS_ENGINE_VERSION = "20.1-dalmatian-spots-patches";
 window.runDogPredictor = runDogPredictor;
 window.runDogRoll = runDogRoll;
 window.runDogPhenotypeCalculator = runDogPhenotypeCalculator;
