@@ -2,8 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: FINAL CAT ORDER NORMALIZER + LYNX BUILDER FIX 2026-06-09");
-window.__CAT_ENGINE_VERSION = "AUTO ANIMAL GENOTYPE + FINAL CAT ORDER NORMALIZER 2026-06-12";
+console.log("CAT ENGINE VERSION: EXPANDED FELINE STRUCTURAL + COAT GENETICS 2026-07-13");
+window.__CAT_ENGINE_VERSION = "EXPANDED FELINE STRUCTURAL + COAT GENETICS 2026-07-13";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -44,8 +44,19 @@ function runCatPredictor(inputs) {
     catOutcomeRow("Glitter", sire.Glitter, dam.Glitter),
     catOutcomeRow("Karpati", sire.Karpati, dam.Karpati),
     catOutcomeRow("Hair Length", sire.HairLength, dam.HairLength),
-    catOutcomeRow("Rex", sire.Rex, dam.Rex),
-    catOutcomeRow("Hairless", sire.Hairless, dam.Hairless)
+    catOutcomeRow("Devon Rex", sire.DevonRex, dam.DevonRex),
+    catOutcomeRow("Cornish Rex", sire.CornishRex, dam.CornishRex),
+    catOutcomeRow("Selkirk Rex", sire.SelkirkRex, dam.SelkirkRex),
+    catOutcomeRow("LaPerm", sire.LaPerm, dam.LaPerm),
+    catOutcomeRow("Ural Rex", sire.UralRex, dam.UralRex),
+    catOutcomeRow("Tennessee Rex", sire.TennesseeRex, dam.TennesseeRex),
+    catOutcomeRow("Sphynx Hairless", sire.Hairless, dam.Hairless),
+    catOutcomeRow("Donskoy/Peterbald Hairless", sire.Donskoy, dam.Donskoy),
+    catOutcomeRow("Lykoi", sire.Lykoi, dam.Lykoi),
+    catOutcomeRow("Munchkin", sire.Munchkin, dam.Munchkin),
+    catOutcomeRow("Scottish Fold", sire.ScottishFold, dam.ScottishFold),
+    catOutcomeRow("American Curl", sire.AmericanCurl, dam.AmericanCurl),
+    catOutcomeRow("Manx", sire.Manx, dam.Manx)
   ].join("");
 
   return renderCatResults(
@@ -137,8 +148,19 @@ function runCatGenotypeBuilder(inputs) {
   add(parts.Glitter, "n/n");
   add(parts.Karpati, "n/n");
   add(parts.HairLength, "L/L");
-  add(parts.Rex, "rx/rx");
-  add(parts.Hairless, "hr/hr");
+  add(parts.DevonRex, "Re/Re");
+  add(parts.CornishRex, "Cr/Cr");
+  add(parts.SelkirkRex, "se/se");
+  add(parts.LaPerm, "lp/lp");
+  add(parts.UralRex, "Ur/Ur");
+  add(parts.TennesseeRex, "tr/tr");
+  add(parts.Hairless, "Hr/Hr");
+  add(parts.Donskoy, "dn/dn");
+  add(parts.Lykoi, "Lk/Lk");
+  add(parts.Munchkin, "mk/mk");
+  add(parts.ScottishFold, "fd/fd");
+  add(parts.AmericanCurl, "cu/cu");
+  add(parts.Manx, "m/m");
 
   return genes.join(" ");
 }
@@ -323,12 +345,23 @@ function runCatGenotypeBuilder(inputs) {
     phenotype.includes("short-haired") ||
     phenotype.includes("short haired");
 
-  const wantsRex =
-    phenotype.includes("rex");
+  const wantsDevonRex = phenotype.includes("devon rex");
+  const wantsCornishRex = phenotype.includes("cornish rex");
+  const wantsSelkirkRex = phenotype.includes("selkirk rex");
+  const wantsLaPerm = phenotype.includes("laperm") || phenotype.includes("la perm");
+  const wantsUralRex = phenotype.includes("ural rex");
+  const wantsTennesseeRex = phenotype.includes("tennessee rex");
+  const wantsGenericRex = phenotype.includes("rex") &&
+    !wantsDevonRex && !wantsCornishRex && !wantsSelkirkRex &&
+    !wantsUralRex && !wantsTennesseeRex;
 
-  const wantsHairless =
-    phenotype.includes("hairless") ||
-    phenotype.includes("sphynx");
+  const wantsHairless = phenotype.includes("hairless") || phenotype.includes("sphynx");
+  const wantsDonskoy = phenotype.includes("donskoy") || phenotype.includes("peterbald");
+  const wantsLykoi = phenotype.includes("lykoi") || phenotype.includes("roan");
+  const wantsMunchkin = phenotype.includes("munchkin") || phenotype.includes("dwarf");
+  const wantsScottishFold = phenotype.includes("scottish fold") || phenotype.includes("folded ears");
+  const wantsAmericanCurl = phenotype.includes("american curl") || phenotype.includes("curled ears");
+  const wantsManx = phenotype.includes("manx") || phenotype.includes("cymric") || phenotype.includes("tailless");
 
   const base = {
     Orange: "o/o",
@@ -353,8 +386,19 @@ function runCatGenotypeBuilder(inputs) {
     Glitter: "n/n",
     Karpati: "n/n",
     HairLength: "L/L",
-    Rex: "rx/rx",
-    Hairless: "hr/hr"
+    DevonRex: "Re/Re",
+    CornishRex: "Cr/Cr",
+    SelkirkRex: "se/se",
+    LaPerm: "lp/lp",
+    UralRex: "Ur/Ur",
+    TennesseeRex: "tr/tr",
+    Hairless: "Hr/Hr",
+    Donskoy: "dn/dn",
+    Lykoi: "Lk/Lk",
+    Munchkin: "mk/mk",
+    ScottishFold: "fd/fd",
+    AmericanCurl: "cu/cu",
+    Manx: "m/m"
   };
 
   function cloneBase() {
@@ -495,14 +539,57 @@ function runCatGenotypeBuilder(inputs) {
       addHidden("Shorthair can carry longhair: L/l.");
     }
 
-    if (wantsRex) {
-      parts.Rex = "Rx/rx";
-      addSuggestion("Rex Coat: Rx/-");
+    if (wantsDevonRex || wantsGenericRex) {
+      parts.DevonRex = "re/re";
+      addSuggestion("Devon Rex: re/re (recessive)");
     }
-
+    if (wantsCornishRex) {
+      parts.CornishRex = "cr/cr";
+      addSuggestion("Cornish Rex: cr/cr (recessive)");
+    }
+    if (wantsSelkirkRex) {
+      parts.SelkirkRex = "Se/se";
+      addSuggestion("Selkirk Rex: Se/- (dominant)");
+    }
+    if (wantsLaPerm) {
+      parts.LaPerm = "Lp/lp";
+      addSuggestion("LaPerm: Lp/- (dominant)");
+    }
+    if (wantsUralRex) {
+      parts.UralRex = "ur/ur";
+      addSuggestion("Ural Rex: ur/ur (recessive simulation locus)");
+    }
+    if (wantsTennesseeRex) {
+      parts.TennesseeRex = "Tr/tr";
+      addSuggestion("Tennessee Rex: Tr/- (dominant simulation locus)");
+    }
     if (wantsHairless) {
-      parts.Hairless = "Hr/hr";
-      addSuggestion("Hairless: Hr/-");
+      parts.Hairless = "hr/hr";
+      addSuggestion("Sphynx Hairless: hr/hr (recessive)");
+    }
+    if (wantsDonskoy) {
+      parts.Donskoy = "Dn/dn";
+      addSuggestion("Donskoy/Peterbald Hairless: Dn/- (dominant)");
+    }
+    if (wantsLykoi) {
+      parts.Lykoi = "lk/lk";
+      addSuggestion("Lykoi hypotrichia and roaning: lk/lk (recessive)");
+    }
+    if (wantsMunchkin) {
+      parts.Munchkin = "Mk/mk";
+      addSuggestion("Munchkin: Mk/mk; Mk/Mk is embryonic lethal");
+    }
+    if (wantsScottishFold) {
+      parts.ScottishFold = "Fd/fd";
+      addSuggestion("Scottish Fold: Fd/-; Fd/Fd has severe skeletal disease");
+    }
+    if (wantsAmericanCurl) {
+      parts.AmericanCurl = "Cu/cu";
+      addSuggestion("American Curl: Cu/-");
+    }
+    if (wantsManx) {
+      parts.Manx = "M/m";
+      addSuggestion("Manx/Cymric: M/m; M/M is embryonic lethal");
     }
 
     return parts;
@@ -879,8 +966,20 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   const wantsKarpati = has("karpati");
   const wantsLonghair = has("longhair") || has("long hair") || has("long haired");
   const wantsShorthair = has("shorthair") || has("short hair") || has("short haired");
-  const wantsRex = has("rex");
+  const wantsDevonRex = has("devon rex");
+  const wantsCornishRex = has("cornish rex");
+  const wantsSelkirkRex = has("selkirk rex");
+  const wantsLaPerm = has("laperm") || has("la perm");
+  const wantsUralRex = has("ural rex");
+  const wantsTennesseeRex = has("tennessee rex");
+  const wantsGenericRex = has("rex") && !wantsDevonRex && !wantsCornishRex && !wantsSelkirkRex && !wantsUralRex && !wantsTennesseeRex;
   const wantsHairless = has("hairless") || has("sphynx");
+  const wantsDonskoy = has("donskoy") || has("peterbald");
+  const wantsLykoi = has("lykoi") || has("roan");
+  const wantsMunchkin = has("munchkin") || has("dwarf");
+  const wantsScottishFold = has("scottish fold") || has("folded ears");
+  const wantsAmericanCurl = has("american curl") || has("curled ears");
+  const wantsManx = has("manx") || has("cymric") || has("tailless");
 
   const genes = [];
 
@@ -908,8 +1007,19 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
       Glitter: /^(Gl|n)\//,
       Karpati: /^(Kp|n)\//,
       HairLength: /^(L|l)\//,
-      Rex: /^(Rx|rx)\//,
-      Hairless: /^(Hr|hr)\//
+      DevonRex: /^(Re|re)\//,
+      CornishRex: /^(Cr|cr)\//,
+      SelkirkRex: /^(Se|se)\//,
+      LaPerm: /^(Lp|lp)\//,
+      UralRex: /^(Ur|ur)\//,
+      TennesseeRex: /^(Tr|tr)\//,
+      Hairless: /^(Hr|hr)\//,
+      Donskoy: /^(Dn|dn)\//,
+      Lykoi: /^(Lk|lk)\//,
+      Munchkin: /^(Mk|mk)\//,
+      ScottishFold: /^(Fd|fd)\//,
+      AmericanCurl: /^(Cu|cu)\//,
+      Manx: /^(M|m)\//
     };
 
     const re = prefixes[locus];
@@ -1010,8 +1120,19 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   if (wantsKarpati) setGene("Karpati", "Kp/n");
   if (wantsLonghair) setGene("HairLength", "l/l");
   if (wantsShorthair) setGene("HairLength", "L/l");
-  if (wantsRex) setGene("Rex", "Rx/rx");
-  if (wantsHairless) setGene("Hairless", "Hr/hr");
+  if (wantsDevonRex || wantsGenericRex) setGene("DevonRex", "re/re");
+  if (wantsCornishRex) setGene("CornishRex", "cr/cr");
+  if (wantsSelkirkRex) setGene("SelkirkRex", "Se/se");
+  if (wantsLaPerm) setGene("LaPerm", "Lp/lp");
+  if (wantsUralRex) setGene("UralRex", "ur/ur");
+  if (wantsTennesseeRex) setGene("TennesseeRex", "Tr/tr");
+  if (wantsHairless) setGene("Hairless", "hr/hr");
+  if (wantsDonskoy) setGene("Donskoy", "Dn/dn");
+  if (wantsLykoi) setGene("Lykoi", "lk/lk");
+  if (wantsMunchkin) setGene("Munchkin", "Mk/mk");
+  if (wantsScottishFold) setGene("ScottishFold", "Fd/fd");
+  if (wantsAmericanCurl) setGene("AmericanCurl", "Cu/cu");
+  if (wantsManx) setGene("Manx", "M/m");
 
   return cleanAutoCatGenotype(genes.join(" "));
 }
@@ -1040,8 +1161,19 @@ function cleanAutoCatGenotype(genotype) {
     /^(Gl|n)\//,
     /^(Kp|n)\//,
     /^(L|l)\//,
-    /^(Rx|rx)\//,
-    /^(Hr|hr)\//
+    /^(Re|re)\//,
+    /^(Cr|cr)\//,
+    /^(Se|se)\//,
+    /^(Lp|lp)\//,
+    /^(Ur|ur)\//,
+    /^(Tr|tr)\//,
+    /^(Hr|hr)\//,
+    /^(Dn|dn)\//,
+    /^(Lk|lk)\//,
+    /^(Mk|mk)\//,
+    /^(Fd|fd)\//,
+    /^(Cu|cu)\//,
+    /^(M|m)\//
   ];
 
   const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
@@ -1109,9 +1241,19 @@ function parseCatGenotype(genotypeText) {
 
     HairLength: findCatGenePair(text, ["L/L", "L/l", "l/L", "l/l"], "L/L"),
 
-    Rex: findCatGenePair(text, ["Rx/Rx", "Rx/rx", "rx/Rx", "rx/rx"], "rx/rx"),
-
-    Hairless: findCatGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "hr/hr")
+    DevonRex: findCatGenePair(text, ["Re/Re", "Re/re", "re/Re", "re/re"], "Re/Re"),
+    CornishRex: findCatGenePair(text, ["Cr/Cr", "Cr/cr", "cr/Cr", "cr/cr"], "Cr/Cr"),
+    SelkirkRex: findCatGenePair(text, ["Se/Se", "Se/se", "se/Se", "se/se"], "se/se"),
+    LaPerm: findCatGenePair(text, ["Lp/Lp", "Lp/lp", "lp/Lp", "lp/lp"], "lp/lp"),
+    UralRex: findCatGenePair(text, ["Ur/Ur", "Ur/ur", "ur/Ur", "ur/ur"], "Ur/Ur"),
+    TennesseeRex: findCatGenePair(text, ["Tr/Tr", "Tr/tr", "tr/Tr", "tr/tr"], "tr/tr"),
+    Hairless: findCatGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], "Hr/Hr"),
+    Donskoy: findCatGenePair(text, ["Dn/Dn", "Dn/dn", "dn/Dn", "dn/dn"], "dn/dn"),
+    Lykoi: findCatGenePair(text, ["Lk/Lk", "Lk/lk", "lk/Lk", "lk/lk"], "Lk/Lk"),
+    Munchkin: findCatGenePair(text, ["Mk/Mk", "Mk/mk", "mk/Mk", "mk/mk"], "mk/mk"),
+    ScottishFold: findCatGenePair(text, ["Fd/Fd", "Fd/fd", "fd/Fd", "fd/fd"], "fd/fd"),
+    AmericanCurl: findCatGenePair(text, ["Cu/Cu", "Cu/cu", "cu/Cu", "cu/cu"], "cu/cu"),
+    Manx: findCatGenePair(text, ["M/M", "M/m", "m/M", "m/m"], "m/m")
   };
 }
 
@@ -1144,6 +1286,7 @@ function buildCatPhenotypeName(parsed, namingStyle) {
 
   mainName = addCatWhiteSpottingName(mainName, parsed, isAlbino);
   mainName = addCatPolydactylName(mainName, parsed);
+  mainName = addCatStructuralTraitNames(mainName, parsed);
   mainName = addCatHairTypeName(mainName, parsed);
 
   return mainName;
@@ -1364,19 +1507,42 @@ function addCatPolydactylName(colour, parsed) {
   return colour;
 }
 
+function addCatStructuralTraitNames(colour, parsed) {
+  const traits = [];
+
+  if (parsed.Munchkin === "Mk/Mk") traits.push("Nonviable Munchkin");
+  else if (parsed.Munchkin === "Mk/mk" || parsed.Munchkin === "mk/Mk") traits.push("Munchkin");
+
+  if (parsed.ScottishFold === "Fd/Fd") traits.push("Homozygous Scottish Fold");
+  else if (parsed.ScottishFold === "Fd/fd" || parsed.ScottishFold === "fd/Fd") traits.push("Scottish Fold");
+
+  if (parsed.AmericanCurl === "Cu/Cu" || parsed.AmericanCurl === "Cu/cu" || parsed.AmericanCurl === "cu/Cu") traits.push("American Curl");
+
+  if (parsed.Manx === "M/M") traits.push("Nonviable Manx");
+  else if (parsed.Manx === "M/m" || parsed.Manx === "m/M") traits.push("Manx");
+
+  return traits.length ? colour + " " + traits.join(" ") : colour;
+}
+
 function addCatHairTypeName(colour, parsed) {
-  if (parsed.Hairless === "Hr/Hr" || parsed.Hairless === "Hr/hr" || parsed.Hairless === "hr/Hr") {
-    return colour + " Hairless";
+  const coats = [];
+
+  if (parsed.Donskoy === "Dn/Dn" || parsed.Donskoy === "Dn/dn" || parsed.Donskoy === "dn/Dn") {
+    coats.push("Donskoy Hairless");
+  } else if (parsed.Hairless === "hr/hr") {
+    coats.push("Sphynx Hairless");
   }
 
-  if (parsed.Rex === "Rx/Rx" || parsed.Rex === "Rx/rx" || parsed.Rex === "rx/Rx") {
-    return colour + " Rex";
-  }
+  if (parsed.Lykoi === "lk/lk") coats.push("Roan Lykoi");
+  if (parsed.DevonRex === "re/re") coats.push("Devon Rex");
+  if (parsed.CornishRex === "cr/cr") coats.push("Cornish Rex");
+  if (parsed.SelkirkRex === "Se/Se" || parsed.SelkirkRex === "Se/se" || parsed.SelkirkRex === "se/Se") coats.push("Selkirk Rex");
+  if (parsed.LaPerm === "Lp/Lp" || parsed.LaPerm === "Lp/lp" || parsed.LaPerm === "lp/Lp") coats.push("LaPerm");
+  if (parsed.UralRex === "ur/ur") coats.push("Ural Rex");
+  if (parsed.TennesseeRex === "Tr/Tr" || parsed.TennesseeRex === "Tr/tr" || parsed.TennesseeRex === "tr/Tr") coats.push("Tennessee Rex");
 
-  if (parsed.HairLength === "l/l") {
-    return colour + " Longhair";
-  }
-
+  if (coats.length) return colour + " " + coats.join(" ");
+  if (parsed.HairLength === "l/l") return colour + " Longhair";
   return colour + " Shorthair";
 }
 
@@ -1384,7 +1550,11 @@ function addCatHairTypeName(colour, parsed) {
 function normalizeCatColourOrder(name) {
   let colour = String(name || "").trim().replace(/\s+/g, " ");
 
-  const hairWords = ["Shorthair", "Longhair", "Rex", "Hairless"];
+  const hairWords = [
+    "Donskoy Hairless", "Sphynx Hairless", "Roan Lykoi",
+    "Tennessee Rex", "Selkirk Rex", "Cornish Rex", "Devon Rex", "Ural Rex",
+    "LaPerm", "Shorthair", "Longhair", "Rex", "Hairless"
+  ];
   let hair = "";
 
   for (const word of hairWords) {
@@ -1876,28 +2046,9 @@ function applyCatPolydactyl(colour, parsed) {
 }
 
 function applyCatHairType(colour, parsed) {
-  if (
-    parsed.Hairless === "Hr/Hr" ||
-    parsed.Hairless === "Hr/hr" ||
-    parsed.Hairless === "hr/Hr"
-  ) {
-    return colour + " Hairless";
-  }
-
-  if (
-    parsed.Rex === "Rx/Rx" ||
-    parsed.Rex === "Rx/rx" ||
-    parsed.Rex === "rx/Rx"
-  ) {
-    return colour + " Rex";
-  }
-
-  if (parsed.HairLength === "l/l") {
-    return colour + " Longhair";
-  }
-
-  return colour + " Shorthair";
+  return addCatHairTypeName(colour, parsed);
 }
+
 
 /* =========================
    OUTPUT HELPERS
@@ -2107,10 +2258,19 @@ function sortCatGenePair(alleles) {
     "pd": 2,
     "L": 1,
     "l": 2,
-    "Rx": 1,
-    "rx": 2,
-    "Hr": 1,
-    "hr": 2,
+    "Re": 1, "re": 2,
+    "Cr": 1, "cr": 2,
+    "Se": 1, "se": 2,
+    "Lp": 1, "lp": 2,
+    "Ur": 1, "ur": 2,
+    "Tr": 1, "tr": 2,
+    "Hr": 1, "hr": 2,
+    "Dn": 1, "dn": 2,
+    "Lk": 1, "lk": 2,
+    "Mk": 1, "mk": 2,
+    "Fd": 1, "fd": 2,
+    "Cu": 1, "cu": 2,
+    "M": 1, "m": 2,
     "Amb": 1,
     "Su": 1,
     "Es": 1,
