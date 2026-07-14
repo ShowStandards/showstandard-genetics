@@ -2,8 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: EXPANDED FELINE STRUCTURAL + COAT GENETICS 2026-07-13");
-window.__CAT_ENGINE_VERSION = "EXPANDED FELINE STRUCTURAL + COAT GENETICS 2026-07-13";
+console.log("CAT ENGINE VERSION: COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS 2026-07-13");
+window.__CAT_ENGINE_VERSION = "COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS 2026-07-13";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -56,7 +56,14 @@ function runCatPredictor(inputs) {
     catOutcomeRow("Munchkin", sire.Munchkin, dam.Munchkin),
     catOutcomeRow("Scottish Fold", sire.ScottishFold, dam.ScottishFold),
     catOutcomeRow("American Curl", sire.AmericanCurl, dam.AmericanCurl),
-    catOutcomeRow("Manx", sire.Manx, dam.Manx)
+    catOutcomeRow("Manx", sire.Manx, dam.Manx),
+    catOutcomeRow("American Wirehair", sire.Wirehair, dam.Wirehair),
+    catOutcomeRow("Satin", sire.Satin, dam.Satin),
+    catOutcomeRow("Natural Bobtail", sire.Bobtail, dam.Bobtail),
+    catOutcomeRow("Ojos Azules", sire.OjosAzules, dam.OjosAzules),
+    catOutcomeRow("Dominant Blue Eye", sire.DominantBlueEye, dam.DominantBlueEye),
+    catOutcomeRow("Copper Eye Modifier", sire.CopperEye, dam.CopperEye),
+    catOutcomeRow("Burmilla Golden Modifier", sire.BurmillaGolden, dam.BurmillaGolden)
   ].join("");
 
   return renderCatResults(
@@ -161,6 +168,13 @@ function runCatGenotypeBuilder(inputs) {
   add(parts.ScottishFold, "fd/fd");
   add(parts.AmericanCurl, "cu/cu");
   add(parts.Manx, "m/m");
+  add(parts.Wirehair, "wh/wh");
+  add(parts.Satin, "st/st");
+  add(parts.Bobtail, "bt/bt");
+  add(parts.OjosAzules, "oa/oa");
+  add(parts.DominantBlueEye, "db/db");
+  add(parts.CopperEye, "ce/ce");
+  add(parts.BurmillaGolden, "bg/bg");
 
   return genes.join(" ");
 }
@@ -362,6 +376,13 @@ function runCatGenotypeBuilder(inputs) {
   const wantsScottishFold = phenotype.includes("scottish fold") || phenotype.includes("folded ears");
   const wantsAmericanCurl = phenotype.includes("american curl") || phenotype.includes("curled ears");
   const wantsManx = phenotype.includes("manx") || phenotype.includes("cymric") || phenotype.includes("tailless");
+  const wantsWirehair = phenotype.includes("wirehair") || phenotype.includes("wire haired");
+  const wantsSatin = phenotype.includes("satin");
+  const wantsBobtail = phenotype.includes("bobtail") || phenotype.includes("bobbed tail");
+  const wantsOjosAzules = phenotype.includes("ojos azules");
+  const wantsDominantBlueEye = phenotype.includes("dominant blue eye") || phenotype.includes("dbe");
+  const wantsCopperEye = phenotype.includes("copper eye") || phenotype.includes("copper eyed");
+  const wantsBurmillaGolden = phenotype.includes("burmilla golden") || phenotype.includes("golden modifier");
 
   const base = {
     Orange: "o/o",
@@ -398,7 +419,14 @@ function runCatGenotypeBuilder(inputs) {
     Munchkin: "mk/mk",
     ScottishFold: "fd/fd",
     AmericanCurl: "cu/cu",
-    Manx: "m/m"
+    Manx: "m/m",
+    Wirehair: "wh/wh",
+    Satin: "st/st",
+    Bobtail: "bt/bt",
+    OjosAzules: "oa/oa",
+    DominantBlueEye: "db/db",
+    CopperEye: "ce/ce",
+    BurmillaGolden: "bg/bg"
   };
 
   function cloneBase() {
@@ -591,6 +619,13 @@ function runCatGenotypeBuilder(inputs) {
       parts.Manx = "M/m";
       addSuggestion("Manx/Cymric: M/m; M/M is embryonic lethal");
     }
+    if (wantsWirehair) { parts.Wirehair = "Wh/wh"; addSuggestion("American Wirehair: Wh/- (dominant)"); }
+    if (wantsSatin) { parts.Satin = "St/st"; addSuggestion("Satin coat: St/-"); }
+    if (wantsBobtail) { parts.Bobtail = "Bt/bt"; addSuggestion("Natural Bobtail: Bt/-"); }
+    if (wantsOjosAzules) { parts.OjosAzules = "Oa/oa"; addSuggestion("Ojos Azules: Oa/-"); }
+    if (wantsDominantBlueEye) { parts.DominantBlueEye = "Db/db"; addSuggestion("Dominant Blue Eye: Db/-"); }
+    if (wantsCopperEye) { parts.CopperEye = "Ce/ce"; addSuggestion("Copper Eye Modifier: Ce/-"); }
+    if (wantsBurmillaGolden) { parts.BurmillaGolden = "Bg/bg"; addSuggestion("Burmilla Golden Modifier: Bg/-"); }
 
     return parts;
   }
@@ -980,6 +1015,13 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   const wantsScottishFold = has("scottish fold") || has("folded ears");
   const wantsAmericanCurl = has("american curl") || has("curled ears");
   const wantsManx = has("manx") || has("cymric") || has("tailless");
+  const wantsWirehair = has("wirehair") || has("wire haired");
+  const wantsSatin = has("satin");
+  const wantsBobtail = has("bobtail") || has("bobbed tail");
+  const wantsOjosAzules = has("ojos azules");
+  const wantsDominantBlueEye = has("dominant blue eye") || has("dbe");
+  const wantsCopperEye = has("copper eye") || has("copper eyed");
+  const wantsBurmillaGolden = has("burmilla golden") || has("golden modifier");
 
   const genes = [];
 
@@ -1019,7 +1061,14 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
       Munchkin: /^(Mk|mk)\//,
       ScottishFold: /^(Fd|fd)\//,
       AmericanCurl: /^(Cu|cu)\//,
-      Manx: /^(M|m)\//
+      Manx: /^(M|m)\//,
+      Wirehair: /^(Wh|wh)\//,
+      Satin: /^(St|st)\//,
+      Bobtail: /^(Bt|bt)\//,
+      OjosAzules: /^(Oa|oa)\//,
+      DominantBlueEye: /^(Db|db)\//,
+      CopperEye: /^(Ce|ce)\//,
+      BurmillaGolden: /^(Bg|bg)\//
     };
 
     const re = prefixes[locus];
@@ -1133,6 +1182,13 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   if (wantsScottishFold) setGene("ScottishFold", "Fd/fd");
   if (wantsAmericanCurl) setGene("AmericanCurl", "Cu/cu");
   if (wantsManx) setGene("Manx", "M/m");
+  if (wantsWirehair) setGene("Wirehair", "Wh/wh");
+  if (wantsSatin) setGene("Satin", "St/st");
+  if (wantsBobtail) setGene("Bobtail", "Bt/bt");
+  if (wantsOjosAzules) setGene("OjosAzules", "Oa/oa");
+  if (wantsDominantBlueEye) setGene("DominantBlueEye", "Db/db");
+  if (wantsCopperEye) setGene("CopperEye", "Ce/ce");
+  if (wantsBurmillaGolden) setGene("BurmillaGolden", "Bg/bg");
 
   return cleanAutoCatGenotype(genes.join(" "));
 }
@@ -1173,7 +1229,14 @@ function cleanAutoCatGenotype(genotype) {
     /^(Mk|mk)\//,
     /^(Fd|fd)\//,
     /^(Cu|cu)\//,
-    /^(M|m)\//
+    /^(M|m)\//,
+    /^(Wh|wh)\//,
+    /^(St|st)\//,
+    /^(Bt|bt)\//,
+    /^(Oa|oa)\//,
+    /^(Db|db)\//,
+    /^(Ce|ce)\//,
+    /^(Bg|bg)\//
   ];
 
   const tokens = String(genotype || "").split(/\s+/).filter(Boolean);
@@ -1253,7 +1316,15 @@ function parseCatGenotype(genotypeText) {
     Munchkin: findCatGenePair(text, ["Mk/Mk", "Mk/mk", "mk/Mk", "mk/mk"], "mk/mk"),
     ScottishFold: findCatGenePair(text, ["Fd/Fd", "Fd/fd", "fd/Fd", "fd/fd"], "fd/fd"),
     AmericanCurl: findCatGenePair(text, ["Cu/Cu", "Cu/cu", "cu/Cu", "cu/cu"], "cu/cu"),
-    Manx: findCatGenePair(text, ["M/M", "M/m", "m/M", "m/m"], "m/m")
+    Manx: findCatGenePair(text, ["M/M", "M/m", "m/M", "m/m"], "m/m"),
+
+    Wirehair: findCatGenePair(text, ["Wh/Wh", "Wh/wh", "wh/Wh", "wh/wh"], "wh/wh"),
+    Satin: findCatGenePair(text, ["St/St", "St/st", "st/St", "st/st"], "st/st"),
+    Bobtail: findCatGenePair(text, ["Bt/Bt", "Bt/bt", "bt/Bt", "bt/bt"], "bt/bt"),
+    OjosAzules: findCatGenePair(text, ["Oa/Oa", "Oa/oa", "oa/Oa", "oa/oa"], "oa/oa"),
+    DominantBlueEye: findCatGenePair(text, ["Db/Db", "Db/db", "db/Db", "db/db"], "db/db"),
+    CopperEye: findCatGenePair(text, ["Ce/Ce", "Ce/ce", "ce/Ce", "ce/ce"], "ce/ce"),
+    BurmillaGolden: findCatGenePair(text, ["Bg/Bg", "Bg/bg", "bg/Bg", "bg/bg"], "bg/bg")
   };
 }
 
@@ -1286,8 +1357,9 @@ function buildCatPhenotypeName(parsed, namingStyle) {
 
   mainName = addCatWhiteSpottingName(mainName, parsed, isAlbino);
   mainName = addCatPolydactylName(mainName, parsed);
-  mainName = addCatStructuralTraitNames(mainName, parsed);
+  mainName = addCatStructuralTraitNames(mainName, parsed, namingStyle);
   mainName = addCatHairTypeName(mainName, parsed);
+  mainName = addCatEyeTraitNames(mainName, parsed);
 
   return mainName;
 }
@@ -1394,6 +1466,10 @@ function getCatExtraModifierWords(parsed) {
 
   if (parsed.Karpati === "Kp/Kp" || parsed.Karpati === "Kp/n") {
     modifiers.push("Karpati");
+  }
+
+  if (parsed.BurmillaGolden === "Bg/Bg" || parsed.BurmillaGolden === "Bg/bg" || parsed.BurmillaGolden === "bg/Bg") {
+    modifiers.push("Burmilla Golden");
   }
 
   return modifiers;
@@ -1507,7 +1583,7 @@ function addCatPolydactylName(colour, parsed) {
   return colour;
 }
 
-function addCatStructuralTraitNames(colour, parsed) {
+function addCatStructuralTraitNames(colour, parsed, namingStyle) {
   const traits = [];
 
   if (parsed.Munchkin === "Mk/Mk") traits.push("Nonviable Munchkin");
@@ -1520,6 +1596,15 @@ function addCatStructuralTraitNames(colour, parsed) {
 
   if (parsed.Manx === "M/M") traits.push("Nonviable Manx");
   else if (parsed.Manx === "M/m" || parsed.Manx === "m/M") traits.push("Manx");
+
+  if (parsed.Bobtail === "Bt/Bt" || parsed.Bobtail === "Bt/bt" || parsed.Bobtail === "bt/Bt") {
+    const style = String(namingStyle || "").toLowerCase();
+    if (style.includes("japanese")) traits.push("Japanese Bobtail");
+    else if (style.includes("kurilian")) traits.push("Kurilian Bobtail");
+    else if (style.includes("mekong")) traits.push("Mekong Bobtail");
+    else if (style.includes("american bobtail")) traits.push("American Bobtail");
+    else traits.push("Natural Bobtail");
+  }
 
   return traits.length ? colour + " " + traits.join(" ") : colour;
 }
@@ -1540,10 +1625,22 @@ function addCatHairTypeName(colour, parsed) {
   if (parsed.LaPerm === "Lp/Lp" || parsed.LaPerm === "Lp/lp" || parsed.LaPerm === "lp/Lp") coats.push("LaPerm");
   if (parsed.UralRex === "ur/ur") coats.push("Ural Rex");
   if (parsed.TennesseeRex === "Tr/Tr" || parsed.TennesseeRex === "Tr/tr" || parsed.TennesseeRex === "tr/Tr") coats.push("Tennessee Rex");
+  if (parsed.Wirehair === "Wh/Wh" || parsed.Wirehair === "Wh/wh" || parsed.Wirehair === "wh/Wh") coats.push("American Wirehair");
+  if (parsed.Satin === "St/St" || parsed.Satin === "St/st" || parsed.Satin === "st/St") coats.push("Satin");
 
   if (coats.length) return colour + " " + coats.join(" ");
   if (parsed.HairLength === "l/l") return colour + " Longhair";
   return colour + " Shorthair";
+}
+
+
+function addCatEyeTraitNames(colour, parsed) {
+  const traits = [];
+  if (parsed.OjosAzules === "Oa/Oa") traits.push("Homozygous Ojos Azules");
+  else if (parsed.OjosAzules === "Oa/oa" || parsed.OjosAzules === "oa/Oa") traits.push("Ojos Azules");
+  if (parsed.DominantBlueEye === "Db/Db" || parsed.DominantBlueEye === "Db/db" || parsed.DominantBlueEye === "db/Db") traits.push("Dominant Blue-Eyed");
+  if (parsed.CopperEye === "Ce/Ce" || parsed.CopperEye === "Ce/ce" || parsed.CopperEye === "ce/Ce") traits.push("Copper-Eyed");
+  return traits.length ? colour + " " + traits.join(" ") : colour;
 }
 
 
@@ -1553,7 +1650,7 @@ function normalizeCatColourOrder(name) {
   const hairWords = [
     "Donskoy Hairless", "Sphynx Hairless", "Roan Lykoi",
     "Tennessee Rex", "Selkirk Rex", "Cornish Rex", "Devon Rex", "Ural Rex",
-    "LaPerm", "Shorthair", "Longhair", "Rex", "Hairless"
+    "LaPerm", "American Wirehair", "Satin", "Shorthair", "Longhair", "Rex", "Hairless"
   ];
   let hair = "";
 
@@ -2271,6 +2368,13 @@ function sortCatGenePair(alleles) {
     "Fd": 1, "fd": 2,
     "Cu": 1, "cu": 2,
     "M": 1, "m": 2,
+    "Wh": 1, "wh": 2,
+    "St": 1, "st": 2,
+    "Bt": 1, "bt": 2,
+    "Oa": 1, "oa": 2,
+    "Db": 1, "db": 2,
+    "Ce": 1, "ce": 2,
+    "Bg": 1, "bg": 2,
     "Amb": 1,
     "Su": 1,
     "Es": 1,
@@ -2311,3 +2415,5 @@ window.applyCatWhiteSpotting = applyCatWhiteSpotting;
 window.applyCatPolydactyl = applyCatPolydactyl;
 window.applyCatHairType = applyCatHairType;
 window.applyCatBreedSpecificNaming = applyCatBreedSpecificNaming;
+window.parseCatGenotype = parseCatGenotype;
+window.getCatPhenotype = getCatPhenotype;
