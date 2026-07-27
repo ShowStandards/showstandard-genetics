@@ -2,8 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS 2026-07-13");
-window.__CAT_ENGINE_VERSION = "COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS 2026-07-13";
+console.log("CAT ENGINE VERSION: COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS + WIREHAIR 2026-07-27");
+window.__CAT_ENGINE_VERSION = "COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS + WIREHAIR 2026-07-27";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -376,7 +376,7 @@ function runCatGenotypeBuilder(inputs) {
   const wantsScottishFold = phenotype.includes("scottish fold") || phenotype.includes("folded ears");
   const wantsAmericanCurl = phenotype.includes("american curl") || phenotype.includes("curled ears");
   const wantsManx = phenotype.includes("manx") || phenotype.includes("cymric") || phenotype.includes("tailless");
-  const wantsWirehair = phenotype.includes("wirehair") || phenotype.includes("wire haired");
+  const wantsWirehair = phenotype.includes("wirehair") || phenotype.includes("wire-haired") || phenotype.includes("wire haired");
   const wantsSatin = phenotype.includes("satin");
   const wantsBobtail = phenotype.includes("bobtail") || phenotype.includes("bobbed tail");
   const wantsOjosAzules = phenotype.includes("ojos azules");
@@ -1015,7 +1015,7 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   const wantsScottishFold = has("scottish fold") || has("folded ears");
   const wantsAmericanCurl = has("american curl") || has("curled ears");
   const wantsManx = has("manx") || has("cymric") || has("tailless");
-  const wantsWirehair = has("wirehair") || has("wire haired");
+  const wantsWirehair = has("wirehair") || has("wire-haired") || has("wire haired");
   const wantsSatin = has("satin");
   const wantsBobtail = has("bobtail") || has("bobbed tail");
   const wantsOjosAzules = has("ojos azules");
@@ -1625,7 +1625,7 @@ function addCatHairTypeName(colour, parsed) {
   if (parsed.LaPerm === "Lp/Lp" || parsed.LaPerm === "Lp/lp" || parsed.LaPerm === "lp/Lp") coats.push("LaPerm");
   if (parsed.UralRex === "ur/ur") coats.push("Ural Rex");
   if (parsed.TennesseeRex === "Tr/Tr" || parsed.TennesseeRex === "Tr/tr" || parsed.TennesseeRex === "tr/Tr") coats.push("Tennessee Rex");
-  if (parsed.Wirehair === "Wh/Wh" || parsed.Wirehair === "Wh/wh" || parsed.Wirehair === "wh/Wh") coats.push("American Wirehair");
+  if (parsed.Wirehair === "Wh/Wh" || parsed.Wirehair === "Wh/wh" || parsed.Wirehair === "wh/Wh") coats.push("Wirehair");
   if (parsed.Satin === "St/St" || parsed.Satin === "St/st" || parsed.Satin === "st/St") coats.push("Satin");
 
   if (coats.length) return colour + " " + coats.join(" ");
@@ -1650,7 +1650,7 @@ function normalizeCatColourOrder(name) {
   const hairWords = [
     "Donskoy Hairless", "Sphynx Hairless", "Roan Lykoi",
     "Tennessee Rex", "Selkirk Rex", "Cornish Rex", "Devon Rex", "Ural Rex",
-    "LaPerm", "American Wirehair", "Satin", "Shorthair", "Longhair", "Rex", "Hairless"
+    "LaPerm", "Wirehair", "American Wirehair", "Satin", "Shorthair", "Longhair", "Rex", "Hairless"
   ];
   let hair = "";
 
