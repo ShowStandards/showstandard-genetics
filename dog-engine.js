@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 20.6 - AGOUTI DISPLAY TERMINOLOGY UPDATED */
 /* DOG ENGINE VERSION 20.5 - PANDA LOCUS ADDED */
 /* DOG ENGINE VERSION 20.4 - DALMATIAN BASE COLOUR HARDENED */
 /* DOG ENGINE VERSION 20.3 - DALMATIAN COMPLEX + EXTENSION DEFAULT FIX */
@@ -892,7 +893,7 @@ function getDogShadeNotes(phenotypeText) {
     { terms: ["mahogany red", "deep red", "dark red", "orange", "orange red"], display: "red shade", genetic: "Red" },
     { terms: ["pale cream", "white cream", "ivory cream", "light cream"], display: "cream shade", genetic: "Cream" },
     { terms: ["golden sable", "mahogany sable", "shaded sable", "clear sable", "red sable", "cream sable", "pale cream sable"], display: "sable shade", genetic: "Sable/Fawn family" },
-    { terms: ["silver wolf sable", "grey wolf sable", "gray wolf sable"], display: "wolf sable shade", genetic: "Wolf Sable" },
+    { terms: ["silver wolf sable", "grey wolf sable", "gray wolf sable"], display: "wolf sable shade", genetic: "Agouti" },
     { terms: ["jet black", "raven black", "true black"], display: "black shade", genetic: "Black" },
     { terms: ["dark blue", "steel blue", "slate blue"], display: "blue shade", genetic: "Blue" },
     { terms: ["liver", "brown", "dark liver", "dark chocolate"], display: "chocolate/liver shade", genetic: "Chocolate" },
@@ -900,8 +901,8 @@ function getDogShadeNotes(phenotypeText) {
     { terms: ["orange belton"], display: "Orange Belton", genetic: "Red Roan/Ticked pattern" },
     { terms: ["blue belton"], display: "Blue Belton", genetic: "Blue Roan/Ticked pattern" },
     { terms: ["lemon belton"], display: "Lemon Belton", genetic: "Cream Roan/Ticked pattern" },
-    { terms: ["red sesame"], display: "Red Sesame", genetic: "Sable/Wolf Sable family" },
-    { terms: ["black sesame"], display: "Black Sesame", genetic: "Wolf Sable family" }
+    { terms: ["red sesame"], display: "Red Sesame", genetic: "Sable/Agouti family" },
+    { terms: ["black sesame"], display: "Black Sesame", genetic: "Agouti family" }
   ];
 
   for (const item of shadeMap) {
@@ -1027,7 +1028,7 @@ function getDogBaseColour(parsed) {
   }
 
   if (parsed.Agouti === "aw/aw" || parsed.Agouti === "aw/at" || parsed.Agouti === "aw/asa" || parsed.Agouti === "aw/a") {
-    return "Wolf Sable";
+    return "Agouti";
   }
 
   if (parsed.Agouti === "at/at" || parsed.Agouti === "at/asa" || parsed.Agouti === "at/a") {
@@ -1051,7 +1052,7 @@ function applyDogDarkPigmentModifiers(colour, parsed) {
       "Black": "Chocolate",
       "Black & Tan": "Chocolate & Tan",
       "Sable": "Chocolate Sable",
-      "Wolf Sable": "Chocolate Wolf Sable",
+      "Agouti": "Chocolate Agouti",
       "Saddle Tan": "Chocolate Saddle Tan"
     });
   } else if (isCocoa) {
@@ -1059,7 +1060,7 @@ function applyDogDarkPigmentModifiers(colour, parsed) {
       "Black": "Cocoa",
       "Black & Tan": "Cocoa & Tan",
       "Sable": "Cocoa Sable",
-      "Wolf Sable": "Cocoa Wolf Sable",
+      "Agouti": "Cocoa Agouti",
       "Saddle Tan": "Cocoa Saddle Tan"
     });
   }
@@ -1075,9 +1076,9 @@ function applyDogDarkPigmentModifiers(colour, parsed) {
       "Sable": "Blue Sable",
       "Chocolate Sable": "Lilac Sable",
       "Cocoa Sable": "Lilac Cocoa Sable",
-      "Wolf Sable": "Blue Wolf Sable",
-      "Chocolate Wolf Sable": "Lilac Wolf Sable",
-      "Cocoa Wolf Sable": "Lilac Cocoa Wolf Sable",
+      "Agouti": "Blue Agouti",
+      "Chocolate Agouti": "Lilac Agouti",
+      "Cocoa Agouti": "Lilac Cocoa Agouti",
       "Saddle Tan": "Blue Saddle Tan",
       "Chocolate Saddle Tan": "Lilac Saddle Tan",
       "Cocoa Saddle Tan": "Lilac Cocoa Saddle Tan"
@@ -1118,10 +1119,10 @@ function applyDogExtensionModifiers(colour, parsed) {
       "Chocolate & Tan": "Chocolate & Tan Cocker Sable",
       "Blue & Tan": "Blue & Tan Cocker Sable",
       "Lilac & Tan": "Lilac & Tan Cocker Sable",
-      "Wolf Sable": "Wolf Cocker Sable",
-      "Blue Wolf Sable": "Blue Wolf Cocker Sable",
-      "Chocolate Wolf Sable": "Chocolate Wolf Cocker Sable",
-      "Lilac Wolf Sable": "Lilac Wolf Cocker Sable"
+      "Agouti": "Wolf Cocker Sable",
+      "Blue Agouti": "Blue Wolf Cocker Sable",
+      "Chocolate Agouti": "Chocolate Wolf Cocker Sable",
+      "Lilac Agouti": "Lilac Wolf Cocker Sable"
     });
   }
 
@@ -1144,10 +1145,10 @@ function applyDogIntensity(colour, parsed) {
       "Lilac Cocker Sable": "Lilac Cocker Fawn",
       "Cocoa Cocker Sable": "Cocoa Cocker Fawn",
       "Lilac Cocoa Cocker Sable": "Lilac Cocoa Cocker Fawn",
-      "Wolf Sable": "Pale Wolf Sable",
-      "Blue Wolf Sable": "Pale Blue Wolf Sable",
-      "Chocolate Wolf Sable": "Pale Chocolate Wolf Sable",
-      "Lilac Wolf Sable": "Pale Lilac Wolf Sable",
+      "Agouti": "Pale Agouti",
+      "Blue Agouti": "Pale Blue Agouti",
+      "Chocolate Agouti": "Pale Chocolate Agouti",
+      "Lilac Agouti": "Pale Lilac Agouti",
       "Black & Tan": "Cream Point",
       "Chocolate & Tan": "Chocolate Cream",
       "Blue & Tan": "Blue Cream",
@@ -1172,10 +1173,10 @@ function applyDogIntensity(colour, parsed) {
       "Lilac Cocker Sable": "Silver Lilac Cocker Sable",
       "Cocoa Cocker Sable": "Silver Cocoa Cocker Sable",
       "Lilac Cocoa Cocker Sable": "Silver Lilac Cocoa Cocker Sable",
-      "Wolf Sable": "Silver Wolf Sable",
-      "Blue Wolf Sable": "Silver Blue Wolf Sable",
-      "Chocolate Wolf Sable": "Silver Chocolate Wolf Sable",
-      "Lilac Wolf Sable": "Silver Lilac Wolf Sable",
+      "Agouti": "Silver Agouti",
+      "Blue Agouti": "Silver Blue Agouti",
+      "Chocolate Agouti": "Silver Chocolate Agouti",
+      "Lilac Agouti": "Silver Lilac Agouti",
       "Black & Tan": "Black Silver & Tan",
       "Chocolate & Tan": "Chocolate Silver & Tan",
       "Blue & Tan": "Blue Silver & Tan",
@@ -1232,10 +1233,10 @@ function applyDogMerleAndHarlequin(colour, parsed) {
     "Blue Fawn": doublePrefix + "Slate Merle Fawn",
     "Lilac Fawn": doublePrefix + "Lilac Merle Fawn",
 
-    "Wolf Sable": doublePrefix + "Blue Merle Wolf Sable",
-    "Chocolate Wolf Sable": doublePrefix + "Red Merle Wolf Sable",
-    "Blue Wolf Sable": doublePrefix + "Slate Merle Wolf Sable",
-    "Lilac Wolf Sable": doublePrefix + "Lilac Merle Wolf Sable",
+    "Agouti": doublePrefix + "Blue Merle Agouti",
+    "Chocolate Agouti": doublePrefix + "Red Merle Agouti",
+    "Blue Agouti": doublePrefix + "Slate Merle Agouti",
+    "Lilac Agouti": doublePrefix + "Lilac Merle Agouti",
 
     "Saddle Tan": doublePrefix + "Blue Merle Saddle Tan",
     "Chocolate Saddle Tan": doublePrefix + "Red Merle Saddle Tan",
@@ -1297,7 +1298,7 @@ function getDogDalmatianColourName(colour, parsed) {
       "Chocolate": "Liver",
       "Chocolate & Tan": "Liver & Tan",
       "Chocolate Sable": "Liver Sable",
-      "Chocolate Wolf Sable": "Liver Wolf Sable",
+      "Chocolate Agouti": "Liver Agouti",
       "Chocolate Saddle Tan": "Liver Saddle Tan",
       "Lilac": "Lilac",
       "Blue": "Blue"
