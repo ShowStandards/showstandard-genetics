@@ -299,7 +299,8 @@ function runCatGenotypeBuilder(inputs) {
     phenotype.includes("ticked");
 
   const wantsBurmese =
-    phenotype.includes("burmese");
+    phenotype.includes("burmese") ||
+    phenotype.includes("sepia");
 
   const wantsPoint =
     phenotype.includes("siamese") ||
@@ -984,7 +985,7 @@ function buildAutoCatGenotype(phenotypeInput, genderInput) {
   const wantsClassic = has("classic");
   const wantsSpotted = has("spotted");
   const wantsTicked = has("ticked");
-  const wantsBurmese = has("burmese");
+  const wantsBurmese = has("burmese") || has("sepia");
   const wantsPoint = has("siamese") || has("point");
   const wantsMink = has("mink");
   const wantsBlueEyedAlbino = has("blue eyed albino");
@@ -1501,7 +1502,12 @@ function applyCatPointNamingFromParts(core, base, silverWord, pattern, parsed, n
     "Caramel": "Caramel",
     "Apricot": "Apricot",
     "Tortie": "Tortie",
+    "Black Tortie": "Seal Tortie",
+    "Chocolate Tortie": "Chocolate Tortie",
+    "Cinnamon Tortie": "Cinnamon Tortie",
     "Blue-Cream Tortie": "Blue-Cream",
+    "Lilac-Cream Tortie": "Lilac-Cream",
+    "Fawn-Cream Tortie": "Fawn-Cream",
     "Caramel-Apricot Tortie": "Caramel-Apricot"
   };
 
@@ -1524,15 +1530,22 @@ function applyCatBurmeseMinkNamingFromParts(core, base, parsed, namingStyle) {
 
   if (!wantsBurmese && !wantsMink) return core;
 
-  const burmeseMap = {
-    "Black": "Sable",
-    "Chocolate": "Champagne",
-    "Blue": "Blue Burmese",
-    "Lilac": "Platinum",
-    "Red": "Red Burmese",
-    "Cream": "Cream Burmese",
-    "Tortie": "Tortoiseshell Burmese",
-    "Blue-Cream Tortie": "Blue-Cream Burmese"
+  const sepiaMap = {
+    "Black": "Black Sepia",
+    "Chocolate": "Chocolate Sepia",
+    "Cinnamon": "Cinnamon Sepia",
+    "Blue": "Blue Sepia",
+    "Lilac": "Lilac Sepia",
+    "Fawn": "Fawn Sepia",
+    "Red": "Red Sepia",
+    "Cream": "Cream Sepia",
+    "Tortie": "Tortie Sepia",
+    "Black Tortie": "Black Tortie Sepia",
+    "Chocolate Tortie": "Chocolate Tortie Sepia",
+    "Cinnamon Tortie": "Cinnamon Tortie Sepia",
+    "Blue-Cream Tortie": "Blue-Cream Sepia",
+    "Lilac-Cream Tortie": "Lilac-Cream Sepia",
+    "Fawn-Cream Tortie": "Fawn-Cream Sepia"
   };
 
   const minkMap = {
@@ -1548,7 +1561,7 @@ function applyCatBurmeseMinkNamingFromParts(core, base, parsed, namingStyle) {
     "Blue-Cream Tortie": "Blue-Cream Mink"
   };
 
-  if (wantsBurmese) return burmeseMap[base] || (core + " Burmese");
+  if (wantsBurmese) return sepiaMap[base] || (core + " Sepia");
   if (wantsMink) return minkMap[base] || (core + " Mink");
 
   return core;
@@ -1741,7 +1754,18 @@ function getCatBaseColour(parsed) {
   }
 
   if (parsed.Orange === "O/o") {
-    return "Tortie";
+    if (
+      parsed.Brown === "b/b" ||
+      parsed.Brown === "b/bl"
+    ) {
+      return "Chocolate Tortie";
+    }
+
+    if (parsed.Brown === "bl/bl") {
+      return "Cinnamon Tortie";
+    }
+
+    return "Black Tortie";
   }
 
   if (
@@ -1786,17 +1810,16 @@ function applyCatDilute(colour, parsed) {
 
   if (colour === "Red") return "Cream";
 
-  if (colour === "Tortie") {
-
-    if (isChocolate) {
-      return "Lilac-Cream Tortie";
-    }
-
-    if (isCinnamon) {
-      return "Fawn-Cream Tortie";
-    }
-
+  if (colour === "Black Tortie" || colour === "Tortie") {
     return "Blue-Cream Tortie";
+  }
+
+  if (colour === "Chocolate Tortie") {
+    return "Lilac-Cream Tortie";
+  }
+
+  if (colour === "Cinnamon Tortie") {
+    return "Fawn-Cream Tortie";
   }
 
   return colour;
@@ -1925,14 +1948,14 @@ function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
 
   function renameBurmese(base) {
     return base
-      .replace(/^Black$/, "Sable")
-      .replace(/^Chocolate$/, "Champagne")
-      .replace(/^Blue$/, "Blue Burmese")
-      .replace(/^Lilac$/, "Platinum")
-      .replace(/^Red$/, "Red Burmese")
-      .replace(/^Cream$/, "Cream Burmese")
-      .replace(/^Tortie$/, "Tortoiseshell Burmese")
-      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Burmese");
+      .replace(/^Black$/, "Black Sepia")
+      .replace(/^Chocolate$/, "Chocolate Sepia")
+      .replace(/^Blue$/, "Blue Sepia")
+      .replace(/^Lilac$/, "Lilac Sepia")
+      .replace(/^Red$/, "Red Sepia")
+      .replace(/^Cream$/, "Cream Sepia")
+      .replace(/^Tortie$/, "Tortie Sepia")
+      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Sepia");
   }
 
   function renameMink(base) {
