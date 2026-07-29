@@ -2,8 +2,8 @@
    FELINE GENETICS ENGINE
 ========================= */
 
-console.log("CAT ENGINE VERSION: COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS + WIREHAIR 2026-07-27");
-window.__CAT_ENGINE_VERSION = "COMPLETE FELINE COLOUR + COAT + STRUCTURAL GENETICS + WIREHAIR 2026-07-27";
+console.log("CAT ENGINE VERSION: POINT + SEPIA FIX V2 2026-07-29");
+window.__CAT_ENGINE_VERSION = "POINT + SEPIA FIX V2 2026-07-29";
 
 function runCatGenetics(inputs) {
   const mode = inputs.mode;
@@ -1525,7 +1525,7 @@ function applyCatPointNamingFromParts(core, base, silverWord, pattern, parsed, n
 
 function applyCatBurmeseMinkNamingFromParts(core, base, parsed, namingStyle) {
   const style = String(namingStyle || "").toLowerCase();
-  const wantsBurmese = parsed.Colourpoint === "cb/cb" || style.includes("burmese");
+  const wantsBurmese = parsed.Colourpoint === "cb/cb" || style.includes("burmese") || style.includes("sepia");
   const wantsMink = parsed.Colourpoint === "cb/cs" || style.includes("tonkinese") || style.includes("mink");
 
   if (!wantsBurmese && !wantsMink) return core;
@@ -1847,15 +1847,32 @@ function applyCatPointModifier(colour, parsed) {
   if (!parsed || parsed.Colourpoint === "C/C") return colour;
 
   if (parsed.Colourpoint === "cb/cb") {
-    return "Burmese " + colour;
+    return colour + " Sepia";
   }
 
   if (parsed.Colourpoint === "cs/cs") {
-    return "Pointed " + colour;
+    const pointMap = {
+      "Black": "Seal Point",
+      "Blue": "Blue Point",
+      "Chocolate": "Chocolate Point",
+      "Lilac": "Lilac Point",
+      "Cinnamon": "Cinnamon Point",
+      "Fawn": "Fawn Point",
+      "Red": "Flame Point",
+      "Cream": "Cream Point",
+      "Black Tortie": "Seal Tortie Point",
+      "Chocolate Tortie": "Chocolate Tortie Point",
+      "Cinnamon Tortie": "Cinnamon Tortie Point",
+      "Blue-Cream Tortie": "Blue-Cream Point",
+      "Lilac-Cream Tortie": "Lilac-Cream Point",
+      "Fawn-Cream Tortie": "Fawn-Cream Point"
+    };
+
+    return pointMap[colour] || (colour + " Point");
   }
 
   if (parsed.Colourpoint === "cb/cs") {
-    return "Mink " + colour;
+    return colour + " Mink";
   }
 
   if (parsed.Colourpoint === "ca/ca") {
@@ -1921,70 +1938,92 @@ function applyCatBreedSpecificNaming(colour, parsed, namingStyle) {
     return words.some(word => style.includes(word));
   }
 
-  const isPointed = parsed.Colourpoint === "cs/cs" || colour.startsWith("Pointed ");
-  const isBurmese = parsed.Colourpoint === "cb/cb" || colour.startsWith("Burmese ");
-  const isMink = parsed.Colourpoint === "cb/cs" || colour.startsWith("Mink ");
+  const isPointed =
+    parsed.Colourpoint === "cs/cs" ||
+    colour.startsWith("Pointed ");
+
+  const isSepia =
+    parsed.Colourpoint === "cb/cb" ||
+    colour.startsWith("Burmese ");
+
+  const isMink =
+    parsed.Colourpoint === "cb/cs" ||
+    colour.startsWith("Mink ");
 
   let clean = colour
     .replace(/^Pointed /, "")
     .replace(/^Burmese /, "")
-    .replace(/^Mink /, "");
+    .replace(/^Mink /, "")
+    .replace(/ Sepia$/, "")
+    .replace(/ Mink$/, "");
 
-  function renamePoint(base) {
-    return base
-      .replace(/^Black$/, "Seal Point")
-      .replace(/^Blue$/, "Blue Point")
-      .replace(/^Chocolate$/, "Chocolate Point")
-      .replace(/^Lilac$/, "Lilac Point")
-      .replace(/^Cinnamon$/, "Cinnamon Point")
-      .replace(/^Fawn$/, "Fawn Point")
-      .replace(/^Red$/, "Flame Point")
-      .replace(/^Cream$/, "Cream Point")
-      .replace(/^Tortie$/, "Tortie Point")
-      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Point")
-      .replace(/^(.*) Tabby (.*)$/, "$2 Lynx Point")
-      .replace(/^(.*) Silver (.*) Tabby$/, "$1 Silver Lynx Point");
+  const pointMap = {
+    "Black": "Seal Point",
+    "Blue": "Blue Point",
+    "Chocolate": "Chocolate Point",
+    "Lilac": "Lilac Point",
+    "Cinnamon": "Cinnamon Point",
+    "Fawn": "Fawn Point",
+    "Red": "Flame Point",
+    "Cream": "Cream Point",
+    "Tortie": "Tortie Point",
+    "Black Tortie": "Seal Tortie Point",
+    "Chocolate Tortie": "Chocolate Tortie Point",
+    "Cinnamon Tortie": "Cinnamon Tortie Point",
+    "Blue-Cream Tortie": "Blue-Cream Point",
+    "Lilac-Cream Tortie": "Lilac-Cream Point",
+    "Fawn-Cream Tortie": "Fawn-Cream Point"
+  };
+
+  const sepiaMap = {
+    "Black": "Black Sepia",
+    "Chocolate": "Chocolate Sepia",
+    "Cinnamon": "Cinnamon Sepia",
+    "Blue": "Blue Sepia",
+    "Lilac": "Lilac Sepia",
+    "Fawn": "Fawn Sepia",
+    "Red": "Red Sepia",
+    "Cream": "Cream Sepia",
+    "Tortie": "Tortie Sepia",
+    "Black Tortie": "Black Tortie Sepia",
+    "Chocolate Tortie": "Chocolate Tortie Sepia",
+    "Cinnamon Tortie": "Cinnamon Tortie Sepia",
+    "Blue-Cream Tortie": "Blue-Cream Sepia",
+    "Lilac-Cream Tortie": "Lilac-Cream Sepia",
+    "Fawn-Cream Tortie": "Fawn-Cream Sepia"
+  };
+
+  const minkMap = {
+    "Black": "Natural Mink",
+    "Chocolate": "Champagne Mink",
+    "Blue": "Blue Mink",
+    "Lilac": "Platinum Mink",
+    "Cinnamon": "Cinnamon Mink",
+    "Fawn": "Fawn Mink",
+    "Red": "Red Mink",
+    "Cream": "Cream Mink",
+    "Tortie": "Tortie Mink",
+    "Black Tortie": "Natural Tortie Mink",
+    "Chocolate Tortie": "Chocolate Tortie Mink",
+    "Cinnamon Tortie": "Cinnamon Tortie Mink",
+    "Blue-Cream Tortie": "Blue-Cream Mink",
+    "Lilac-Cream Tortie": "Lilac-Cream Mink",
+    "Fawn-Cream Tortie": "Fawn-Cream Mink"
+  };
+
+  if (
+    isPointed ||
+    hasStyle(["siamese", "point", "colourpoint", "colorpoint", "ragdoll", "birman", "himalayan", "balinese"])
+  ) {
+    return pointMap[clean] || (clean + " Point");
   }
 
-  function renameBurmese(base) {
-    return base
-      .replace(/^Black$/, "Black Sepia")
-      .replace(/^Chocolate$/, "Chocolate Sepia")
-      .replace(/^Blue$/, "Blue Sepia")
-      .replace(/^Lilac$/, "Lilac Sepia")
-      .replace(/^Red$/, "Red Sepia")
-      .replace(/^Cream$/, "Cream Sepia")
-      .replace(/^Tortie$/, "Tortie Sepia")
-      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Sepia");
-  }
-
-  function renameMink(base) {
-    return base
-      .replace(/^Black$/, "Natural Mink")
-      .replace(/^Chocolate$/, "Champagne Mink")
-      .replace(/^Blue$/, "Blue Mink")
-      .replace(/^Lilac$/, "Platinum Mink")
-      .replace(/^Cinnamon$/, "Cinnamon Mink")
-      .replace(/^Fawn$/, "Fawn Mink")
-      .replace(/^Red$/, "Red Mink")
-      .replace(/^Cream$/, "Cream Mink")
-      .replace(/^Tortie$/, "Tortie Mink")
-      .replace(/^Blue-Cream Tortie$/, "Blue-Cream Mink");
-  }
-
-  if (isPointed || hasStyle(["siamese", "point", "colourpoint", "colorpoint", "ragdoll", "birman", "himalayan", "balinese"])) {
-    const renamed = renamePoint(clean);
-    return renamed === clean ? clean + " Point" : renamed;
-  }
-
-  if (isBurmese || hasStyle(["burmese"])) {
-    const renamed = renameBurmese(clean);
-    return renamed === clean ? clean + " Burmese" : renamed;
+  if (isSepia || hasStyle(["burmese", "sepia"])) {
+    return sepiaMap[clean] || (clean + " Sepia");
   }
 
   if (isMink || hasStyle(["tonkinese", "mink"])) {
-    const renamed = renameMink(clean);
-    return renamed === clean ? clean + " Mink" : renamed;
+    return minkMap[clean] || (clean + " Mink");
   }
 
   return colour;
