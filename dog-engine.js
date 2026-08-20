@@ -1,3 +1,4 @@
+/* DOG ENGINE VERSION 20.7 - COAT TEXTURES: FURNISHINGS / WIREHAIR / FEATHERING SEPARATED */
 /* DOG ENGINE VERSION 20.6 - AGOUTI DISPLAY TERMINOLOGY UPDATED */
 /* DOG ENGINE VERSION 20.5 - PANDA LOCUS ADDED */
 /* DOG ENGINE VERSION 20.4 - DALMATIAN BASE COLOUR HARDENED */
@@ -97,6 +98,8 @@ function runDogPredictor(inputs) {
     dogOutcomeRow("Greying", sire.Greying, dam.Greying),
     dogOutcomeRow("Long Coat", sire.LongCoat, dam.LongCoat),
     dogOutcomeRow("Furnishings", sire.Furnishings, dam.Furnishings),
+    dogOutcomeRow("Wirehair", sire.Wirehair, dam.Wirehair),
+    dogOutcomeRow("Feathering", sire.Feathering, dam.Feathering),
     dogOutcomeRow("Curl", sire.Curl, dam.Curl),
     dogOutcomeRow("Hairless", sire.Hairless, dam.Hairless)
   ].join("");
@@ -210,6 +213,8 @@ function runDogGenotypeBuilder(inputs) {
 
   const wantsLongCoat = phenotype.includes("long coat") || phenotype.includes("longcoat") || phenotype.includes("long coated");
   const wantsFurnished = phenotype.includes("furnished") || phenotype.includes("furnishings");
+  const wantsWirehair = phenotype.includes("wirehair") || phenotype.includes("wire hair") || phenotype.includes("wire-haired") || phenotype.includes("wire haired");
+  const wantsFeathering = phenotype.includes("feathered") || phenotype.includes("feathering");
   const wantsCurly = phenotype.includes("curly") || phenotype.includes("curl");
   const wantsHairless = phenotype.includes("hairless") || phenotype.includes("chinese crested") || phenotype.includes("xolo") || phenotype.includes("peruvian inca orchid");
 
@@ -247,6 +252,8 @@ function runDogGenotypeBuilder(inputs) {
     if (parts.Greying) geneParts.push(parts.Greying);
     if (parts.LongCoat) geneParts.push(parts.LongCoat);
     if (parts.Furnishings) geneParts.push(parts.Furnishings);
+    if (parts.Wirehair) geneParts.push(parts.Wirehair);
+    if (parts.Feathering) geneParts.push(parts.Feathering);
     if (parts.Curl) geneParts.push(parts.Curl);
     if (parts.Hairless) geneParts.push(parts.Hairless);
 
@@ -284,8 +291,10 @@ function runDogGenotypeBuilder(inputs) {
     }
     if (wantsPanda) copy.Panda = wantsPandaCarrier ? "pn/pn" : "Pn/pn";
     if (wantsFaded) copy.Greying = "G/g";
-    if (wantsLongCoat) copy.LongCoat = "l/l";
+    if (wantsLongCoat || wantsFeathering) copy.LongCoat = "l/l";
     if (wantsFurnished) copy.Furnishings = "F/n";
+    if (wantsWirehair) copy.Wirehair = "Wh/n";
+    if (wantsFeathering) copy.Feathering = "Fg/n";
     if (wantsCurly) copy.Curl = "Cu/n";
     if (wantsHairless) copy.Hairless = "Hr/hr";
 
@@ -310,8 +319,10 @@ function runDogGenotypeBuilder(inputs) {
     if (wantsTicking) addSuggestion("Ticking: T/-");
     if (wantsRoan && !wantsDalmatian) addSuggestion("Roan: R/-");
     if (wantsFaded) addSuggestion("Greying/Fading: G/-");
-    if (wantsLongCoat) addSuggestion("Long Coat: l/l");
-    if (wantsFurnished) addSuggestion("Furnishings: F/-");
+    if (wantsLongCoat || wantsFeathering) addSuggestion("Long Coat: l/l");
+    if (wantsFurnished) addSuggestion("Furnishings: F/- (facial beard/eyebrows; separate from wirehair)");
+    if (wantsWirehair) addSuggestion("Wirehair: Wh/- (wire coat texture)");
+    if (wantsFeathering) addSuggestion("Feathering: Fg/- with l/l (Saluki/Setter/Spaniel-style feathering)");
     if (wantsCurly) addSuggestion("Curl: Cu/-");
     if (wantsHairless) addSuggestion("Hairless: Hr/hr. Hr/Hr is non-viable; hr/hr is coated/powderpuff.");
   }
@@ -643,6 +654,8 @@ function buildAutoDogGenotype(phenotypeInput) {
   const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
   const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
   const wantsHairless = has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid");
+  const wantsWirehair = has("wirehair") || has("wire hair") || has("wire-haired") || has("wire haired");
+  const wantsFeathering = has("feathered") || has("feathering");
   const wantsDalmatian = has("dalmatian");
   const wantsPatchedDalmatian = has("patched dalmatian") || has("dalmatian patch") || has("patch dalmatian");
   const wantsDalmatianPatchCarrier = has("patch carrier") || has("patch-carrier");
@@ -668,6 +681,8 @@ function buildAutoDogGenotype(phenotypeInput) {
       Greying: /^(G|g)\//,
       LongCoat: /^(L|l)\//,
       Furnishings: /^(F|n)\//,
+      Wirehair: /^(Wh|n)\//,
+      Feathering: /^(Fg|n)\//,
       Curl: /^(Cu|n)\//,
       Hairless: /^(Hr|hr)\//,
       Dalmatian: /^(Dsp|dsp)\//,
@@ -833,8 +848,10 @@ function buildAutoDogGenotype(phenotypeInput) {
   }
   if (wantsPanda) addGene("Panda", wantsPandaCarrier ? "pn/pn" : "Pn/pn");
   if (has("faded") || has("grey") || has("gray")) addGene("Greying", "G/g");
-  if (has("long coat") || has("longcoat") || has("long coated")) addGene("LongCoat", "l/l");
+  if (has("long coat") || has("longcoat") || has("long coated") || wantsFeathering) addGene("LongCoat", "l/l");
   if (has("furnished") || has("furnishings")) addGene("Furnishings", "F/n");
+  if (wantsWirehair) addGene("Wirehair", "Wh/n");
+  if (wantsFeathering) addGene("Feathering", "Fg/n");
   if (has("curly") || has("curl")) addGene("Curl", "Cu/n");
   if (wantsHairless) addGene("Hairless", "Hr/hr");
 
@@ -862,6 +879,8 @@ function cleanAutoDogGenotype(genotype) {
     /^(G|g)\//,
     /^(L|l)\//,
     /^(F|n)\//,
+    /^(Wh|n)\//,
+    /^(Fg|n)\//,
     /^(Cu|n)\//
   ];
 
@@ -971,11 +990,16 @@ function parseDogGenotype(genotypeText) {
     Greying: findDogGenePair(text, ["G/G", "G/g", "g/G", "g/g"], "g/g"),
     LongCoat: findDogGenePair(text, ["L/L", "L/l", "l/L", "l/l"], ""),
     Furnishings: findDogGenePair(text, ["F/F", "F/n", "n/F", "n/n"], "n/n"),
+    Wirehair: findDogGenePair(text, ["Wh/Wh", "Wh/n", "n/Wh", "n/n"], "n/n"),
+    Feathering: findDogGenePair(text, ["Fg/Fg", "Fg/n", "n/Fg", "n/n"], "n/n"),
     Curl: findDogGenePair(text, ["Cu/Cu", "Cu/n", "n/Cu", "n/n"], "n/n"),
     Hairless: findDogGenePair(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"], ""),
 
     // These flags stop default fallback genes from displaying as if the user entered them.
     LongCoatProvided: hasDogExplicitGene(text, ["L/L", "L/l", "l/L", "l/l"]),
+    FurnishingsProvided: hasDogExplicitGene(text, ["F/F", "F/n", "n/F", "n/n"]),
+    WirehairProvided: hasDogExplicitGene(text, ["Wh/Wh", "Wh/n", "n/Wh", "n/n"]),
+    FeatheringProvided: hasDogExplicitGene(text, ["Fg/Fg", "Fg/n", "n/Fg", "n/n"]),
     HairlessProvided: hasDogExplicitGene(text, ["Hr/Hr", "Hr/hr", "hr/Hr", "hr/hr"])
   };
 }
@@ -1354,27 +1378,29 @@ function applyDogCoatTraits(colour, parsed) {
   const isLong = parsed.LongCoat === "l/l";
   const isShort = parsed.LongCoat === "L/L" || parsed.LongCoat === "L/l" || parsed.LongCoat === "l/L";
   const isFurnished = hasDogGene(parsed.Furnishings, "F");
+  const isWirehaired = hasDogGene(parsed.Wirehair, "Wh");
+  const isFeathered = isLong && hasDogGene(parsed.Feathering, "Fg");
   const isCurly = hasDogGene(parsed.Curl, "Cu");
 
-  // Long coat combinations.
-  if (isLong && isFurnished && isCurly) return colour + " Long Curly Furnished Coat";
-  if (isLong && isCurly) return colour + " Long Curly Coat";
-  if (isLong && isFurnished) return colour + " Long Furnished Coat";
-  if (isLong) return colour + " Long Coat";
+  const traits = [];
 
-  // Short coat combinations only display Short Coat when the user actually typed L/L, L/l, or l/L.
-  // This avoids adding Short Coat to every dog by default.
-  if (parsed.LongCoatProvided && isShort && isFurnished && isCurly) return colour + " Short Curly Wirehaired Coat";
-  if (parsed.LongCoatProvided && isShort && isCurly) return colour + " Short Curly Coat";
-  if (parsed.LongCoatProvided && isShort && isFurnished) return colour + " Wirehaired Coat";
-  if (parsed.LongCoatProvided && isShort) return colour + " Short Coat";
+  // Length / feathering.
+  if (isFeathered) traits.push("Feathered");
+  else if (isLong) traits.push("Long");
 
-  // If no L-locus was entered, still show texture genes when they were entered.
-  if (isFurnished && isCurly) return colour + " Curly Wirehaired Coat";
-  if (isFurnished) return colour + " Wirehaired Coat";
-  if (isCurly) return colour + " Curly Coat";
+  // Texture is independent from facial furnishings.
+  if (isCurly) traits.push("Curly");
+  if (isWirehaired) traits.push("Wirehaired");
+  if (isFurnished) traits.push("Furnished");
 
-  return colour;
+  // Only print Short when an L-locus was explicitly supplied.
+  if (!isLong && parsed.LongCoatProvided && isShort && traits.length === 0) {
+    traits.push("Short");
+  }
+
+  if (traits.length === 0) return colour;
+
+  return colour + " " + traits.join(" ") + " Coat";
 }
 
 function applyDogHairless(colour, parsed) {
@@ -1429,7 +1455,9 @@ function renderDogGeneIntroTable() {
         <tr><td>Intensity</td><td>I, i</td><td>Controls red pigment depth, including red, cream, fawn, pale/silver sable, and silver points.</td></tr>
         <tr><td>Greying / Fading</td><td>G, g</td><td>Adds progressive fading/silvering.</td></tr>
         <tr><td>Long Coat</td><td>L, l</td><td>l/l creates long coat.</td></tr>
-        <tr><td>Furnishings</td><td>F, n</td><td>Adds facial furnishings/wire-style coat traits.</td></tr>
+        <tr><td>Furnishings</td><td>F, n</td><td>Adds facial furnishings such as beard, moustache, and eyebrows. It no longer automatically means wirehaired.</td></tr>
+        <tr><td>Wirehair</td><td>Wh, n</td><td>Show Standard coat-texture locus. Wh/- displays a wirehaired coat independently of furnishings.</td></tr>
+        <tr><td>Feathering</td><td>Fg, n</td><td>Show Standard coat-expression locus. Fg/- with l/l displays Saluki/Setter/Spaniel-style feathering.</td></tr>
         <tr><td>Curl</td><td>Cu, n</td><td>Adds curly coat texture.</td></tr>
         <tr><td>Hairless</td><td>Hr, hr</td><td>Hr/hr creates hairless dogs. hr/hr creates coated/powderpuff dogs. Hr/Hr is non-viable.</td></tr>
       </table>
