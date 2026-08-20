@@ -37,6 +37,7 @@ function runHorsePredictor(inputs) {
     horseOutcomeRow("Splash", sire.Splash, dam.Splash),
     horseOutcomeRow("Sabino", sire.Sabino, dam.Sabino),
     horseOutcomeRow("Rabicano", sire.Rabicano, dam.Rabicano),
+    horseOutcomeRow("Manchado", sire.Manchado, dam.Manchado),
     horseOutcomeRow("Appaloosa", sire.Appaloosa, dam.Appaloosa),
     horseOutcomeRow("PATN1", sire.PATN1, dam.PATN1),
     horseOutcomeRow("PATN2", sire.PATN2, dam.PATN2)
@@ -511,6 +512,13 @@ function runHorseGenotypeBuilder(inputs) {
     addToExamples("Rb/n");
   }
 
+  if (phenotype.includes("manchado")) {
+    addSuggestion("Manchado: Mn/Mn");
+    addToExamples("Mn/Mn");
+    addHidden("Manchado is treated as a recessive simulated locus in Show Standard; Mn/n is a non-visible carrier.");
+    addNote("Manchado is modeled in Show Standard as recessive for consistent inheritance, because the real-world causal gene has not been established.");
+  }
+
   if (phenotype.includes("tovero")) {
     addSuggestion("Tobiano: To/-");
     addSuggestion("Frame Overo: OLW/-");
@@ -620,6 +628,7 @@ function parseHorseGenotype(genotypeText) {
     Splash: findGenePair(text, ["Spl/Spl", "Spl/n", "n/Spl", "n/n"], "n/n"),
     Sabino: findGenePair(text, ["Sb/Sb", "Sb/n", "n/Sb", "n/n"], "n/n"),
     Rabicano: findGenePair(text, ["Rb/Rb", "Rb/n", "n/Rb", "n/n"], "n/n"),
+    Manchado: findGenePair(text, ["Mn/Mn", "Mn/n", "n/Mn", "n/n"], "n/n"),
 
     Appaloosa: findGenePair(
       text,
@@ -784,6 +793,7 @@ function buildHorseVisibleColour(parsed) {
   colour = applyHorseRoan(colour, parsed);
 
   colour = applyHorsePatterns(colour, parsed);
+  colour = applyHorseManchado(colour, parsed);
   colour = applyHorseAppaloosa(colour, parsed);
 
   return colour.trim();
@@ -1056,6 +1066,12 @@ function getHorseWhiteExpression(score) {
   return "Maximum White";
 }
 
+function applyHorseManchado(colour, parsed) {
+  if (parsed.Manchado !== "Mn/Mn") return colour;
+
+  return colour + " Manchado";
+}
+
 function applyHorseAppaloosa(colour, parsed) {
   const lp = parsed.Appaloosa;
   const patn1 = parsed.PATN1;
@@ -1196,6 +1212,7 @@ function calculateHorseGeneOutcomes(sirePair, damPair) {
 | Splash | Spl | Dominant white pattern. Spl/Spl scores higher than Spl/n. |
 | Sabino | Sb | Dominant white pattern. Sb/Sb scores higher than Sb/n. |
 | Rabicano | Rb | Roaning/white pattern modifier. Adds a smaller amount to white-expression score. |
+| Manchado | Mn | Show Standard simulated recessive locus. Mn/Mn displays Manchado; Mn/n is a non-visible carrier. Kept separate from the white-expression score. |
 | Appaloosa / Leopard Complex | Lp | Required for Appaloosa patterning. Lp with no PATN displays Varnish Roan. |
 | PATN1 | PATN1 | Appaloosa modifier. With Lp/lp gives Leopard; with Lp/Lp gives Few Spot. |
 | PATN2 | PATN2 | Appaloosa modifier. With Lp/lp gives Blanket; with Lp/Lp gives Snow Cap. |
