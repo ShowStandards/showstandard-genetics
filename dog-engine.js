@@ -1,3 +1,5 @@
+/* DOG ENGINE VERSION 21.0 - RANDOMIZED VALID AUTO-GENOTYPES + HIDDEN CARRIERS */
+/* DOG ENGINE VERSION 20.9 - WHITE + COAT TYPE AUTO-GENOTYPE FIX */
 /* DOG ENGINE VERSION 20.7 - COAT TEXTURES: FURNISHINGS / WIREHAIR / FEATHERING SEPARATED */
 /* DOG ENGINE VERSION 20.6 - AGOUTI DISPLAY TERMINOLOGY UPDATED */
 /* DOG ENGINE VERSION 20.5 - PANDA LOCUS ADDED */
@@ -638,6 +640,55 @@ function buildAutoDogGenotype(phenotypeInput) {
     return phenotype.includes(String(phrase || "").toLowerCase());
   }
 
+  function pick(options) {
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function normalExtension() {
+    if (wantsMask) return pick(["Em/e", "Em/Em"]);
+    return pick(["E/E", "E/e"]);
+  }
+
+  function blackPigmentBrownLocus() {
+    // Non-brown dogs may still carry brown.
+    return pick(["B/B", "B/b"]);
+  }
+
+  function nonDiluteLocus() {
+    // Non-dilute dogs may still carry dilute.
+    return pick(["D/D", "D/d"]);
+  }
+
+  function hiddenAgoutiUnderDominantBlack() {
+    // K/- masks the A locus, so these are all valid hidden possibilities.
+    return pick([
+      "Ay/a",
+      "Ay/at",
+      "aw/a",
+      "aw/at",
+      "at/a",
+      "at/at",
+      "a/a"
+    ]);
+  }
+
+  function setRandomDarkBase({ brown = false, dilute = false } = {}) {
+    addGene("Extension", normalExtension());
+
+    // A solid dark dog can be dominant black (K/-) with hidden Agouti,
+    // or recessive black (ky/ky + a/a).
+    if (Math.random() < 0.65) {
+      addGene("K", pick(["K/K", "K/ky"]));
+      addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+    } else {
+      addGene("K", "ky/ky");
+      addGene("Agouti", "a/a");
+    }
+
+    addGene("Brown", brown ? "b/b" : blackPigmentBrownLocus());
+    addGene("Dilute", dilute ? "d/d" : nonDiluteLocus());
+  }
+
   const wantsMask = has("mask") || has("masked");
   const wantsTanPoint = has("tan") || has("tricolor") || has("tricolour") || has("tri colour") || has("tri color");
   const wantsBlackAndTan = has("black and tan") || has("black tan") || has("tan point");
@@ -662,7 +713,23 @@ function buildAutoDogGenotype(phenotypeInput) {
   const wantsDomino = has("domino") && !has("northern domino");
   const wantsNorthernDomino = has("northern domino");
   const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
-  const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
+  const hasWhiteWord = /(?:^|\s)white(?:\s|$)/.test(phenotype);
+  const whiteIsMarkingOnly =
+    has("with white") ||
+    has("and white") ||
+    has("white markings") ||
+    has("irish") ||
+    has("piebald") ||
+    has("extreme white") ||
+    has("tricolor") ||
+    has("tricolour");
+
+  // Treat "White", "White Hairless", "White Powderpuff", etc. as a white base,
+  // but do not mistake "Black and White" / "with white markings" for genetic white.
+  const wantsWhite =
+    has("genetic white") ||
+    has("recessive white") ||
+    (hasWhiteWord && !whiteIsMarkingOnly);
   const wantsPowderpuff = has("powderpuff") || has("powder puff") || phenotype === "coated";
   const wantsHairless = !wantsPowderpuff && (has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid"));
   const wantsWirehair = has("wirehair") || has("wire hair") || has("wire-haired") || has("wire haired");
@@ -716,118 +783,195 @@ function buildAutoDogGenotype(phenotypeInput) {
     setGene(locus, value);
   }
 
-  // Base colour first, using the same naming assumptions as the visible engine.
+  // Base colour first. Required phenotype genes stay fixed, while hidden
+  // alleles/carriers are randomized so foundation animals are not clones.
   if (wantsWhite) {
     addGene("Extension", "e/e");
-    addGene("K", "K/ky");
+
+    // e/e masks most dark-pigment patterning, so hidden K/A/B/D can vary.
+    if (Math.random() < 0.65) {
+      addGene("K", pick(["K/K", "K/ky"]));
+      addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+    } else {
+      addGene("K", "ky/ky");
+      addGene("Agouti", pick(["Ay/a", "aw/a", "at/a", "a/a"]));
+    }
+
+    addGene("Brown", blackPigmentBrownLocus());
+    addGene("Dilute", nonDiluteLocus());
     addGene("WhiteSpotting", "sw/sw");
     addGene("Intensity", "i/i");
+
   } else if (wantsBlueMerle) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
-    addGene("Brown", "B/B");
-    addGene("Dilute", "D/D");
+    addGene("Extension", normalExtension());
+    if (wantsTanPoint) {
+      addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+      addGene("Agouti", pick(["at/at", "at/a"]));
+    } else {
+      if (Math.random() < 0.65) {
+        addGene("K", pick(["K/K", "K/ky"]));
+        addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+      } else {
+        addGene("K", "ky/ky");
+        addGene("Agouti", "a/a");
+      }
+    }
+    addGene("Brown", blackPigmentBrownLocus());
+    addGene("Dilute", nonDiluteLocus());
     addGene("Merle", "M/m");
+
   } else if (wantsRedMerle) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Extension", normalExtension());
+    if (wantsTanPoint) {
+      addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+      addGene("Agouti", pick(["at/at", "at/a"]));
+    } else {
+      if (Math.random() < 0.65) {
+        addGene("K", pick(["K/K", "K/ky"]));
+        addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+      } else {
+        addGene("K", "ky/ky");
+        addGene("Agouti", "a/a");
+      }
+    }
     addGene("Brown", "b/b");
-    addGene("Dilute", "D/D");
+    addGene("Dilute", nonDiluteLocus());
     addGene("Merle", "M/m");
+
   } else if (wantsSlateMerle) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
-    addGene("Brown", "B/B");
+    addGene("Extension", normalExtension());
+    if (wantsTanPoint) {
+      addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+      addGene("Agouti", pick(["at/at", "at/a"]));
+    } else {
+      if (Math.random() < 0.65) {
+        addGene("K", pick(["K/K", "K/ky"]));
+        addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+      } else {
+        addGene("K", "ky/ky");
+        addGene("Agouti", "a/a");
+      }
+    }
+    addGene("Brown", blackPigmentBrownLocus());
     addGene("Dilute", "d/d");
     addGene("Merle", "M/m");
+
   } else if (wantsLilacMerle) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
+    addGene("Extension", normalExtension());
+    if (wantsTanPoint) {
+      addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+      addGene("Agouti", pick(["at/at", "at/a"]));
+    } else {
+      if (Math.random() < 0.65) {
+        addGene("K", pick(["K/K", "K/ky"]));
+        addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+      } else {
+        addGene("K", "ky/ky");
+        addGene("Agouti", "a/a");
+      }
+    }
     addGene("Brown", "b/b");
     addGene("Dilute", "d/d");
     addGene("Merle", "M/m");
+
   } else if (wantsGenericMerle) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", wantsTanPoint ? "ky/ky" : "K/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "a/a");
-    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
-    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : "D/D");
+    addGene("Extension", normalExtension());
+    if (wantsTanPoint) {
+      addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+      addGene("Agouti", pick(["at/at", "at/a"]));
+    } else {
+      if (Math.random() < 0.65) {
+        addGene("K", pick(["K/K", "K/ky"]));
+        addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+      } else {
+        addGene("K", "ky/ky");
+        addGene("Agouti", "a/a");
+      }
+    }
+    addGene("Brown", wantsChocolate ? "b/b" : blackPigmentBrownLocus());
+    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : nonDiluteLocus());
     addGene("Merle", has("double") ? "M/M" : "M/m");
+
   } else if (wantsCream || wantsSilver || (wantsRed && !wantsChocolate)) {
     addGene("Extension", "e/e");
-    addGene("K", "K/ky");
-    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
-    addGene("Dilute", wantsLilac ? "d/d" : "D/D");
-    addGene("Intensity", wantsSilver ? "i/i" : wantsCream ? "I/i" : "I/I");
+
+    // Recessive red masks K/A, so let those hidden loci vary.
+    if (Math.random() < 0.65) {
+      addGene("K", pick(["K/K", "K/ky"]));
+      addGene("Agouti", hiddenAgoutiUnderDominantBlack());
+    } else {
+      addGene("K", "ky/ky");
+      addGene("Agouti", pick(["Ay/a", "aw/a", "at/a", "a/a"]));
+    }
+
+    addGene("Brown", wantsChocolate ? "b/b" : blackPigmentBrownLocus());
+    addGene("Dilute", wantsLilac ? "d/d" : nonDiluteLocus());
+    addGene("Intensity", wantsSilver ? "i/i" : wantsCream ? pick(["I/i", "i/i"]) : pick(["I/I", "I/i"]));
+
   } else if (wantsDomino) {
-    addGene("Extension", "Eg/e");
+    addGene("Extension", pick(["Eg/e", "Eg/Eg"]));
     addGene("K", "ky/ky");
-    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? "at/a" : "aw/a");
-    addGene("Intensity", "I/I");
+    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? pick(["at/at", "at/a"]) : pick(["aw/a", "at/a"]));
+    addGene("Intensity", pick(["I/I", "I/i"]));
+
   } else if (wantsNorthernDomino) {
-    addGene("Extension", "Ea/e");
+    addGene("Extension", pick(["Ea/e", "Ea/Ea"]));
     addGene("K", "ky/ky");
-    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? "at/a" : "aw/a");
-    addGene("Intensity", "I/I");
+    addGene("Agouti", wantsTanPoint || wantsBlackAndTan ? pick(["at/at", "at/a"]) : pick(["aw/a", "at/a"]));
+    addGene("Intensity", pick(["I/I", "I/i"]));
+
   } else if (wantsCockerSable) {
-    addGene("Extension", "Eh/e");
+    addGene("Extension", pick(["Eh/e", "Eh/Eh"]));
     addGene("K", "ky/ky");
-    addGene("Agouti", wantsTanPoint ? "at/a" : "Ay/a");
-    addGene("Intensity", "I/I");
+    addGene("Agouti", wantsTanPoint ? pick(["at/at", "at/a"]) : pick(["Ay/a", "Ay/at"]));
+    addGene("Intensity", pick(["I/I", "I/i"]));
+
   } else if (wantsBlueFawn) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "ky/ky");
-    addGene("Agouti", "Ay/a");
+    addGene("Extension", normalExtension());
+    addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
+    addGene("Agouti", pick(["Ay/a", "Ay/at"]));
+    addGene("Brown", blackPigmentBrownLocus());
     addGene("Dilute", "d/d");
-    addGene("Intensity", "I/i");
+    addGene("Intensity", pick(["I/I", "I/i"]));
+
   } else if (wantsSable || wantsFawn) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("Extension", normalExtension());
     addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
-    addGene("Agouti", "Ay/a");
-    addGene("Intensity", wantsFawn ? "I/i" : "I/I");
+    addGene("Agouti", pick(["Ay/Ay", "Ay/aw", "Ay/at", "Ay/a"]));
+    addGene("Brown", blackPigmentBrownLocus());
+    addGene("Dilute", nonDiluteLocus());
+    addGene("Intensity", wantsFawn ? pick(["I/I", "I/i"]) : "I/I");
+
   } else if (wantsWolfSable) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("Extension", normalExtension());
     addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
-    addGene("Agouti", "aw/a");
+    addGene("Agouti", pick(["aw/aw", "aw/at", "aw/a"]));
+    addGene("Brown", blackPigmentBrownLocus());
+    addGene("Dilute", nonDiluteLocus());
+
   } else if (wantsTanPoint || wantsBlackAndTan) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
+    addGene("Extension", normalExtension());
     addGene("K", wantsBrindle ? "kbr/ky" : "ky/ky");
-    addGene("Agouti", "at/a");
-    addGene("Brown", wantsChocolate ? "b/b" : "B/B");
-    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : "D/D");
+    addGene("Agouti", pick(["at/at", "at/a"]));
+    addGene("Brown", wantsChocolate ? "b/b" : blackPigmentBrownLocus());
+    addGene("Dilute", wantsBlue || wantsLilac ? "d/d" : nonDiluteLocus());
+
   } else if (wantsChocolate) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "K/ky");
-    addGene("Agouti", "a/a");
-    addGene("Brown", "b/b");
-    addGene("Dilute", "D/D");
+    setRandomDarkBase({ brown: true, dilute: false });
+
   } else if (wantsCocoa) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "K/ky");
-    addGene("Agouti", "a/a");
+    setRandomDarkBase({ brown: false, dilute: false });
     addGene("Cocoa", "co/co");
+
   } else if (wantsLilac) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "K/ky");
-    addGene("Agouti", "a/a");
-    addGene("Brown", "b/b");
-    addGene("Dilute", "d/d");
+    setRandomDarkBase({ brown: true, dilute: true });
+
   } else if (wantsBlue) {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "K/ky");
-    addGene("Agouti", "a/a");
-    addGene("Brown", "B/B");
-    addGene("Dilute", "d/d");
+    setRandomDarkBase({ brown: false, dilute: true });
+
   } else {
-    addGene("Extension", wantsMask ? "Em/e" : "E/E");
-    addGene("K", "K/ky");
-    addGene("Agouti", "a/a");
-    addGene("Brown", "B/B");
-    addGene("Dilute", "D/D");
+    // Plain black / generic dark default.
+    setRandomDarkBase({ brown: false, dilute: false });
   }
 
   // Pattern / modifier overlays.
