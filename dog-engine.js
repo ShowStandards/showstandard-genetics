@@ -216,7 +216,8 @@ function runDogGenotypeBuilder(inputs) {
   const wantsWirehair = phenotype.includes("wirehair") || phenotype.includes("wire hair") || phenotype.includes("wire-haired") || phenotype.includes("wire haired");
   const wantsFeathering = phenotype.includes("feathered") || phenotype.includes("feathering");
   const wantsCurly = phenotype.includes("curly") || phenotype.includes("curl");
-  const wantsHairless = phenotype.includes("hairless") || phenotype.includes("chinese crested") || phenotype.includes("xolo") || phenotype.includes("peruvian inca orchid");
+  const wantsPowderpuff = phenotype.includes("powderpuff") || phenotype.includes("powder puff") || cleanPhenotype === "coated";
+  const wantsHairless = !wantsPowderpuff && (phenotype.includes("hairless") || phenotype.includes("chinese crested") || phenotype.includes("xolo") || phenotype.includes("peruvian inca orchid"));
 
   const wantsSilverSable = phenotype.includes("silver sable");
   const wantsCockerSable = phenotype.includes("cocker sable") || phenotype.includes("cocker spaniel sable");
@@ -297,6 +298,7 @@ function runDogGenotypeBuilder(inputs) {
     if (wantsFeathering) copy.Feathering = "Fg/n";
     if (wantsCurly) copy.Curl = "Cu/n";
     if (wantsHairless) copy.Hairless = "Hr/hr";
+    if (wantsPowderpuff) copy.Hairless = "hr/hr";
 
     return copy;
   }
@@ -324,7 +326,8 @@ function runDogGenotypeBuilder(inputs) {
     if (wantsWirehair) addSuggestion("Wirehair: Wh/- (wire coat texture)");
     if (wantsFeathering) addSuggestion("Feathering: Fg/- with l/l (Saluki/Setter/Spaniel-style feathering)");
     if (wantsCurly) addSuggestion("Curl: Cu/-");
-    if (wantsHairless) addSuggestion("Hairless: Hr/hr. Hr/Hr is non-viable; hr/hr is coated/powderpuff.");
+    if (wantsHairless) addSuggestion("Hairless: Hr/hr. Hr/Hr is non-viable.");
+    if (wantsPowderpuff) addSuggestion("Coated/Powderpuff: hr/hr.");
   }
 
   if (isPlainGeneticWhite) {
@@ -576,6 +579,13 @@ function runDogGenotypeBuilder(inputs) {
     }
   }
 
+  if (wantsPowderpuff) {
+    addSuggestion("Coated/Powderpuff: hr/hr");
+    if (!examples.some(example => example.includes("hr/hr"))) {
+      addBuiltExample({ Extension: extensionBase("E/E"), K: "K/ky", Agouti: "a/a", Hairless: "hr/hr" });
+    }
+  }
+
   addGeneralPatternSuggestions();
 
   if (suggestions.length === 0) suggestions.push("No simple genotype match found yet.");
@@ -653,7 +663,8 @@ function buildAutoDogGenotype(phenotypeInput) {
   const wantsNorthernDomino = has("northern domino");
   const wantsCockerSable = has("cocker sable") || has("cocker spaniel sable");
   const wantsWhite = has("genetic white") || has("recessive white") || phenotype === "white";
-  const wantsHairless = has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid");
+  const wantsPowderpuff = has("powderpuff") || has("powder puff") || phenotype === "coated";
+  const wantsHairless = !wantsPowderpuff && (has("hairless") || has("chinese crested") || has("xolo") || has("peruvian inca orchid"));
   const wantsWirehair = has("wirehair") || has("wire hair") || has("wire-haired") || has("wire haired");
   const wantsFeathering = has("feathered") || has("feathering");
   const wantsDalmatian = has("dalmatian");
@@ -854,6 +865,7 @@ function buildAutoDogGenotype(phenotypeInput) {
   if (wantsFeathering) addGene("Feathering", "Fg/n");
   if (has("curly") || has("curl")) addGene("Curl", "Cu/n");
   if (wantsHairless) addGene("Hairless", "Hr/hr");
+  else if (wantsPowderpuff) addGene("Hairless", "hr/hr");
 
   return cleanAutoDogGenotype(genes.join(" "));
 }
